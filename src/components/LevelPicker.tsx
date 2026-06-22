@@ -90,7 +90,7 @@ export function LevelPicker({ value, onChange }: Props) {
       </div>
 
       <p className="text-xs text-gray-400 h-4">
-        {tier ? `${tier.name} · 第 ${value} 級` : '可不填,團主之後也能幫你設定'}
+        {tier ? `${tier.name} · 第 ${value} 級` : '不確定就先填 3,團主之後可再幫你調整 👍'}
       </p>
 
       <AnimatePresence>
