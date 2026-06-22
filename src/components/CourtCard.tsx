@@ -97,7 +97,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
   return (
     <div className="card relative overflow-hidden">
       <div className="flex items-center justify-between mb-2">
-        <span className="font-extrabold text-gray-700">場地 {court.court_num}</span>
+        <span className="font-extrabold text-gray-700">{court.name?.trim() ? court.name : `場地 ${court.court_num}`}</span>
         {court.playing.length === 0 ? (
           <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">空場</span>
         ) : full ? (

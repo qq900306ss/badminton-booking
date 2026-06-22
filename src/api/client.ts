@@ -21,6 +21,7 @@ export interface PlayerSlot {
 export interface CourtView {
   court_id: string
   court_num: number
+  name?: string
   status: 'empty' | 'playing'
   playing: PlayerSlot[]
   queue: PlayerSlot[]
