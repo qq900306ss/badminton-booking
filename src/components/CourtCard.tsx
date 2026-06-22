@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import type { CourtView, PlayerSlot } from '../api/client'
 import { tierOf } from '../lib/levels'
 
@@ -26,10 +26,8 @@ function Avatar({ slot }: { slot: PlayerSlot }) {
   const bg = tier ? tier.avatarBg : fallbackColor(slot.player_id)
   return (
     <motion.div
-      layout
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 400, damping: 22 }}
       className="flex flex-col items-center gap-1"
     >
@@ -125,16 +123,17 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
         <div className="absolute top-3 bottom-3 left-[22%] border-l border-white/40" />
         <div className="absolute top-3 bottom-3 right-[22%] border-r border-white/40" />
 
-        <div className="relative grid grid-cols-2 gap-y-3 place-items-center py-2">
-          <AnimatePresence mode="popLayout">
-            {slots.map((slot, i) =>
-              slot.player_id ? (
-                <Avatar key={slot.player_id} slot={slot} />
+        {/* fixed 2×2 grid — each cell keeps its place regardless of content */}
+        <div className="relative grid grid-cols-2 gap-y-3 py-2">
+          {slots.map((slot, i) => (
+            <div key={i} className="h-16 flex items-center justify-center">
+              {slot.player_id ? (
+                <Avatar slot={slot} />
               ) : (
-                <EmptySlot key={`empty-${i}`} canJoin={canPlace} onJoin={() => onJoinPlaying(i)} />
-              )
-            )}
-          </AnimatePresence>
+                <EmptySlot canJoin={canPlace} onJoin={() => onJoinPlaying(i)} />
+              )}
+            </div>
+          ))}
         </div>
       </div>
 
