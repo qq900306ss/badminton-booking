@@ -51,6 +51,7 @@ export interface SessionPlayer {
   player_id: string
   display_name: string
   level: number
+  claimed: boolean
   is_temp: boolean
 }
 
@@ -76,11 +77,11 @@ export const sessionApi = {
     api.get<{ data: SessionPlayer[] }>(`/api/sessions/${sessionId}/players`),
 
   joinPlaying: (sessionId: string, courtId: string) =>
-    api.post(`/api/sessions/${sessionId}/courts/${courtId}/join-playing`),
+    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/join-playing`),
 
   joinQueue: (sessionId: string, courtId: string) =>
-    api.post(`/api/sessions/${sessionId}/courts/${courtId}/join-queue`),
+    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/join-queue`),
 
   leaveQueue: (sessionId: string, courtId: string) =>
-    api.post(`/api/sessions/${sessionId}/courts/${courtId}/leave-queue`),
+    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/leave-queue`),
 }

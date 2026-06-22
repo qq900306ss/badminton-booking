@@ -1,11 +1,28 @@
-import { useParams } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useSessionView, useCourtActions } from '../hooks/useSession'
 import { CourtCard } from '../components/CourtCard'
 
 export function CourtPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
-  const myPlayerId = localStorage.getItem('player_id')
-  const myName = localStorage.getItem('display_name') ?? ''
+  const sid = sessionId ?? ''
+  const nav = useNavigate()
+
+  // identity is bound to this session; bounce to entry if not joined yet
+  const saved = localStorage.getItem(`badminton_${sid}`)
+  const identity = saved ? (JSON.parse(saved) as { player_id: string; display_name: string }) : null
+  const myPlayerId = identity?.player_id ?? null
+  const myName = identity?.display_name ?? ''
+
+  useEffect(() => {
+    if (!identity) {
+      nav(`/?s=${sid}`, { replace: true })
+      return
+    }
+    // keep the global id in sync for the X-Player-ID request header
+    localStorage.setItem('player_id', identity.player_id)
+    localStorage.setItem('display_name', identity.display_name)
+  }, [sid]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: session, isLoading } = useSessionView(sessionId ?? '')
   const { joinPlaying, joinQueue, leaveQueue } = useCourtActions(sessionId ?? '')
