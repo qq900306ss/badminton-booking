@@ -4,6 +4,7 @@ import { sessionApi } from '../api/client'
 import type { SessionPlayer } from '../api/client'
 import { useSessionPlayers } from '../hooks/useSession'
 import { LevelPicker } from '../components/LevelPicker'
+import { tierOf } from '../lib/levels'
 
 export function EntryPage() {
   const [params] = useSearchParams()
@@ -16,6 +17,7 @@ export function EntryPage() {
   const [loading, setLoading] = useState(false)
   const [name, setName] = useState('')
   const [level, setLevel] = useState(0)
+  const [showManual, setShowManual] = useState(false)
 
   const { data: players } = useSessionPlayers(step === 'pick' ? sessionId : '')
 
@@ -46,8 +48,8 @@ export function EntryPage() {
 
   const typed = name.trim()
   const roster = players ?? []
-  const matches = typed ? roster.filter((p) => p.display_name.includes(typed)) : roster
-  const exactMatch = roster.some((p) => p.display_name === typed)
+  // manual entry is the fallback: auto-open only when there's no list to pick from
+  const manualOpen = showManual || roster.length === 0
 
   if (!sessionId) {
     return (
@@ -92,54 +94,68 @@ export function EntryPage() {
 
         {step === 'pick' && (
           <div className="card space-y-4">
-            <p className="font-bold text-gray-700 text-center">你叫什麼名字?</p>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="輸入你的名字"
-              autoFocus
-              className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3
-                focus:outline-none focus:border-brand-pink text-center text-lg font-bold"
-            />
+            <p className="font-bold text-gray-700 text-center">你是哪位?</p>
 
-            <LevelPicker value={level} onChange={setLevel} />
-
-            {/* matching roster names → tap to join */}
-            {matches.length > 0 && (
+            {/* 1. pick your name from the list first */}
+            {roster.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs text-gray-400">
-                  {typed ? '是這個你嗎?點一下' : '名單上的人,點你的名字'}
-                </p>
-                <div className="max-h-44 overflow-y-auto space-y-2">
-                  {matches.map((p: SessionPlayer) => (
-                    <button
-                      key={p.player_id}
-                      onClick={() => join(p.display_name, false)}
-                      disabled={loading}
-                      className="w-full text-left px-4 py-3 rounded-2xl bg-gray-50
-                        hover:bg-brand-pink hover:text-white font-semibold transition-colors"
-                    >
-                      {p.display_name}
-                    </button>
-                  ))}
+                <p className="text-xs text-gray-400">點選你的名字</p>
+                <div className="max-h-56 overflow-y-auto space-y-2">
+                  {roster.map((p: SessionPlayer) => {
+                    const t = tierOf(p.level)
+                    return (
+                      <button
+                        key={p.player_id}
+                        onClick={() => join(p.display_name, false)}
+                        disabled={loading}
+                        className="w-full text-left px-4 py-3 rounded-2xl bg-gray-50
+                          hover:bg-brand-pink hover:text-white font-semibold transition-colors
+                          flex items-center justify-between gap-2"
+                      >
+                        <span>{p.display_name}</span>
+                        {p.level > 0 && t && (
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${t.chip}`}>
+                            {t.name} {p.level}
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}
 
-            {/* join as the typed name (only when it isn't already an exact roster name) */}
-            {typed && !exactMatch && (
+            {/* 2. fallback: only if your name really isn't in the list */}
+            {manualOpen ? (
+              <div className="space-y-3 border-t pt-3">
+                {roster.length > 0 && (
+                  <p className="text-xs text-gray-400">找不到自己?自己加入</p>
+                )}
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="輸入你的名字"
+                  autoFocus={roster.length === 0}
+                  className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3
+                    focus:outline-none focus:border-brand-pink text-center text-lg font-bold"
+                />
+                <LevelPicker value={level} onChange={setLevel} />
+                <button
+                  onClick={() => join(typed, true)}
+                  disabled={!typed || loading}
+                  className="btn-primary w-full"
+                >
+                  {loading ? '加入中...' : typed ? `用「${typed}」加入 →` : '輸入名字加入'}
+                </button>
+              </div>
+            ) : (
               <button
-                onClick={() => join(typed, true)}
-                disabled={loading}
-                className="btn-primary w-full"
+                onClick={() => setShowManual(true)}
+                className="btn-secondary w-full text-sm"
               >
-                {loading ? '加入中...' : `用「${typed}」加入 →`}
+                找不到自己?自己加入 →
               </button>
-            )}
-
-            {!typed && roster.length === 0 && (
-              <p className="text-sm text-gray-300 text-center">打上你的名字就能加入球場 🏸</p>
             )}
 
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
