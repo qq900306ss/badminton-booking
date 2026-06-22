@@ -75,18 +75,20 @@ interface Props {
   court: CourtView
   myPlayerId: string | null
   locked?: boolean
+  inAnotherCourt?: boolean
   onJoinPlaying: () => void
   onJoinQueue: () => void
   onLeaveQueue: () => void
 }
 
-export function CourtCard({ court, myPlayerId, locked = false, onJoinPlaying, onJoinQueue, onLeaveQueue }: Props) {
+export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue }: Props) {
   const imPlaying = court.playing.some((p) => p.player_id === myPlayerId)
   const imQueued = court.queue.some((p) => p.player_id === myPlayerId)
-  const hasSpace = court.playing.length < 4
-  const canJoinPlaying = !locked && !imPlaying && !imQueued && hasSpace
-  const canJoinQueue = !locked && !imPlaying && !imQueued && !hasSpace && court.queue.length < 4
+  const free = !locked && !inAnotherCourt && !imPlaying && !imQueued
+  const canJoinPlaying = free && court.playing.length < 4
+  const canJoinQueue = free && court.queue.length < 4
 
+  const full = court.playing.length === 4
   const mins = elapsedMins(court.started_at)
   // four fixed positions; top two = one side, bottom two = the other side
   const slots = [court.playing[0], court.playing[1], court.playing[2], court.playing[3]]
@@ -95,12 +97,16 @@ export function CourtCard({ court, myPlayerId, locked = false, onJoinPlaying, on
     <div className="card relative overflow-hidden">
       <div className="flex items-center justify-between mb-2">
         <span className="font-extrabold text-gray-700">場地 {court.court_num}</span>
-        {court.status === 'playing' ? (
+        {court.playing.length === 0 ? (
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">空場</span>
+        ) : full ? (
           <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-mint text-emerald-700">
             進行中{mins !== null ? ` · 已打 ${mins} 分` : ''}
           </span>
         ) : (
-          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">空場</span>
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-yellow text-amber-700">
+            湊人中 {court.playing.length}/4
+          </span>
         )}
       </div>
 
@@ -143,16 +149,25 @@ export function CourtCard({ court, myPlayerId, locked = false, onJoinPlaying, on
       {/* actions */}
       {imPlaying && <div className="text-center text-sm font-bold text-emerald-600 py-1">⚡ 你在場上打!</div>}
       {imQueued && (
-        <button onClick={onLeaveQueue} className="btn-secondary w-full text-sm">退出排隊</button>
+        <button onClick={onLeaveQueue} className="btn-secondary w-full text-sm">退出排隊(場地 {court.court_num})</button>
       )}
-      {canJoinPlaying && (
-        <p className="text-center text-xs text-brand-pink font-semibold">👆 點上面的空位加入</p>
+      {!imPlaying && !imQueued && inAnotherCourt && (
+        <p className="text-center text-xs text-gray-300">你已在其他場地</p>
       )}
-      {canJoinQueue && (
-        <button onClick={onJoinQueue} className="btn-secondary w-full text-sm">排隊等待</button>
-      )}
-      {locked && !imPlaying && !imQueued && (
+      {!imPlaying && !imQueued && !inAnotherCourt && locked && (
         <p className="text-center text-xs text-gray-300">尚未開放排隊</p>
+      )}
+      {(canJoinPlaying || canJoinQueue) && (
+        <div className="space-y-1.5">
+          {canJoinPlaying && (
+            <p className="text-center text-xs text-brand-pink font-semibold">👆 點上面空位直接上場</p>
+          )}
+          {canJoinQueue && (
+            <button onClick={onJoinQueue} className="btn-secondary w-full text-sm">
+              {court.playing.length < 4 ? '我先排隊就好' : '排隊等待'}
+            </button>
+          )}
+        </div>
       )}
     </div>
   )

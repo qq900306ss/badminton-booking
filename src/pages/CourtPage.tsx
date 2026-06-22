@@ -27,6 +27,14 @@ export function CourtPage() {
   const { data: session, isLoading } = useSessionView(sessionId ?? '')
   const { joinPlaying, joinQueue, leaveQueue } = useCourtActions(sessionId ?? '')
 
+  // a player may only be in one court at a time
+  const myCourtId =
+    session?.courts.find(
+      (c) =>
+        c.playing.some((p) => p.player_id === myPlayerId) ||
+        c.queue.some((p) => p.player_id === myPlayerId)
+    )?.court_id ?? null
+
   // queue-open gate: before this time players can look but not join/queue
   const queueOpenAt = session?.queue_open_at ? new Date(session.queue_open_at) : null
   const locked = queueOpenAt ? new Date() < queueOpenAt : false
@@ -69,6 +77,13 @@ export function CourtPage() {
       {/* header */}
       <div className="bg-white shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => nav('/')}
+            className="text-gray-400 hover:text-brand-pink text-lg font-bold px-1"
+            aria-label="回大廳"
+          >
+            ←
+          </button>
           <span className="text-2xl">🏸</span>
           <span className="font-extrabold text-gray-800">球場即時</span>
         </div>
@@ -102,6 +117,7 @@ export function CourtPage() {
             court={court}
             myPlayerId={myPlayerId}
             locked={locked}
+            inAnotherCourt={myCourtId !== null && myCourtId !== court.court_id}
             onJoinPlaying={() => joinPlaying.mutate(court.court_id)}
             onJoinQueue={() => joinQueue.mutate(court.court_id)}
             onLeaveQueue={() => leaveQueue.mutate(court.court_id)}
