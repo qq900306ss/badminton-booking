@@ -34,6 +34,10 @@ export function useCourtActions(sessionId: string) {
     mutationFn: (courtId: string) => sessionApi.leaveQueue(sessionId, courtId),
     onSuccess: invalidate,
   })
+  const leavePlaying = useMutation({
+    mutationFn: (courtId: string) => sessionApi.leavePlaying(sessionId, courtId),
+    onSuccess: invalidate,
+  })
 
-  return { joinPlaying, joinQueue, leaveQueue }
+  return { joinPlaying, joinQueue, leaveQueue, leavePlaying }
 }

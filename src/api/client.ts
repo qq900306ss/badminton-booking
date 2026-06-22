@@ -86,4 +86,7 @@ export const sessionApi = {
 
   leaveQueue: (sessionId: string, courtId: string) =>
     api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/leave-queue`),
+
+  leavePlaying: (sessionId: string, courtId: string) =>
+    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/leave-playing`),
 }

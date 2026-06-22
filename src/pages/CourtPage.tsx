@@ -25,7 +25,7 @@ export function CourtPage() {
   }, [sid]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: session, isLoading } = useSessionView(sessionId ?? '')
-  const { joinPlaying, joinQueue, leaveQueue } = useCourtActions(sessionId ?? '')
+  const { joinPlaying, joinQueue, leaveQueue, leavePlaying } = useCourtActions(sessionId ?? '')
 
   // a player may only be in one court at a time
   const myCourtId =
@@ -121,6 +121,7 @@ export function CourtPage() {
             onJoinPlaying={() => joinPlaying.mutate(court.court_id)}
             onJoinQueue={() => joinQueue.mutate(court.court_id)}
             onLeaveQueue={() => leaveQueue.mutate(court.court_id)}
+            onLeavePlaying={() => leavePlaying.mutate(court.court_id)}
           />
         ))}
       </div>

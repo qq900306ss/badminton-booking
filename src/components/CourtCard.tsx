@@ -79,9 +79,10 @@ interface Props {
   onJoinPlaying: () => void
   onJoinQueue: () => void
   onLeaveQueue: () => void
+  onLeavePlaying: () => void
 }
 
-export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue }: Props) {
+export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying }: Props) {
   const imPlaying = court.playing.some((p) => p.player_id === myPlayerId)
   const imQueued = court.queue.some((p) => p.player_id === myPlayerId)
   const free = !locked && !inAnotherCourt && !imPlaying && !imQueued
@@ -147,7 +148,15 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
       )}
 
       {/* actions */}
-      {imPlaying && <div className="text-center text-sm font-bold text-emerald-600 py-1">⚡ 你在場上打!</div>}
+      {imPlaying && full && (
+        <div className="text-center text-sm font-bold text-emerald-600 py-1">⚡ 你在場上打!</div>
+      )}
+      {imPlaying && !full && (
+        <div className="space-y-1.5">
+          <p className="text-center text-xs text-amber-600 font-semibold">等湊滿 4 人開打</p>
+          <button onClick={onLeavePlaying} className="btn-secondary w-full text-sm">離開場地(換場)</button>
+        </div>
+      )}
       {imQueued && (
         <button onClick={onLeaveQueue} className="btn-secondary w-full text-sm">退出排隊(場地 {court.court_num})</button>
       )}
