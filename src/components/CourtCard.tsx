@@ -76,29 +76,30 @@ interface Props {
   myPlayerId: string | null
   locked?: boolean
   inAnotherCourt?: boolean
-  onJoinPlaying: () => void
+  onJoinPlaying: (position: number) => void
   onJoinQueue: () => void
   onLeaveQueue: () => void
   onLeavePlaying: () => void
 }
 
 export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying }: Props) {
-  const imPlaying = court.playing.some((p) => p.player_id === myPlayerId)
+  // playing is a fixed 4-slot array; empty slots have player_id === ''
+  const slots = court.playing
+  const filled = slots.filter((p) => p.player_id).length
+  const imPlaying = slots.some((p) => p.player_id === myPlayerId)
   const imQueued = court.queue.some((p) => p.player_id === myPlayerId)
   const free = !locked && !inAnotherCourt && !imPlaying && !imQueued
-  const canJoinPlaying = free && court.playing.length < 4
+  const canJoinPlaying = free && filled < 4
   const canJoinQueue = free && court.queue.length < 4
 
-  const full = court.playing.length === 4
+  const full = filled === 4
   const mins = elapsedMins(court.started_at)
-  // four fixed positions; top two = one side, bottom two = the other side
-  const slots = [court.playing[0], court.playing[1], court.playing[2], court.playing[3]]
 
   return (
     <div className="card relative overflow-hidden">
       <div className="flex items-center justify-between mb-2">
         <span className="font-extrabold text-gray-700">{court.name?.trim() ? court.name : `場地 ${court.court_num}`}</span>
-        {court.playing.length === 0 ? (
+        {filled === 0 ? (
           <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">空場</span>
         ) : full ? (
           <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-mint text-emerald-700">
@@ -106,7 +107,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
           </span>
         ) : (
           <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-yellow text-amber-700">
-            湊人中 {court.playing.length}/4
+            湊人中 {filled}/4
           </span>
         )}
       </div>
@@ -124,10 +125,10 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
         <div className="relative grid grid-cols-2 gap-y-3 place-items-center py-2">
           <AnimatePresence mode="popLayout">
             {slots.map((slot, i) =>
-              slot ? (
+              slot.player_id ? (
                 <Avatar key={slot.player_id} slot={slot} />
               ) : (
-                <EmptySlot key={`empty-${i}`} canJoin={canJoinPlaying} onJoin={onJoinPlaying} />
+                <EmptySlot key={`empty-${i}`} canJoin={canJoinPlaying} onJoin={() => onJoinPlaying(i)} />
               )
             )}
           </AnimatePresence>

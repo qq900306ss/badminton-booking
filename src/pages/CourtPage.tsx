@@ -118,7 +118,7 @@ export function CourtPage() {
             myPlayerId={myPlayerId}
             locked={locked}
             inAnotherCourt={myCourtId !== null && myCourtId !== court.court_id}
-            onJoinPlaying={() => joinPlaying.mutate(court.court_id)}
+            onJoinPlaying={(position) => joinPlaying.mutate({ courtId: court.court_id, position })}
             onJoinQueue={() => joinQueue.mutate(court.court_id)}
             onLeaveQueue={() => leaveQueue.mutate(court.court_id)}
             onLeavePlaying={() => leavePlaying.mutate(court.court_id)}

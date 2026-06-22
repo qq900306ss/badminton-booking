@@ -23,7 +23,8 @@ export function useCourtActions(sessionId: string) {
   const invalidate = () => qc.invalidateQueries({ queryKey: ['session', sessionId] })
 
   const joinPlaying = useMutation({
-    mutationFn: (courtId: string) => sessionApi.joinPlaying(sessionId, courtId),
+    mutationFn: (v: { courtId: string; position: number }) =>
+      sessionApi.joinPlaying(sessionId, v.courtId, v.position),
     onSuccess: invalidate,
   })
   const joinQueue = useMutation({

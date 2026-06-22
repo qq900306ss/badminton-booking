@@ -79,8 +79,10 @@ export const sessionApi = {
   getPlayers: (sessionId: string) =>
     api.get<{ data: SessionPlayer[] }>(`/api/sessions/${sessionId}/players`),
 
-  joinPlaying: (sessionId: string, courtId: string) =>
-    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/join-playing`),
+  joinPlaying: (sessionId: string, courtId: string, position: number) =>
+    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/join-playing`, {
+      position,
+    }),
 
   joinQueue: (sessionId: string, courtId: string) =>
     api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/join-queue`),
