@@ -70,23 +70,24 @@ export function LevelPicker({ value, onChange }: Props) {
         </button>
       </div>
 
-      <select
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-semibold text-gray-700
-          bg-white focus:outline-none focus:border-brand-pink"
-      >
-        <option value={0}>未選擇(建議先填 3)</option>
-        {TIERS.map((t) => (
-          <optgroup key={t.name} label={`${t.name}(${t.note})`}>
-            {Array.from({ length: t.max - t.min + 1 }, (_, i) => t.min + i).map((lv) => (
-              <option key={lv} value={lv}>
-                第 {lv} 級
-              </option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
+      <div className="flex flex-wrap gap-1.5">
+        {TIERS.flatMap((t) =>
+          Array.from({ length: t.max - t.min + 1 }, (_, i) => t.min + i).map((lv) => {
+            const selected = value === lv
+            return (
+              <button
+                type="button"
+                key={lv}
+                onClick={() => onChange(selected ? 0 : lv)}
+                className={`w-9 h-9 rounded-xl font-bold text-sm transition-all ${t.chip}
+                  ${selected ? 'ring-2 ring-offset-1 ring-gray-700 scale-110' : 'opacity-80'}`}
+              >
+                {lv}
+              </button>
+            )
+          })
+        )}
+      </div>
 
       <p className="text-xs text-gray-400 h-4">
         {tier ? `${tier.name} · 第 ${value} 級` : '不確定就先填 3,團主之後可再幫你調整 👍'}
