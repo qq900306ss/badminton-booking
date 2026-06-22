@@ -26,9 +26,24 @@ export interface CourtView {
 
 export interface SessionView {
   session_id: string
+  title: string
   num_courts: number
   status: string
+  start_at?: string
+  end_at?: string
+  queue_open_at?: string
   courts: CourtView[]
+}
+
+export interface SessionSummary {
+  session_id: string
+  title: string
+  num_courts: number
+  status: string
+  start_at?: string
+  end_at?: string
+  queue_open_at?: string
+  opened_at: string
 }
 
 export interface SessionPlayer {
@@ -38,6 +53,8 @@ export interface SessionPlayer {
 }
 
 export const sessionApi = {
+  listOpen: () => api.get<{ data: SessionSummary[] }>('/api/sessions/open'),
+
   join: (sessionId: string, password: string, displayName: string, isTemp = false) =>
     api.post<{ data: { player_id: string; display_name: string } }>(
       `/api/sessions/${sessionId}/join`,

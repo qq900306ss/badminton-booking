@@ -10,6 +10,13 @@ export function CourtPage() {
   const { data: session, isLoading } = useSessionView(sessionId ?? '')
   const { joinPlaying, joinQueue, leaveQueue } = useCourtActions(sessionId ?? '')
 
+  // queue-open gate: before this time players can look but not join/queue
+  const queueOpenAt = session?.queue_open_at ? new Date(session.queue_open_at) : null
+  const locked = queueOpenAt ? new Date() < queueOpenAt : false
+  const openTimeStr = queueOpenAt
+    ? queueOpenAt.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })
+    : ''
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-brand-bg flex items-center justify-center">
@@ -57,6 +64,19 @@ export function CourtPage() {
         </div>
       </div>
 
+      {/* session title */}
+      {session.title && (
+        <p className="text-center font-extrabold text-gray-700 pt-3">{session.title}</p>
+      )}
+
+      {/* queue-open gate banner */}
+      {locked && (
+        <div className="mx-4 mt-3 bg-brand-yellow/60 rounded-2xl px-4 py-3 text-center">
+          <p className="font-bold text-amber-700">⏰ 排隊 {openTimeStr} 開放</p>
+          <p className="text-xs text-amber-600 mt-0.5">先看看球場狀況,時間到就能自己排上場囉</p>
+        </div>
+      )}
+
       {/* courts grid */}
       <div className="p-4 grid gap-4 sm:grid-cols-2">
         {session.courts.map((court) => (
@@ -64,6 +84,7 @@ export function CourtPage() {
             key={court.court_id}
             court={court}
             myPlayerId={myPlayerId}
+            locked={locked}
             onJoinPlaying={() => joinPlaying.mutate(court.court_id)}
             onJoinQueue={() => joinQueue.mutate(court.court_id)}
             onLeaveQueue={() => leaveQueue.mutate(court.court_id)}

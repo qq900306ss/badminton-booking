@@ -46,16 +46,17 @@ function EmptySlot() {
 interface Props {
   court: CourtView
   myPlayerId: string | null
+  locked?: boolean
   onJoinPlaying: () => void
   onJoinQueue: () => void
   onLeaveQueue: () => void
 }
 
-export function CourtCard({ court, myPlayerId, onJoinPlaying, onJoinQueue, onLeaveQueue }: Props) {
+export function CourtCard({ court, myPlayerId, locked = false, onJoinPlaying, onJoinQueue, onLeaveQueue }: Props) {
   const imPlaying = court.playing.some((p) => p.player_id === myPlayerId)
   const imQueued  = court.queue.some((p) => p.player_id === myPlayerId)
-  const canJoinPlaying = !imPlaying && !imQueued && court.playing.length < 4
-  const canJoinQueue   = !imPlaying && !imQueued && court.playing.length >= 4 && court.queue.length < 4
+  const canJoinPlaying = !locked && !imPlaying && !imQueued && court.playing.length < 4
+  const canJoinQueue   = !locked && !imPlaying && !imQueued && court.playing.length >= 4 && court.queue.length < 4
 
   // court diagram: top row = playing[0,1], bottom row = playing[2,3]
   const slots: (PlayerSlot | null)[] = [
