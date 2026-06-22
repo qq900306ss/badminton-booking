@@ -57,6 +57,12 @@ export interface SessionPlayer {
 export const sessionApi = {
   listOpen: () => api.get<{ data: SessionSummary[] }>('/api/sessions/open'),
 
+  verifyPassword: (sessionId: string, password: string) =>
+    api.post<{ data: { ok: boolean; title: string } }>(
+      `/api/sessions/${sessionId}/verify-password`,
+      { password }
+    ),
+
   join: (sessionId: string, password: string, displayName: string, level = 0, isTemp = false) =>
     api.post<{ data: { player_id: string; display_name: string } }>(
       `/api/sessions/${sessionId}/join`,

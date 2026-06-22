@@ -21,10 +21,20 @@ export function EntryPage() {
 
   const { data: players } = useSessionPlayers(step === 'pick' ? sessionId : '')
 
-  function handlePasswordSubmit(e: React.FormEvent) {
+  async function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!password.trim() || !sessionId) return
-    setStep('pick')
+    setLoading(true)
+    setError('')
+    try {
+      await sessionApi.verifyPassword(sessionId, password)
+      setStep('pick') // password confirmed up front
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status
+      setError(status === 401 ? '密碼錯誤,請再試一次' : status === 410 ? '這場已結束' : '無法驗證,請稍後再試')
+    } finally {
+      setLoading(false)
+    }
   }
 
   // join either as an existing roster player (isTemp=false) or a brand-new name (isTemp=true)
@@ -86,8 +96,8 @@ export function EntryPage() {
               />
             </label>
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
-            <button type="submit" disabled={!password.trim()} className="btn-primary w-full">
-              進入 →
+            <button type="submit" disabled={!password.trim() || loading} className="btn-primary w-full">
+              {loading ? '驗證中...' : '進入 →'}
             </button>
           </form>
         )}
