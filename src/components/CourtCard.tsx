@@ -53,21 +53,24 @@ function Avatar({ slot }: { slot: PlayerSlot }) {
 }
 
 function EmptySlot({ canJoin, onJoin }: { canJoin: boolean; onJoin: () => void }) {
-  if (canJoin) {
-    return (
-      <button
-        onClick={onJoin}
-        className="w-11 h-11 rounded-full border-2 border-dashed border-brand-pink/70 text-brand-pink
-          flex items-center justify-center text-xl font-bold bg-white/40
-          hover:bg-brand-pink hover:text-white active:scale-90 transition-all"
-        aria-label="加入這個位置"
-      >
-        +
-      </button>
-    )
-  }
+  // same flex-col + name-line height as Avatar, so swapping doesn't shift layout
   return (
-    <div className="w-11 h-11 rounded-full border-2 border-dashed border-white/70 bg-white/20" />
+    <div className="flex flex-col items-center gap-1">
+      {canJoin ? (
+        <button
+          onClick={onJoin}
+          className="w-11 h-11 rounded-full border-2 border-dashed border-brand-pink/70 text-brand-pink
+            flex items-center justify-center text-xl font-bold bg-white/40
+            hover:bg-brand-pink hover:text-white active:scale-90 transition-all"
+          aria-label="加入這個位置"
+        >
+          +
+        </button>
+      ) : (
+        <div className="w-11 h-11 rounded-full border-2 border-dashed border-white/70 bg-white/20" />
+      )}
+      <span className="text-xs">&nbsp;</span>
+    </div>
   )
 }
 
@@ -88,11 +91,11 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
   const filled = slots.filter((p) => p.player_id).length
   const imPlaying = slots.some((p) => p.player_id === myPlayerId)
   const imQueued = court.queue.some((p) => p.player_id === myPlayerId)
-  const free = !locked && !inAnotherCourt && !imPlaying && !imQueued
-  const canJoinPlaying = free && filled < 4
-  const canJoinQueue = free && court.queue.length < 4
-
   const full = filled === 4
+  // empty slot tappable: to join (not in any court) or to move (already playing here)
+  const canPlace = !locked && !inAnotherCourt && !imQueued && filled < 4
+  // queue only matters when the court is full (otherwise empty slots auto-fill)
+  const canJoinQueue = !locked && !inAnotherCourt && !imPlaying && !imQueued && full && court.queue.length < 4
   const mins = elapsedMins(court.started_at)
 
   return (
@@ -128,7 +131,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
               slot.player_id ? (
                 <Avatar key={slot.player_id} slot={slot} />
               ) : (
-                <EmptySlot key={`empty-${i}`} canJoin={canJoinPlaying} onJoin={() => onJoinPlaying(i)} />
+                <EmptySlot key={`empty-${i}`} canJoin={canPlace} onJoin={() => onJoinPlaying(i)} />
               )
             )}
           </AnimatePresence>
@@ -154,7 +157,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
       )}
       {imPlaying && !full && (
         <div className="space-y-1.5">
-          <p className="text-center text-xs text-amber-600 font-semibold">等湊滿 4 人開打</p>
+          <p className="text-center text-xs text-amber-600 font-semibold">👆 點其他空位可換位置 · 等湊滿 4 人開打</p>
           <button onClick={onLeavePlaying} className="btn-secondary w-full text-sm">離開場地(換場)</button>
         </div>
       )}
@@ -165,19 +168,13 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
         <p className="text-center text-xs text-gray-300">你已在其他場地</p>
       )}
       {!imPlaying && !imQueued && !inAnotherCourt && locked && (
-        <p className="text-center text-xs text-gray-300">尚未開放排隊</p>
+        <p className="text-center text-xs text-gray-300">尚未開放</p>
       )}
-      {(canJoinPlaying || canJoinQueue) && (
-        <div className="space-y-1.5">
-          {canJoinPlaying && (
-            <p className="text-center text-xs text-brand-pink font-semibold">👆 點上面空位直接上場</p>
-          )}
-          {canJoinQueue && (
-            <button onClick={onJoinQueue} className="btn-secondary w-full text-sm">
-              {court.playing.length < 4 ? '我先排隊就好' : '排隊等待'}
-            </button>
-          )}
-        </div>
+      {canPlace && !imPlaying && (
+        <p className="text-center text-xs text-brand-pink font-semibold">👆 點空位選位置上場</p>
+      )}
+      {canJoinQueue && (
+        <button onClick={onJoinQueue} className="btn-secondary w-full text-sm">排隊等待(滿場)</button>
       )}
     </div>
   )
