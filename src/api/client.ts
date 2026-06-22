@@ -14,6 +14,7 @@ api.interceptors.request.use((config) => {
 export interface PlayerSlot {
   player_id: string
   display_name: string
+  level: number
 }
 
 export interface CourtView {
@@ -49,16 +50,17 @@ export interface SessionSummary {
 export interface SessionPlayer {
   player_id: string
   display_name: string
+  level: number
   is_temp: boolean
 }
 
 export const sessionApi = {
   listOpen: () => api.get<{ data: SessionSummary[] }>('/api/sessions/open'),
 
-  join: (sessionId: string, password: string, displayName: string, isTemp = false) =>
+  join: (sessionId: string, password: string, displayName: string, level = 0, isTemp = false) =>
     api.post<{ data: { player_id: string; display_name: string } }>(
       `/api/sessions/${sessionId}/join`,
-      { password, display_name: displayName, is_temp: isTemp }
+      { password, display_name: displayName, level, is_temp: isTemp }
     ),
 
   getView: (sessionId: string) =>

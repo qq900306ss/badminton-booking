@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { sessionApi } from '../api/client'
 import type { SessionPlayer } from '../api/client'
 import { useSessionPlayers } from '../hooks/useSession'
+import { LevelPicker } from '../components/LevelPicker'
 
 export function EntryPage() {
   const [params] = useSearchParams()
@@ -14,6 +15,7 @@ export function EntryPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [name, setName] = useState('')
+  const [level, setLevel] = useState(0)
 
   const { data: players } = useSessionPlayers(step === 'pick' ? sessionId : '')
 
@@ -29,7 +31,7 @@ export function EntryPage() {
     setLoading(true)
     setError('')
     try {
-      const res = await sessionApi.join(sessionId, password, displayName.trim(), isTemp)
+      const res = await sessionApi.join(sessionId, password, displayName.trim(), level, isTemp)
       const { player_id } = res.data.data
       localStorage.setItem('player_id', player_id)
       localStorage.setItem('display_name', displayName.trim())
@@ -100,6 +102,8 @@ export function EntryPage() {
               className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3
                 focus:outline-none focus:border-brand-pink text-center text-lg font-bold"
             />
+
+            <LevelPicker value={level} onChange={setLevel} />
 
             {/* matching roster names → tap to join */}
             {matches.length > 0 && (

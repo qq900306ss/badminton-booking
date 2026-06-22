@@ -1,13 +1,14 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import type { CourtView, PlayerSlot } from '../api/client'
+import { tierOf } from '../lib/levels'
 
-// deterministic pastel colour per player_id
+// deterministic pastel colour per player_id (fallback when no level set)
 const PALETTE = [
   'bg-brand-pink', 'bg-brand-mint', 'bg-brand-yellow',
   'bg-brand-peach', 'bg-brand-lavender',
   'bg-purple-200', 'bg-blue-200', 'bg-teal-200',
 ]
-function avatarColor(id: string) {
+function fallbackColor(id: string) {
   let h = 0
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0
   return PALETTE[h % PALETTE.length]
@@ -15,6 +16,8 @@ function avatarColor(id: string) {
 
 function Avatar({ slot }: { slot: PlayerSlot }) {
   const initial = slot.display_name?.[0]?.toUpperCase() ?? '?'
+  const tier = tierOf(slot.level)
+  const bg = tier ? tier.avatarBg : fallbackColor(slot.player_id)
   return (
     <motion.div
       layout
@@ -24,9 +27,17 @@ function Avatar({ slot }: { slot: PlayerSlot }) {
       transition={{ type: 'spring', stiffness: 400, damping: 22 }}
       className={`flex flex-col items-center gap-1`}
     >
-      <div className={`w-12 h-12 rounded-full ${avatarColor(slot.player_id)}
-        flex items-center justify-center text-lg font-extrabold text-white shadow`}>
-        {initial}
+      <div className="relative">
+        <div className={`w-12 h-12 rounded-full ${bg}
+          flex items-center justify-center text-lg font-extrabold text-white shadow`}>
+          {initial}
+        </div>
+        {slot.level > 0 && (
+          <span className="absolute -top-1 -right-1 bg-white text-gray-700 text-[10px] font-bold
+            rounded-full w-5 h-5 flex items-center justify-center shadow border border-gray-100">
+            {slot.level}
+          </span>
+        )}
       </div>
       <span className="text-xs font-semibold text-gray-600 max-w-[3.5rem] truncate">
         {slot.display_name}
