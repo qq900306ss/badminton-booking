@@ -2,7 +2,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { CourtView, PlayerSlot } from '../api/client'
 import { tierOf } from '../lib/levels'
 
-// deterministic pastel colour per player_id (fallback when no level set)
 const PALETTE = [
   'bg-brand-pink', 'bg-brand-mint', 'bg-brand-yellow',
   'bg-brand-peach', 'bg-brand-lavender',
@@ -12,6 +11,13 @@ function fallbackColor(id: string) {
   let h = 0
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0
   return PALETTE[h % PALETTE.length]
+}
+
+function elapsedMins(startedAt?: string): number | null {
+  if (!startedAt) return null
+  const ms = Date.now() - new Date(startedAt).getTime()
+  if (ms < 0) return null
+  return Math.floor(ms / 60000)
 }
 
 function Avatar({ slot }: { slot: PlayerSlot }) {
@@ -25,11 +31,11 @@ function Avatar({ slot }: { slot: PlayerSlot }) {
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-      className={`flex flex-col items-center gap-1`}
+      className="flex flex-col items-center gap-1"
     >
       <div className="relative">
-        <div className={`w-12 h-12 rounded-full ${bg}
-          flex items-center justify-center text-lg font-extrabold text-white shadow`}>
+        <div className={`w-11 h-11 rounded-full ${bg} flex items-center justify-center
+          text-base font-extrabold text-white shadow-md ring-2 ring-white`}>
           {initial}
         </div>
         {slot.level > 0 && (
@@ -39,18 +45,29 @@ function Avatar({ slot }: { slot: PlayerSlot }) {
           </span>
         )}
       </div>
-      <span className="text-xs font-semibold text-gray-600 max-w-[3.5rem] truncate">
+      <span className="text-xs font-semibold text-gray-700 max-w-[4rem] truncate">
         {slot.display_name}
       </span>
     </motion.div>
   )
 }
 
-function EmptySlot() {
+function EmptySlot({ canJoin, onJoin }: { canJoin: boolean; onJoin: () => void }) {
+  if (canJoin) {
+    return (
+      <button
+        onClick={onJoin}
+        className="w-11 h-11 rounded-full border-2 border-dashed border-brand-pink/70 text-brand-pink
+          flex items-center justify-center text-xl font-bold bg-white/40
+          hover:bg-brand-pink hover:text-white active:scale-90 transition-all"
+        aria-label="加入這個位置"
+      >
+        +
+      </button>
+    )
+  }
   return (
-    <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-200 flex items-center justify-center">
-      <span className="text-gray-300 text-xl">+</span>
-    </div>
+    <div className="w-11 h-11 rounded-full border-2 border-dashed border-white/70 bg-white/20" />
   )
 }
 
@@ -65,86 +82,77 @@ interface Props {
 
 export function CourtCard({ court, myPlayerId, locked = false, onJoinPlaying, onJoinQueue, onLeaveQueue }: Props) {
   const imPlaying = court.playing.some((p) => p.player_id === myPlayerId)
-  const imQueued  = court.queue.some((p) => p.player_id === myPlayerId)
-  const canJoinPlaying = !locked && !imPlaying && !imQueued && court.playing.length < 4
-  const canJoinQueue   = !locked && !imPlaying && !imQueued && court.playing.length >= 4 && court.queue.length < 4
+  const imQueued = court.queue.some((p) => p.player_id === myPlayerId)
+  const hasSpace = court.playing.length < 4
+  const canJoinPlaying = !locked && !imPlaying && !imQueued && hasSpace
+  const canJoinQueue = !locked && !imPlaying && !imQueued && !hasSpace && court.queue.length < 4
 
-  // court diagram: top row = playing[0,1], bottom row = playing[2,3]
-  const slots: (PlayerSlot | null)[] = [
-    court.playing[0] ?? null,
-    court.playing[1] ?? null,
-    court.playing[2] ?? null,
-    court.playing[3] ?? null,
-  ]
+  const mins = elapsedMins(court.started_at)
+  // four fixed positions; top two = one side, bottom two = the other side
+  const slots = [court.playing[0], court.playing[1], court.playing[2], court.playing[3]]
 
   return (
     <div className="card relative overflow-hidden">
-      {/* status badge */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <span className="font-extrabold text-gray-700">場地 {court.court_num}</span>
-        <span className={`text-xs font-bold px-2 py-0.5 rounded-full
-          ${court.status === 'playing' ? 'bg-brand-mint text-emerald-700' : 'bg-gray-100 text-gray-400'}`}>
-          {court.status === 'playing' ? '進行中' : '空場'}
-        </span>
+        {court.status === 'playing' ? (
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-mint text-emerald-700">
+            進行中{mins !== null ? ` · 已打 ${mins} 分` : ''}
+          </span>
+        ) : (
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">空場</span>
+        )}
       </div>
 
-      {/* court diagram */}
-      <div className="relative bg-emerald-50 rounded-2xl p-4 mb-3">
-        {/* net line */}
-        <div className="absolute left-4 right-4 top-1/2 h-0.5 bg-emerald-200 -translate-y-1/2" />
-        {/* court lines */}
-        <div className="absolute inset-4 border-2 border-emerald-200 rounded-xl" />
+      {/* badminton court */}
+      <div className="relative rounded-2xl bg-gradient-to-b from-emerald-200/70 to-emerald-100/70 p-3 mb-3">
+        {/* boundary */}
+        <div className="absolute inset-3 rounded-lg border-2 border-white/80" />
+        {/* net (center) */}
+        <div className="absolute left-3 right-3 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-white" />
+        {/* singles side lines */}
+        <div className="absolute top-3 bottom-3 left-[22%] border-l border-white/40" />
+        <div className="absolute top-3 bottom-3 right-[22%] border-r border-white/40" />
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="relative grid grid-cols-2 gap-y-3 place-items-center py-2">
           <AnimatePresence mode="popLayout">
-            {slots.slice(0, 2).map((slot, i) =>
-              slot ? <Avatar key={slot.player_id} slot={slot} /> : <EmptySlot key={`empty-top-${i}`} />
-            )}
-          </AnimatePresence>
-          <div className="col-span-2 h-2" /> {/* net spacer */}
-          <AnimatePresence mode="popLayout">
-            {slots.slice(2).map((slot, i) =>
-              slot ? <Avatar key={slot.player_id} slot={slot} /> : <EmptySlot key={`empty-bot-${i}`} />
+            {slots.map((slot, i) =>
+              slot ? (
+                <Avatar key={slot.player_id} slot={slot} />
+              ) : (
+                <EmptySlot key={`empty-${i}`} canJoin={canJoinPlaying} onJoin={onJoinPlaying} />
+              )
             )}
           </AnimatePresence>
         </div>
       </div>
 
-      {/* queue row */}
+      {/* queue */}
       {court.queue.length > 0 && (
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className="text-xs text-gray-400 font-semibold">等待中</span>
-          <AnimatePresence>
-            {court.queue.map((p) => (
-              <motion.div key={p.player_id}
-                animate={{ y: [0, -3, 0] }}
-                transition={{ repeat: Infinity, duration: 2, delay: Math.random() }}
-              >
-                <Avatar slot={p} />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          <span className="text-xs text-gray-400 font-semibold">排隊</span>
+          {court.queue.map((p) => (
+            <motion.div key={p.player_id} animate={{ y: [0, -3, 0] }}
+              transition={{ repeat: Infinity, duration: 2 }}>
+              <Avatar slot={p} />
+            </motion.div>
+          ))}
         </div>
       )}
 
-      {/* action buttons */}
-      {imPlaying && (
-        <div className="text-center text-sm font-bold text-emerald-600 py-1">⚡ 你在場上打!</div>
-      )}
+      {/* actions */}
+      {imPlaying && <div className="text-center text-sm font-bold text-emerald-600 py-1">⚡ 你在場上打!</div>}
       {imQueued && (
-        <button onClick={onLeaveQueue} className="btn-secondary w-full text-sm">
-          退出排隊
-        </button>
+        <button onClick={onLeaveQueue} className="btn-secondary w-full text-sm">退出排隊</button>
       )}
       {canJoinPlaying && (
-        <button onClick={onJoinPlaying} className="btn-primary w-full text-sm">
-          🏸 加入這場
-        </button>
+        <p className="text-center text-xs text-brand-pink font-semibold">👆 點上面的空位加入</p>
       )}
       {canJoinQueue && (
-        <button onClick={onJoinQueue} className="btn-secondary w-full text-sm">
-          排隊等待
-        </button>
+        <button onClick={onJoinQueue} className="btn-secondary w-full text-sm">排隊等待</button>
+      )}
+      {locked && !imPlaying && !imQueued && (
+        <p className="text-center text-xs text-gray-300">尚未開放排隊</p>
       )}
     </div>
   )

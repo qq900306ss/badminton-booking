@@ -15,6 +15,7 @@ export interface PlayerSlot {
   player_id: string
   display_name: string
   level: number
+  games: number
 }
 
 export interface CourtView {
@@ -23,6 +24,7 @@ export interface CourtView {
   status: 'empty' | 'playing'
   playing: PlayerSlot[]
   queue: PlayerSlot[]
+  started_at?: string
 }
 
 export interface SessionView {
