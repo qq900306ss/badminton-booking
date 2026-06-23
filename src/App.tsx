@@ -4,6 +4,8 @@ import { EntryPage } from './pages/EntryPage'
 import { CourtPage } from './pages/CourtPage'
 import { LobbyPage } from './pages/LobbyPage'
 import { ToastProvider } from './components/Toast'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { ConnectionBanner } from './components/ConnectionBanner'
 
 const qc = new QueryClient()
 
@@ -16,7 +18,9 @@ function Home() {
 export default function App() {
   return (
     <QueryClientProvider client={qc}>
+      <ErrorBoundary>
       <ToastProvider>
+      <ConnectionBanner />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -25,6 +29,7 @@ export default function App() {
         </Routes>
       </BrowserRouter>
       </ToastProvider>
+      </ErrorBoundary>
     </QueryClientProvider>
   )
 }

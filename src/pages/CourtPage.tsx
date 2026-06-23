@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSessionView, useCourtActions } from '../hooks/useSession'
 import { CourtCard } from '../components/CourtCard'
+import { CourtSkeleton } from '../components/Skeleton'
 import { InstallButton } from '../components/InstallButton'
 import { useToast } from '../components/Toast'
 import { playChime, vibrate, notifyTurn, subscribePush } from '../lib/alert'
@@ -73,8 +74,8 @@ export function CourtPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-brand-bg flex items-center justify-center">
-        <div className="text-4xl animate-bounce">🏸</div>
+      <div className="min-h-screen bg-brand-bg p-4">
+        <CourtSkeleton />
       </div>
     )
   }

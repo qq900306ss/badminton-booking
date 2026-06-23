@@ -20,7 +20,7 @@ function elapsedMins(startedAt?: string): number | null {
   return Math.floor(ms / 60000)
 }
 
-function Avatar({ slot }: { slot: PlayerSlot }) {
+function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
   const initial = slot.display_name?.[0]?.toUpperCase() ?? '?'
   const tier = tierOf(slot.level)
   const bg = tier ? tier.avatarBg : fallbackColor(slot.player_id)
@@ -33,7 +33,8 @@ function Avatar({ slot }: { slot: PlayerSlot }) {
     >
       <div className="relative">
         <div className={`w-11 h-11 rounded-full ${bg} flex items-center justify-center
-          text-base font-extrabold text-white shadow-md ring-2 ring-white`}>
+          text-base font-extrabold text-white shadow-md
+          ${me ? 'ring-4 ring-amber-400' : 'ring-2 ring-white'}`}>
           {initial}
         </div>
         {slot.level > 0 && (
@@ -42,8 +43,14 @@ function Avatar({ slot }: { slot: PlayerSlot }) {
             {slot.level}
           </span>
         )}
+        {me && (
+          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-amber-400 text-white text-[9px]
+            font-bold rounded-full px-1.5 leading-4 shadow">
+            我
+          </span>
+        )}
       </div>
-      <span className="text-xs font-semibold text-gray-700 max-w-[4rem] truncate">
+      <span className={`text-xs font-semibold max-w-[4rem] truncate ${me ? 'text-amber-600' : 'text-gray-700'}`}>
         {slot.display_name}
       </span>
     </motion.div>
@@ -128,7 +135,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
           {slots.map((slot, i) => (
             <div key={i} className="h-16 flex items-center justify-center">
               {slot.player_id ? (
-                <Avatar slot={slot} />
+                <Avatar slot={slot} me={slot.player_id === myPlayerId} />
               ) : (
                 <EmptySlot canJoin={canPlace} onJoin={() => onJoinPlaying(i)} />
               )}
@@ -144,7 +151,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
           {court.queue.map((p) => (
             <motion.div key={p.player_id} animate={{ y: [0, -3, 0] }}
               transition={{ repeat: Infinity, duration: 2 }}>
-              <Avatar slot={p} />
+              <Avatar slot={p} me={p.player_id === myPlayerId} />
             </motion.div>
           ))}
         </div>
