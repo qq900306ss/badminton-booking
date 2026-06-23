@@ -92,8 +92,8 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
   const full = filled === 4
   // empty slot tappable: to join (not in any court) or to move (already playing here)
   const canPlace = !locked && !inAnotherCourt && !imQueued && filled < 4
-  // queue only matters when the court is full (otherwise empty slots auto-fill)
-  const canJoinQueue = !locked && !inAnotherCourt && !imPlaying && !imQueued && full && court.queue.length < 4
+  // a player may choose to queue at any time, even when slots are open
+  const canJoinQueue = !locked && !inAnotherCourt && !imPlaying && !imQueued && court.queue.length < 4
   const mins = elapsedMins(court.started_at)
 
   return (
@@ -170,10 +170,12 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
         <p className="text-center text-xs text-gray-300">尚未開放</p>
       )}
       {canPlace && !imPlaying && (
-        <p className="text-center text-xs text-brand-pink font-semibold">👆 點空位選位置上場</p>
+        <p className="text-center text-xs text-brand-pink font-semibold">👆 點空位直接上場</p>
       )}
       {canJoinQueue && (
-        <button onClick={onJoinQueue} className="btn-secondary w-full text-sm">排隊等待(滿場)</button>
+        <button onClick={onJoinQueue} className="btn-secondary w-full text-sm">
+          {full ? '排隊等待' : '我先排隊就好(不上場)'}
+        </button>
       )}
     </div>
   )
