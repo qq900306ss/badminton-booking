@@ -1,7 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSessionView, useCourtActions } from '../hooks/useSession'
 import { CourtCard } from '../components/CourtCard'
+import { useToast } from '../components/Toast'
+import { playChime, vibrate, notifyTurn } from '../lib/alert'
 
 export function CourtPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -28,12 +30,32 @@ export function CourtPage() {
   const { joinPlaying, joinQueue, leaveQueue, leavePlaying } = useCourtActions(sessionId ?? '')
 
   // a player may only be in one court at a time
-  const myCourtId =
+  const myCourt =
     session?.courts.find(
       (c) =>
         c.playing.some((p) => p.player_id === myPlayerId) ||
         c.queue.some((p) => p.player_id === myPlayerId)
-    )?.court_id ?? null
+    ) ?? null
+  const myCourtId = myCourt?.court_id ?? null
+  const myState: 'playing' | 'queued' | 'none' = !myCourt
+    ? 'none'
+    : myCourt.playing.some((p) => p.player_id === myPlayerId)
+      ? 'playing'
+      : 'queued'
+
+  // alert when promoted from queue → playing (輪到你了)
+  const toast = useToast()
+  const prevState = useRef<typeof myState | null>(null)
+  useEffect(() => {
+    if (prevState.current === 'queued' && myState === 'playing') {
+      const where = myCourt?.name?.trim() ? myCourt.name : `場地 ${myCourt?.court_num}`
+      toast('🏸 輪到你上場了!', 'success')
+      playChime()
+      vibrate()
+      if (document.hidden) notifyTurn(`${where} · 快回來上場`)
+    }
+    prevState.current = myState
+  }, [myState, myCourt, toast])
 
   // queue-open gate: before this time players can look but not join/queue
   const queueOpenAt = session?.queue_open_at ? new Date(session.queue_open_at) : null

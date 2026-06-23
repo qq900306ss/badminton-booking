@@ -5,6 +5,7 @@ import type { SessionPlayer } from '../api/client'
 import { useSessionPlayers } from '../hooks/useSession'
 import { LevelPicker } from '../components/LevelPicker'
 import { tierOf } from '../lib/levels'
+import { requestNotify } from '../lib/alert'
 
 // per-session identity, so back-button can't re-pick / orphan a claimed name
 const idKey = (sid: string) => `badminton_${sid}`
@@ -55,6 +56,7 @@ export function EntryPage() {
 
   async function confirmJoin() {
     if (!chosen) return
+    requestNotify() // 趁這個使用者點擊,順便要通知權限(輪到你了會用到)
     setLoading(true)
     setError('')
     try {

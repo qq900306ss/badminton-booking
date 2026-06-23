@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { EntryPage } from './pages/EntryPage'
 import { CourtPage } from './pages/CourtPage'
 import { LobbyPage } from './pages/LobbyPage'
+import { ToastProvider } from './components/Toast'
 
 const qc = new QueryClient()
 
@@ -15,6 +16,7 @@ function Home() {
 export default function App() {
   return (
     <QueryClientProvider client={qc}>
+      <ToastProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -22,6 +24,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      </ToastProvider>
     </QueryClientProvider>
   )
 }
