@@ -12,11 +12,12 @@ export function useSessionView(sessionId: string) {
   })
 }
 
-export function useSessionPlayers(sessionId: string) {
+export function useSessionPlayers(sessionId: string, poll = false) {
   return useQuery({
     queryKey: ['session-players', sessionId],
     queryFn: () => sessionApi.getPlayers(sessionId).then((r) => r.data.data),
     enabled: !!sessionId,
+    refetchInterval: poll ? 5000 : false,
   })
 }
 

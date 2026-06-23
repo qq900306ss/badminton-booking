@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useSessionView, useCourtActions } from '../hooks/useSession'
+import { useSessionView, useCourtActions, useSessionPlayers } from '../hooks/useSession'
 import { CourtCard } from '../components/CourtCard'
 import { CourtSkeleton } from '../components/Skeleton'
 import { InstallButton } from '../components/InstallButton'
@@ -35,7 +35,24 @@ export function CourtPage() {
   }, [sid]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: session, isLoading } = useSessionView(sessionId ?? '')
+  const { data: sessionPlayers } = useSessionPlayers(sid, true)
   const { joinPlaying, joinQueue, leaveQueue, leavePlaying } = useCourtActions(sessionId ?? '')
+
+  const toast = useToast()
+
+  // if the leader removed me from the session, boot me back to entry
+  const wasPresent = useRef(false)
+  useEffect(() => {
+    if (!sessionPlayers || !myPlayerId) return
+    const present = sessionPlayers.some((p) => p.player_id === myPlayerId)
+    if (present) {
+      wasPresent.current = true
+    } else if (wasPresent.current) {
+      localStorage.removeItem(`badminton_${sid}`)
+      toast('你已被移出本場', 'info')
+      nav(`/?s=${sid}`, { replace: true })
+    }
+  }, [sessionPlayers, myPlayerId, sid, nav, toast])
 
   // a player may only be in one court at a time
   const myCourt =
@@ -52,7 +69,6 @@ export function CourtPage() {
       : 'queued'
 
   // alert when promoted from queue → playing (輪到你了)
-  const toast = useToast()
   const prevState = useRef<typeof myState | null>(null)
   useEffect(() => {
     if (prevState.current === 'queued' && myState === 'playing') {
