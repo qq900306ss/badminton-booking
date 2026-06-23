@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSessionView, useCourtActions } from '../hooks/useSession'
 import { CourtCard } from '../components/CourtCard'
+import { InstallButton } from '../components/InstallButton'
 import { useToast } from '../components/Toast'
 import { playChime, vibrate, notifyTurn, subscribePush } from '../lib/alert'
 import { sessionApi } from '../api/client'
@@ -155,6 +156,9 @@ export function CourtPage() {
       </div>
 
       {/* refresh hint */}
+      <div className="max-w-md mx-auto px-4 pb-2">
+        <InstallButton label="📲 裝到桌面 · 收「輪到你了」通知" />
+      </div>
       <p className="text-center text-xs text-gray-300 pb-6">每 3 秒自動更新</p>
     </div>
   )
