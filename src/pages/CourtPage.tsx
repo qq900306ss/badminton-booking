@@ -40,16 +40,20 @@ export function CourtPage() {
 
   const toast = useToast()
 
-  // if the leader removed me from the session, boot me back to entry
-  const wasPresent = useRef(false)
+  // if the leader removed me from the session, boot me back to entry.
+  // require 2 consecutive "absent" polls so DB eventual-consistency right after
+  // joining doesn't falsely kick a fresh player.
+  const absentCount = useRef(0)
   useEffect(() => {
     if (!sessionPlayers || !myPlayerId) return
-    const present = sessionPlayers.some((p) => p.player_id === myPlayerId)
-    if (present) {
-      wasPresent.current = true
-    } else if (wasPresent.current) {
+    if (sessionPlayers.some((p) => p.player_id === myPlayerId)) {
+      absentCount.current = 0
+      return
+    }
+    absentCount.current += 1
+    if (absentCount.current >= 2) {
       localStorage.removeItem(`badminton_${sid}`)
-      toast('你已被移出本場', 'info')
+      toast('你已被移出本場,請重新選身份', 'info')
       nav(`/?s=${sid}`, { replace: true })
     }
   }, [sessionPlayers, myPlayerId, sid, nav, toast])
