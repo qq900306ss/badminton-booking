@@ -35,7 +35,7 @@ export function CourtPage() {
   }, [sid]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: session, isLoading } = useSessionView(sessionId ?? '')
-  const { data: sessionPlayers } = useSessionPlayers(sid, true)
+  const { data: sessionPlayers, dataUpdatedAt: playersUpdatedAt } = useSessionPlayers(sid, true)
   const { joinPlaying, joinQueue, leaveQueue, leavePlaying } = useCourtActions(sessionId ?? '')
 
   const toast = useToast()
@@ -56,7 +56,9 @@ export function CourtPage() {
       toast('你已被移出本場,請重新選身份', 'info')
       nav(`/?s=${sid}`, { replace: true })
     }
-  }, [sessionPlayers, myPlayerId, sid, nav, toast])
+    // depend on playersUpdatedAt so this runs on EVERY poll (React Query reuses
+    // the array reference when data is unchanged, which would otherwise skip it)
+  }, [playersUpdatedAt]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // a player may only be in one court at a time
   const myCourt =
