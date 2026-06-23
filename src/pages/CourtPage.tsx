@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useSessionView, useCourtActions } from '../hooks/useSession'
 import { CourtCard } from '../components/CourtCard'
 import { useToast } from '../components/Toast'
-import { playChime, vibrate, notifyTurn } from '../lib/alert'
+import { playChime, vibrate, notifyTurn, subscribePush } from '../lib/alert'
+import { sessionApi } from '../api/client'
 
 export function CourtPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -24,6 +25,11 @@ export function CourtPage() {
     // keep the global id in sync for the X-Player-ID request header
     localStorage.setItem('player_id', identity.player_id)
     localStorage.setItem('display_name', identity.display_name)
+    // register for Web Push so 「輪到你了」reaches you even with the app closed
+    subscribePush(
+      () => sessionApi.vapidKey().then((r) => r.data.data.public_key),
+      (sub) => sessionApi.pushSubscribe(sid, sub)
+    )
   }, [sid]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: session, isLoading } = useSessionView(sessionId ?? '')

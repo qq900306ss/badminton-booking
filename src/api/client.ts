@@ -67,6 +67,10 @@ export const sessionApi = {
       { password }
     ),
 
+  vapidKey: () => api.get<{ data: { public_key: string } }>('/api/push/vapid'),
+  pushSubscribe: (sessionId: string, sub: PushSubscriptionJSON) =>
+    api.post(`/api/sessions/${sessionId}/push-subscribe`, sub),
+
   join: (sessionId: string, password: string, displayName: string, level = 0, isTemp = false) =>
     api.post<{ data: { player_id: string; display_name: string } }>(
       `/api/sessions/${sessionId}/join`,

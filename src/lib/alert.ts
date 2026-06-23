@@ -55,3 +55,37 @@ export function requestNotify() {
     // ignore
   }
 }
+
+function urlBase64ToUint8Array(base64: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64.length % 4)) % 4)
+  const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const raw = atob(b64)
+  const arr = new Uint8Array(raw.length)
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
+  return arr
+}
+
+// Subscribe this device to Web Push and register the subscription with the API.
+// Best-effort: needs SW support, granted permission, and a VAPID key.
+export async function subscribePush(
+  getVapid: () => Promise<string>,
+  send: (sub: PushSubscriptionJSON) => Promise<unknown>
+) {
+  try {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return
+    if (Notification.permission !== 'granted') return
+    const reg = await navigator.serviceWorker.ready
+    const vapid = await getVapid()
+    if (!vapid) return
+    let sub = await reg.pushManager.getSubscription()
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapid) as unknown as BufferSource,
+      })
+    }
+    await send(sub.toJSON())
+  } catch {
+    // ignore — push just won't be available
+  }
+}
