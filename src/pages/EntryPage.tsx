@@ -24,16 +24,30 @@ export function EntryPage() {
   const [showManual, setShowManual] = useState(false)
   const [chosen, setChosen] = useState<{ name: string; isTemp: boolean } | null>(null)
 
-  // already joined this session? go straight to the court, no re-picking
+  // already joined this session? verify the identity still exists, THEN go to the
+  // court. if the leader removed it, clear it and let them re-pick.
   useEffect(() => {
     if (!sessionId) return
     const saved = localStorage.getItem(idKey(sessionId))
-    if (saved) {
-      const { player_id, display_name } = JSON.parse(saved)
-      localStorage.setItem('player_id', player_id)
-      localStorage.setItem('display_name', display_name)
-      nav(`/court/${sessionId}`, { replace: true })
-    }
+    if (!saved) return
+    const { player_id, display_name } = JSON.parse(saved)
+    sessionApi
+      .getPlayers(sessionId)
+      .then((r) => {
+        if (r.data.data.some((p) => p.player_id === player_id)) {
+          localStorage.setItem('player_id', player_id)
+          localStorage.setItem('display_name', display_name)
+          nav(`/court/${sessionId}`, { replace: true })
+        } else {
+          localStorage.removeItem(idKey(sessionId)) // 被移出 → 清掉,重新選
+        }
+      })
+      .catch(() => {
+        // network hiccup — fall back to going in with the stored identity
+        localStorage.setItem('player_id', player_id)
+        localStorage.setItem('display_name', display_name)
+        nav(`/court/${sessionId}`, { replace: true })
+      })
   }, [sessionId, nav])
 
   const { data: players } = useSessionPlayers(step === 'pick' ? sessionId : '')
