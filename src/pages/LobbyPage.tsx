@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { sessionApi, type SessionSummary } from '../api/client'
+import { InstallButton } from '../components/InstallButton'
 
 function fmtRange(s: SessionSummary): string {
   if (!s.start_at) return ''
@@ -110,6 +111,8 @@ export function LobbyPage() {
       </header>
 
       <div className="max-w-md mx-auto p-4 space-y-3">
+        <InstallButton />
+
         {isLoading && (
           <div className="text-center py-10">
             <div className="text-3xl animate-bounce">🏸</div>
