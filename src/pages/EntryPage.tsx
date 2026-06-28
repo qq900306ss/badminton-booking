@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { sessionApi } from '../api/client'
-import type { SessionPlayer } from '../api/client'
-import { useSessionPlayers } from '../hooks/useSession'
 import { LevelPicker } from '../components/LevelPicker'
-import { tierOf } from '../lib/levels'
 import { requestNotify } from '../lib/alert'
 import { isLoggedIn, getAccount } from '../lib/playerAuth'
 import { LoginScreen } from '../components/LoginScreen'
@@ -25,8 +22,6 @@ export function EntryPage() {
     () => getAccount()?.join_name || getAccount()?.display_name || ''
   )
   const [level, setLevel] = useState(() => getAccount()?.default_level || 0)
-  const [showManual, setShowManual] = useState(false)
-  const [chosen, setChosen] = useState<{ name: string; isTemp: boolean } | null>(null)
 
   // already joined this session? verify the identity still exists, THEN go to the
   // court. if the leader removed it, clear it and let them re-pick.
@@ -54,8 +49,6 @@ export function EntryPage() {
       })
   }, [sessionId, nav])
 
-  const { data: players } = useSessionPlayers(step === 'pick' ? sessionId : '')
-
   async function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!password.trim() || !sessionId) return
@@ -73,12 +66,16 @@ export function EntryPage() {
   }
 
   async function confirmJoin() {
-    if (!chosen) return
+    const n = name.trim()
+    if (!n) {
+      setError('請輸入名字')
+      return
+    }
     requestNotify() // 趁這個使用者點擊,順便要通知權限(輪到你了會用到)
     setLoading(true)
     setError('')
     try {
-      const res = await sessionApi.join(sessionId, password, chosen.name, level, chosen.isTemp)
+      const res = await sessionApi.join(sessionId, password, n, level)
       const { player_id, display_name } = res.data.data
       localStorage.setItem(idKey(sessionId), JSON.stringify({ player_id, display_name }))
       localStorage.setItem('player_id', player_id)
@@ -92,11 +89,6 @@ export function EntryPage() {
       setLoading(false)
     }
   }
-
-  const typed = name.trim()
-  const roster = players ?? []
-  const available = roster.filter((p) => !p.claimed) // hide already-taken names
-  const manualOpen = showManual || available.length === 0
 
   if (!sessionId) {
     return (
@@ -145,97 +137,29 @@ export function EntryPage() {
           </form>
         )}
 
-        {/* step 2a: choose identity */}
-        {step === 'pick' && !chosen && (
+        {/* step 2: confirm name + level (pre-filled from your account) */}
+        {step === 'pick' && (
           <div className="card space-y-4">
-            <p className="font-bold text-gray-700 text-center">你是哪位?</p>
-
-            {available.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-xs text-gray-400">點選你的名字</p>
-                <div className="max-h-56 overflow-y-auto space-y-2">
-                  {available.map((p: SessionPlayer) => {
-                    const t = tierOf(p.level)
-                    return (
-                      <button
-                        key={p.player_id}
-                        onClick={() => {
-                          setLevel(p.level || 0)
-                          setChosen({ name: p.display_name, isTemp: false })
-                        }}
-                        className="w-full text-left px-4 py-3 rounded-2xl bg-gray-50
-                          hover:bg-brand-pink hover:text-white font-semibold transition-colors
-                          flex items-center justify-between gap-2"
-                      >
-                        <span>{p.display_name}</span>
-                        {p.level > 0 && t && (
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${t.chip}`}>
-                            {t.name} {p.level}
-                          </span>
-                        )}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
-            {manualOpen ? (
-              <div className="space-y-3 border-t pt-3">
-                {available.length > 0 && <p className="text-xs text-gray-400">找不到自己?自己加入</p>}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="輸入你的名字"
-                    autoFocus={available.length === 0}
-                    className="flex-1 border-2 border-gray-200 rounded-2xl px-4 py-3
-                      focus:outline-none focus:border-brand-pink font-bold"
-                  />
-                  <button
-                    onClick={() => {
-                      setLevel(0)
-                      setChosen({ name: typed, isTemp: true })
-                    }}
-                    disabled={!typed}
-                    className="btn-primary px-4"
-                  >
-                    下一步
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button onClick={() => setShowManual(true)} className="btn-secondary w-full text-sm">
-                找不到自己?自己加入 →
-              </button>
-            )}
-
+            <div>
+              <span className="text-sm font-bold text-gray-600">你的名字</span>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="輸入你的名字"
+                autoFocus
+                className="mt-1 w-full border-2 border-gray-200 rounded-2xl px-4 py-3
+                  focus:outline-none focus:border-brand-pink text-center text-lg font-bold"
+              />
+            </div>
+            <div>
+              <span className="text-sm font-bold text-gray-600">程度</span>
+              <LevelPicker value={level} onChange={setLevel} />
+            </div>
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
-          </div>
-        )}
-
-        {/* step 2b: confirm identity + pick level */}
-        {step === 'pick' && chosen && (
-          <div className="card space-y-4">
-            <p className="text-center text-gray-600">
-              你是 <span className="font-extrabold text-gray-800 text-lg">{chosen.name}</span> 🏸
-            </p>
-            <LevelPicker value={level} onChange={setLevel} />
-            <button onClick={confirmJoin} disabled={loading} className="btn-primary w-full">
+            <button onClick={confirmJoin} disabled={loading || !name.trim()} className="btn-primary w-full">
               {loading ? '加入中...' : '進入球場 →'}
             </button>
-            <button
-              onClick={() => {
-                setChosen(null)
-                setName('')
-                setError('')
-              }}
-              className="w-full text-sm text-gray-400"
-            >
-              ← 重新選
-            </button>
-            {error && <p className="text-red-400 text-sm text-center">{error}</p>}
           </div>
         )}
       </div>
