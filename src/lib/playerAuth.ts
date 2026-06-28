@@ -25,6 +25,11 @@ export function setAuth(token: string, player: Player) {
   localStorage.setItem(PLAYER_KEY, JSON.stringify(player))
 }
 
+// update the cached account (e.g. after editing the preferred join name), keep token
+export function updateAccount(player: Player) {
+  localStorage.setItem(PLAYER_KEY, JSON.stringify(player))
+}
+
 export function logout() {
   localStorage.removeItem(TOKEN_KEY)
   localStorage.removeItem(PLAYER_KEY)

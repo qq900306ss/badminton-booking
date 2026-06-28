@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
-import { sessionApi, type SessionSummary } from '../api/client'
+import { sessionApi, playerApi, type SessionSummary } from '../api/client'
+import { getAccount, logout, updateAccount } from '../lib/playerAuth'
 import { InstallButton } from '../components/InstallButton'
 import { ListSkeleton } from '../components/Skeleton'
 
@@ -101,8 +102,84 @@ export function LobbyPage() {
     (a.start_at || a.opened_at).localeCompare(b.start_at || b.opened_at)
   )
 
+  const account = getAccount()
+  const myName = account?.join_name || account?.display_name || ''
+  const [editName, setEditName] = useState(false)
+  const [nameInput, setNameInput] = useState('')
+  const [savingName, setSavingName] = useState(false)
+
+  async function saveName() {
+    const n = nameInput.trim()
+    if (!n) return
+    setSavingName(true)
+    try {
+      const r = await playerApi.updateJoinName(n)
+      updateAccount(r.data.data)
+      setEditName(false)
+    } catch {
+      /* keep dialog open on error */
+    } finally {
+      setSavingName(false)
+    }
+  }
+  function doLogout() {
+    logout()
+    location.href = '/'
+  }
+
   return (
     <div className="min-h-screen bg-brand-bg">
+      {/* account bar — your identity has a home here */}
+      <div className="bg-white shadow-sm px-4 py-2.5 flex items-center justify-between sticky top-0 z-20">
+        <div className="flex items-center gap-2 min-w-0">
+          {account?.avatar_url ? (
+            <img src={account.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-brand-pink text-white flex items-center justify-center text-sm font-bold">
+              {[...myName][0]?.toUpperCase() ?? '?'}
+            </div>
+          )}
+          <span className="font-semibold text-gray-700 text-sm truncate">{myName || '球友'}</span>
+        </div>
+        <div className="flex items-center gap-3 text-sm shrink-0">
+          <button
+            onClick={() => { setNameInput(myName); setEditName(true) }}
+            className="text-brand-pink font-semibold"
+          >
+            改名
+          </button>
+          <button onClick={doLogout} className="text-gray-400">登出</button>
+        </div>
+      </div>
+
+      {editName && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-6"
+          onClick={() => setEditName(false)}
+        >
+          <div
+            className="bg-white rounded-3xl p-6 w-full max-w-xs space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="font-bold text-gray-700 text-center">你的加入名稱</p>
+            <input
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+              autoFocus
+              className="w-full border-2 border-gray-200 rounded-2xl px-4 py-2.5 text-center font-bold
+                focus:outline-none focus:border-brand-pink"
+            />
+            <p className="text-xs text-gray-400 text-center">加入球局時預設用這個名字(每場仍可改)</p>
+            <div className="flex gap-2">
+              <button onClick={() => setEditName(false)} className="btn-secondary flex-1">取消</button>
+              <button onClick={saveName} disabled={savingName} className="btn-primary flex-1">
+                {savingName ? '儲存中…' : '儲存'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <AnimatePresence>{showIntro && <Intro onDone={dismissIntro} />}</AnimatePresence>
 
       <header className="px-4 pt-8 pb-4 text-center">

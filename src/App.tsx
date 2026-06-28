@@ -4,15 +4,19 @@ import { EntryPage } from './pages/EntryPage'
 import { CourtPage } from './pages/CourtPage'
 import { LobbyPage } from './pages/LobbyPage'
 import { AuthCallback } from './pages/AuthCallback'
+import { LoginScreen } from './components/LoginScreen'
+import { isLoggedIn } from './lib/playerAuth'
 import { ToastProvider } from './components/Toast'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ConnectionBanner } from './components/ConnectionBanner'
 
 const qc = new QueryClient()
 
-// "/" shows the entry flow when a session is in the URL (?s=…), else the lobby.
+// login is required up front: not logged in → login screen first; then the
+// entry flow when a session is in the URL (?s=…), else the lobby.
 function Home() {
   const [params] = useSearchParams()
+  if (!isLoggedIn()) return <LoginScreen title="登入開始揪球 🏸" />
   return params.get('s') ? <EntryPage /> : <LobbyPage />
 }
 
