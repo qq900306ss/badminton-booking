@@ -53,13 +53,16 @@ export function CourtPage() {
   const myFamily = (sessionPlayers ?? []).filter((p) => p.owner_id === myPlayerId)
   const actingId = activePlayerId ?? myPlayerId
   const asPlayerArg = actingId === myPlayerId ? undefined : actingId ?? undefined
-  // if the active family member was removed/rejected, fall back to myself
+  // if the active family member was removed/rejected, fall back to myself.
+  // depend on the actual data + current active id (no stale closure) so it
+  // re-checks whenever the player list changes or the active identity switches.
   useEffect(() => {
-    if (actingId === myPlayerId) return
-    if (!(sessionPlayers ?? []).some((p) => p.player_id === actingId && !p.pending)) {
-      setActivePlayerId(myPlayerId)
-    }
-  }, [playersUpdatedAt]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (!activePlayerId || activePlayerId === myPlayerId) return
+    const stillUsable = (sessionPlayers ?? []).some(
+      (p) => p.player_id === activePlayerId && !p.pending
+    )
+    if (!stillUsable) setActivePlayerId(myPlayerId)
+  }, [sessionPlayers, activePlayerId, myPlayerId])
 
   // real-time: WS nudge → refetch instantly; targeted "removed" → toast + log
   useEffect(() => {
@@ -203,7 +206,10 @@ export function CourtPage() {
         activeId={actingId}
         onSwitch={setActivePlayerId}
         onAdd={(name, level, avatar) => addFamily.mutate({ name, level, avatar })}
-        onRemove={(playerId) => removeFamily.mutate(playerId)}
+        onRemove={(playerId) => {
+          if (playerId === activePlayerId) setActivePlayerId(myPlayerId) // don't keep acting as a removed member
+          removeFamily.mutate(playerId)
+        }}
         adding={addFamily.isPending}
       />
 
@@ -237,7 +243,7 @@ export function CourtPage() {
       <div className="max-w-md mx-auto px-4 pb-2">
         <InstallButton label="📲 裝到桌面 · 收「輪到你了」通知" />
       </div>
-      <p className="text-center text-xs text-gray-300 pb-6">每 3 秒自動更新</p>
+      <p className="text-center text-xs text-gray-300 pb-6">⚡ 即時更新(WebSocket)</p>
     </div>
   )
 }
