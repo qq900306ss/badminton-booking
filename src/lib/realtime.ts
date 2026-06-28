@@ -3,6 +3,7 @@
 export type RTMessage =
   | { t: 'changed' }
   | { t: 'removed'; player: string; msg: string }
+  | { t: 'renamed'; player: string; msg: string }
 
 export function connectSessionWS(sessionId: string, onMessage: (m: RTMessage) => void): () => void {
   const base = (import.meta.env.VITE_API_URL || '').replace(/^http/, 'ws')

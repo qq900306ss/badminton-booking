@@ -51,7 +51,7 @@ export function CourtPage() {
     return connectSessionWS(sid, (m) => {
       qc.invalidateQueries({ queryKey: ['session', sid] })
       qc.invalidateQueries({ queryKey: ['session-players', sid] })
-      if (m.t === 'removed' && m.player === myPlayerId) {
+      if ((m.t === 'removed' || m.t === 'renamed') && m.player === myPlayerId) {
         toast(m.msg, 'info')
         vibrate()
         pushNotif(m.msg)
