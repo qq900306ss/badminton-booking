@@ -16,6 +16,7 @@ export interface Player {
   provider: string
   display_name: string
   join_name?: string
+  default_level?: number
   avatar_url?: string
   email?: string
   created_at: string
@@ -27,8 +28,8 @@ export const playerApi = {
   line: (code: string) =>
     api.post<{ data: { token: string; player: Player } }>('/api/auth/player/line', { code }),
   me: () => api.get<{ data: Player }>('/api/players/me'),
-  updateJoinName: (joinName: string) =>
-    api.put<{ data: Player }>('/api/players/me', { join_name: joinName }),
+  updateProfile: (joinName: string, defaultLevel: number) =>
+    api.put<{ data: Player }>('/api/players/me', { join_name: joinName, default_level: defaultLevel }),
 }
 
 export interface PlayerSlot {
@@ -63,6 +64,8 @@ export interface SessionView {
 export interface SessionSummary {
   session_id: string
   title: string
+  city?: string
+  district?: string
   num_courts: number
   status: string
   start_at?: string

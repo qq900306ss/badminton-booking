@@ -24,7 +24,7 @@ export function EntryPage() {
   const [name, setName] = useState(
     () => getAccount()?.join_name || getAccount()?.display_name || ''
   )
-  const [level, setLevel] = useState(0)
+  const [level, setLevel] = useState(() => getAccount()?.default_level || 0)
   const [showManual, setShowManual] = useState(false)
   const [chosen, setChosen] = useState<{ name: string; isTemp: boolean } | null>(null)
 

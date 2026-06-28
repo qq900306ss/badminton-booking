@@ -4,7 +4,9 @@ import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { sessionApi, playerApi, type SessionSummary } from '../api/client'
 import { getAccount, logout, updateAccount } from '../lib/playerAuth'
+import { TW_CITIES } from '../lib/twCities'
 import { InstallButton } from '../components/InstallButton'
+import { LevelPicker } from '../components/LevelPicker'
 import { ListSkeleton } from '../components/Skeleton'
 
 function fmtRange(s: SessionSummary): string {
@@ -102,10 +104,23 @@ export function LobbyPage() {
     (a.start_at || a.opened_at).localeCompare(b.start_at || b.opened_at)
   )
 
+  const [cityFilter, setCityFilter] = useState('')
+  const [districtFilter, setDistrictFilter] = useState('')
+  // 區 options derived from the open sessions in the chosen city (no fixed list)
+  const districtOpts = [
+    ...new Set(
+      list.filter((s) => !cityFilter || s.city === cityFilter).map((s) => s.district).filter(Boolean)
+    ),
+  ] as string[]
+  const filtered = list.filter(
+    (s) => (!cityFilter || s.city === cityFilter) && (!districtFilter || s.district === districtFilter)
+  )
+
   const account = getAccount()
   const myName = account?.join_name || account?.display_name || ''
   const [editName, setEditName] = useState(false)
   const [nameInput, setNameInput] = useState('')
+  const [levelInput, setLevelInput] = useState(0)
   const [savingName, setSavingName] = useState(false)
 
   async function saveName() {
@@ -113,7 +128,7 @@ export function LobbyPage() {
     if (!n) return
     setSavingName(true)
     try {
-      const r = await playerApi.updateJoinName(n)
+      const r = await playerApi.updateProfile(n, levelInput)
       updateAccount(r.data.data)
       setEditName(false)
     } catch {
@@ -143,10 +158,10 @@ export function LobbyPage() {
         </div>
         <div className="flex items-center gap-3 text-sm shrink-0">
           <button
-            onClick={() => { setNameInput(myName); setEditName(true) }}
+            onClick={() => { setNameInput(myName); setLevelInput(account?.default_level || 0); setEditName(true) }}
             className="text-brand-pink font-semibold"
           >
-            改名
+            設定
           </button>
           <button onClick={doLogout} className="text-gray-400">登出</button>
         </div>
@@ -158,18 +173,25 @@ export function LobbyPage() {
           onClick={() => setEditName(false)}
         >
           <div
-            className="bg-white rounded-3xl p-6 w-full max-w-xs space-y-4"
+            className="bg-white rounded-3xl p-6 w-full max-w-sm space-y-4 max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="font-bold text-gray-700 text-center">你的加入名稱</p>
-            <input
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              autoFocus
-              className="w-full border-2 border-gray-200 rounded-2xl px-4 py-2.5 text-center font-bold
-                focus:outline-none focus:border-brand-pink"
-            />
-            <p className="text-xs text-gray-400 text-center">加入球局時預設用這個名字(每場仍可改)</p>
+            <p className="font-bold text-gray-700 text-center">你的資料</p>
+            <div>
+              <span className="text-sm font-bold text-gray-600">加入名稱</span>
+              <input
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                autoFocus
+                className="mt-1 w-full border-2 border-gray-200 rounded-2xl px-4 py-2.5 text-center font-bold
+                  focus:outline-none focus:border-brand-pink"
+              />
+            </div>
+            <div>
+              <span className="text-sm font-bold text-gray-600">預設程度</span>
+              <LevelPicker value={levelInput} onChange={setLevelInput} />
+            </div>
+            <p className="text-xs text-gray-400 text-center">加入球局時預設帶入這些(每場仍可改)</p>
             <div className="flex gap-2">
               <button onClick={() => setEditName(false)} className="btn-secondary flex-1">取消</button>
               <button onClick={saveName} disabled={savingName} className="btn-primary flex-1">
@@ -191,17 +213,40 @@ export function LobbyPage() {
       <div className="max-w-md mx-auto p-4 space-y-3">
         <InstallButton />
 
+        {/* 縣市 / 區 篩選 */}
+        <div className="flex gap-2">
+          <select
+            value={cityFilter}
+            onChange={(e) => { setCityFilter(e.target.value); setDistrictFilter('') }}
+            className="flex-1 border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm bg-white
+              focus:outline-none focus:border-brand-pink"
+          >
+            <option value="">全部縣市</option>
+            {TW_CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <select
+            value={districtFilter}
+            onChange={(e) => setDistrictFilter(e.target.value)}
+            disabled={districtOpts.length === 0}
+            className="flex-1 border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm bg-white
+              disabled:opacity-40 focus:outline-none focus:border-brand-pink"
+          >
+            <option value="">全部區</option>
+            {districtOpts.map((d) => <option key={d} value={d}>{d}</option>)}
+          </select>
+        </div>
+
         {isLoading && <ListSkeleton />}
 
-        {!isLoading && list.length === 0 && (
+        {!isLoading && filtered.length === 0 && (
           <div className="card text-center py-10 space-y-2">
             <div className="text-4xl">😴</div>
-            <p className="font-bold text-gray-600">目前沒有開放中的球局</p>
-            <p className="text-sm text-gray-400">等團主開團,或直接掃 QR Code 進場</p>
+            <p className="font-bold text-gray-600">{cityFilter ? '這個地區目前沒有開團' : '目前沒有開放中的球局'}</p>
+            <p className="text-sm text-gray-400">換個地區、等團主開團,或直接掃 QR Code 進場</p>
           </div>
         )}
 
-        {list.map((s) => (
+        {filtered.map((s) => (
           <motion.button
             key={s.session_id}
             initial={{ opacity: 0, y: 12 }}
@@ -212,6 +257,11 @@ export function LobbyPage() {
           >
             <div>
               <p className="font-extrabold text-gray-800 text-lg">{s.title || '羽球團'}</p>
+              {(s.city || s.district) && (
+                <p className="text-xs text-brand-pink font-semibold mt-0.5">
+                  📍 {s.city}{s.district ? ` · ${s.district}` : ''}
+                </p>
+              )}
               <p className="text-sm text-gray-400 mt-0.5">
                 {fmtRange(s) && <span>{fmtRange(s)} · </span>}
                 {s.num_courts} 個球場
