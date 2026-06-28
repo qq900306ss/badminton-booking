@@ -35,6 +35,11 @@ export const playerApi = {
       default_level: defaultLevel,
       avatar_url: avatarUrl,
     }),
+  avatarUploadUrl: (contentType: string) =>
+    api.post<{ data: { upload_url: string; public_url: string } }>(
+      '/api/players/me/avatar-upload-url',
+      { content_type: contentType }
+    ),
 }
 
 export interface PlayerSlot {

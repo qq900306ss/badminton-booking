@@ -123,7 +123,28 @@ export function LobbyPage() {
   const [nameInput, setNameInput] = useState('')
   const [levelInput, setLevelInput] = useState(0)
   const [avatarInput, setAvatarInput] = useState('')
+  const [uploading, setUploading] = useState(false)
   const [savingName, setSavingName] = useState(false)
+
+  async function uploadPhoto(file: File) {
+    if (file.size > 3 * 1024 * 1024) {
+      alert('照片請小於 3MB')
+      return
+    }
+    setUploading(true)
+    try {
+      const ct = file.type || 'image/jpeg'
+      const r = await playerApi.avatarUploadUrl(ct)
+      const { upload_url, public_url } = r.data.data
+      const put = await fetch(upload_url, { method: 'PUT', body: file, headers: { 'Content-Type': ct } })
+      if (!put.ok) throw new Error('upload failed')
+      setAvatarInput(public_url)
+    } catch {
+      alert('上傳失敗,請再試一次')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   async function saveName() {
     const n = nameInput.trim()
@@ -216,6 +237,18 @@ export function LobbyPage() {
                     用 Google / LINE 大頭貼
                   </button>
                 )}
+                <label className="text-xs font-bold text-brand-pink border-2 border-brand-pink/40 rounded-full px-3 py-1.5 cursor-pointer">
+                  {uploading ? '上傳中…' : '上傳照片'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f) uploadPhoto(f)
+                    }}
+                  />
+                </label>
               </div>
               <div className="mt-2 grid grid-cols-8 gap-1.5">
                 {AVATAR_EMOJIS.map((e) => (
