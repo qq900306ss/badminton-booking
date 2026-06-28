@@ -40,6 +40,7 @@ export const playerApi = {
       '/api/players/me/avatar-upload-url',
       { content_type: contentType }
     ),
+  sendFeedback: (message: string) => api.post('/api/feedback', { message }),
 }
 
 export interface PlayerSlot {

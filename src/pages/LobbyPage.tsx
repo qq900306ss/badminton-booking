@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { sessionApi, playerApi, type SessionSummary } from '../api/client'
 import { getAccount, logout, updateAccount } from '../lib/playerAuth'
+import { FeedbackButton } from '../components/FeedbackButton'
 import { TW_CITIES } from '../lib/twCities'
 import { InstallButton } from '../components/InstallButton'
 import { LevelPicker } from '../components/LevelPicker'
@@ -191,6 +192,7 @@ export function LobbyPage() {
           >
             設定
           </button>
+          <FeedbackButton className="text-gray-400" />
           <button onClick={doLogout} className="text-gray-400">登出</button>
         </div>
       </div>
