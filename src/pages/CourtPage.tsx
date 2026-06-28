@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSessionView, useCourtActions, useSessionPlayers } from '../hooks/useSession'
 import { CourtCard } from '../components/CourtCard'
+import { FamilyBar } from '../components/FamilyBar'
 import { CourtSkeleton } from '../components/Skeleton'
 import { InstallButton } from '../components/InstallButton'
 import { NotificationBell } from '../components/NotificationBell'
@@ -40,10 +41,25 @@ export function CourtPage() {
 
   const { data: session, isLoading } = useSessionView(sessionId ?? '')
   const { data: sessionPlayers, dataUpdatedAt: playersUpdatedAt } = useSessionPlayers(sid, true)
-  const { joinPlaying, joinQueue, leaveQueue, leavePlaying, voteEnd } = useCourtActions(sessionId ?? '')
+  const { joinPlaying, joinQueue, leaveQueue, leavePlaying, voteEnd, addFamily, removeFamily } =
+    useCourtActions(sessionId ?? '')
 
   const toast = useToast()
   const qc = useQueryClient()
+
+  // 家人共用手機:這支手機可代操作「我」+ 自己帶的(已核准)家人。activePlayerId =
+  // 目前正在幫誰操作;送 court action 時若不是本人就帶 as_player。
+  const [activePlayerId, setActivePlayerId] = useState<string | null>(myPlayerId)
+  const myFamily = (sessionPlayers ?? []).filter((p) => p.owner_id === myPlayerId)
+  const actingId = activePlayerId ?? myPlayerId
+  const asPlayerArg = actingId === myPlayerId ? undefined : actingId ?? undefined
+  // if the active family member was removed/rejected, fall back to myself
+  useEffect(() => {
+    if (actingId === myPlayerId) return
+    if (!(sessionPlayers ?? []).some((p) => p.player_id === actingId && !p.pending)) {
+      setActivePlayerId(myPlayerId)
+    }
+  }, [playersUpdatedAt]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // real-time: WS nudge → refetch instantly; targeted "removed" → toast + log
   useEffect(() => {
@@ -79,17 +95,18 @@ export function CourtPage() {
     // the array reference when data is unchanged, which would otherwise skip it)
   }, [playersUpdatedAt]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // a player may only be in one court at a time
+  // a player may only be in one court at a time — computed for the ACTING identity
+  // (me, or the family member I'm currently controlling)
   const myCourt =
     session?.courts.find(
       (c) =>
-        c.playing.some((p) => p.player_id === myPlayerId) ||
-        c.queue.some((p) => p.player_id === myPlayerId)
+        c.playing.some((p) => p.player_id === actingId) ||
+        c.queue.some((p) => p.player_id === actingId)
     ) ?? null
   const myCourtId = myCourt?.court_id ?? null
   const myState: 'playing' | 'queued' | 'none' = !myCourt
     ? 'none'
-    : myCourt.playing.some((p) => p.player_id === myPlayerId)
+    : myCourt.playing.some((p) => p.player_id === actingId)
       ? 'playing'
       : 'queued'
 
@@ -178,6 +195,18 @@ export function CourtPage() {
         <p className="text-center font-extrabold text-gray-700 pt-3">{session.title}</p>
       )}
 
+      {/* 家人共用手機:身份切換 + 帶家人 */}
+      <FamilyBar
+        meId={myPlayerId}
+        meName={displayName}
+        family={myFamily}
+        activeId={actingId}
+        onSwitch={setActivePlayerId}
+        onAdd={(name, level, avatar) => addFamily.mutate({ name, level, avatar })}
+        onRemove={(playerId) => removeFamily.mutate(playerId)}
+        adding={addFamily.isPending}
+      />
+
       {/* queue-open gate banner */}
       {locked && (
         <div className="mx-4 mt-3 bg-brand-yellow/60 rounded-2xl px-4 py-3 text-center">
@@ -192,14 +221,14 @@ export function CourtPage() {
           <CourtCard
             key={court.court_id}
             court={court}
-            myPlayerId={myPlayerId}
+            myPlayerId={actingId}
             locked={locked}
             inAnotherCourt={myCourtId !== null && myCourtId !== court.court_id}
-            onJoinPlaying={(position) => joinPlaying.mutate({ courtId: court.court_id, position })}
-            onJoinQueue={() => joinQueue.mutate(court.court_id)}
-            onLeaveQueue={() => leaveQueue.mutate(court.court_id)}
-            onLeavePlaying={() => leavePlaying.mutate(court.court_id)}
-            onVoteEnd={() => voteEnd.mutate(court.court_id)}
+            onJoinPlaying={(position) => joinPlaying.mutate({ courtId: court.court_id, position, asPlayer: asPlayerArg })}
+            onJoinQueue={() => joinQueue.mutate({ courtId: court.court_id, asPlayer: asPlayerArg })}
+            onLeaveQueue={() => leaveQueue.mutate({ courtId: court.court_id, asPlayer: asPlayerArg })}
+            onLeavePlaying={() => leavePlaying.mutate({ courtId: court.court_id, asPlayer: asPlayerArg })}
+            onVoteEnd={() => voteEnd.mutate({ courtId: court.court_id, asPlayer: asPlayerArg })}
           />
         ))}
       </div>

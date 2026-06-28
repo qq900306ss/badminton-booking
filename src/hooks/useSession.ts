@@ -61,9 +61,10 @@ export function useCourtActions(sessionId: string) {
   }
 
   const joinPlaying = useMutation({
-    mutationFn: (v: { courtId: string; position: number }) =>
-      sessionApi.joinPlaying(sessionId, v.courtId, v.position),
-    ...optimistic<{ courtId: string; position: number }>((draft, v) => {
+    mutationFn: (v: { courtId: string; position: number; asPlayer?: string }) =>
+      sessionApi.joinPlaying(sessionId, v.courtId, v.position, v.asPlayer),
+    ...optimistic<{ courtId: string; position: number; asPlayer?: string }>((draft, v) => {
+      if (v.asPlayer) return // family action: skip optimistic, rely on WS/refetch
       const id = myId()
       draft.courts.forEach((c) => {
         c.playing = c.playing.map((p) => (p.player_id === id ? emptySlot() : p))
@@ -75,31 +76,37 @@ export function useCourtActions(sessionId: string) {
   })
 
   const leavePlaying = useMutation({
-    mutationFn: (courtId: string) => sessionApi.leavePlaying(sessionId, courtId),
-    ...optimistic<string>((draft, courtId) => {
+    mutationFn: (v: { courtId: string; asPlayer?: string }) =>
+      sessionApi.leavePlaying(sessionId, v.courtId, v.asPlayer),
+    ...optimistic<{ courtId: string; asPlayer?: string }>((draft, v) => {
+      if (v.asPlayer) return
       const id = myId()
-      const c = draft.courts.find((cc) => cc.court_id === courtId)
+      const c = draft.courts.find((cc) => cc.court_id === v.courtId)
       if (c) c.playing = c.playing.map((p) => (p.player_id === id ? emptySlot() : p))
     }),
   })
 
   const leaveQueue = useMutation({
-    mutationFn: (courtId: string) => sessionApi.leaveQueue(sessionId, courtId),
-    ...optimistic<string>((draft, courtId) => {
+    mutationFn: (v: { courtId: string; asPlayer?: string }) =>
+      sessionApi.leaveQueue(sessionId, v.courtId, v.asPlayer),
+    ...optimistic<{ courtId: string; asPlayer?: string }>((draft, v) => {
+      if (v.asPlayer) return
       const id = myId()
-      const c = draft.courts.find((cc) => cc.court_id === courtId)
+      const c = draft.courts.find((cc) => cc.court_id === v.courtId)
       if (c) c.queue = c.queue.filter((p) => p.player_id !== id)
     }),
   })
 
   const joinQueue = useMutation({
-    mutationFn: (courtId: string) => sessionApi.joinQueue(sessionId, courtId),
+    mutationFn: (v: { courtId: string; asPlayer?: string }) =>
+      sessionApi.joinQueue(sessionId, v.courtId, v.asPlayer),
     onSuccess: invalidate,
     onError: (e: unknown) => toast(errMsg(e)),
   })
 
   const voteEnd = useMutation({
-    mutationFn: (courtId: string) => sessionApi.voteEnd(sessionId, courtId),
+    mutationFn: (v: { courtId: string; asPlayer?: string }) =>
+      sessionApi.voteEnd(sessionId, v.courtId, v.asPlayer),
     onSuccess: (r) => {
       invalidate()
       if (r.data.data.ended) toast('這場結束了,換下一組!', 'info')
@@ -107,5 +114,21 @@ export function useCourtActions(sessionId: string) {
     onError: (e: unknown) => toast(errMsg(e)),
   })
 
-  return { joinPlaying, joinQueue, leaveQueue, leavePlaying, voteEnd }
+  const addFamily = useMutation({
+    mutationFn: (v: { name: string; level: number; avatar: string }) =>
+      sessionApi.addFamily(sessionId, v.name, v.level, v.avatar),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['session-players', sessionId] })
+      toast('已送出,等團主核准就能幫他排囉', 'info')
+    },
+    onError: (e: unknown) => toast(errMsg(e)),
+  })
+
+  const removeFamily = useMutation({
+    mutationFn: (playerId: string) => sessionApi.removeFamily(sessionId, playerId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['session-players', sessionId] }),
+    onError: (e: unknown) => toast(errMsg(e)),
+  })
+
+  return { joinPlaying, joinQueue, leaveQueue, leavePlaying, voteEnd, addFamily, removeFamily }
 }

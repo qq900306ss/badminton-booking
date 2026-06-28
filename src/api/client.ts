@@ -93,6 +93,9 @@ export interface SessionPlayer {
   level: number
   claimed: boolean
   is_temp: boolean
+  avatar_url?: string
+  owner_id?: string // 家人子身份:帶它來的手機帳號
+  pending?: boolean // 家人待團主核准
 }
 
 export const sessionApi = {
@@ -120,22 +123,41 @@ export const sessionApi = {
   getPlayers: (sessionId: string) =>
     api.get<{ data: SessionPlayer[] }>(`/api/sessions/${sessionId}/players`),
 
-  joinPlaying: (sessionId: string, courtId: string, position: number) =>
+  // as_player (optional): act on behalf of one of my approved family members
+  joinPlaying: (sessionId: string, courtId: string, position: number, asPlayer?: string) =>
     api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/join-playing`, {
       position,
+      as_player: asPlayer,
     }),
 
-  joinQueue: (sessionId: string, courtId: string) =>
-    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/join-queue`),
+  joinQueue: (sessionId: string, courtId: string, asPlayer?: string) =>
+    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/join-queue`, {
+      as_player: asPlayer,
+    }),
 
-  leaveQueue: (sessionId: string, courtId: string) =>
-    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/leave-queue`),
+  leaveQueue: (sessionId: string, courtId: string, asPlayer?: string) =>
+    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/leave-queue`, {
+      as_player: asPlayer,
+    }),
 
-  leavePlaying: (sessionId: string, courtId: string) =>
-    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/leave-playing`),
+  leavePlaying: (sessionId: string, courtId: string, asPlayer?: string) =>
+    api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/leave-playing`, {
+      as_player: asPlayer,
+    }),
 
-  voteEnd: (sessionId: string, courtId: string) =>
+  voteEnd: (sessionId: string, courtId: string, asPlayer?: string) =>
     api.post<{ data: { ended: boolean; votes: number; needed: number } }>(
-      `/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/vote-end`
+      `/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/vote-end`,
+      { as_player: asPlayer }
     ),
+
+  addFamily: (sessionId: string, name: string, level: number, avatarUrl: string) =>
+    api.post<{ data: SessionPlayer }>(`/api/sessions/${sessionId}/family`, {
+      name,
+      level,
+      avatar_url: avatarUrl,
+    }),
+
+  removeFamily: (sessionId: string, playerId: string) =>
+    api.delete(`/api/sessions/${sessionId}/family/${playerId}`),
 }
