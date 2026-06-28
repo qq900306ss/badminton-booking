@@ -40,7 +40,7 @@ export function CourtPage() {
 
   const { data: session, isLoading } = useSessionView(sessionId ?? '')
   const { data: sessionPlayers, dataUpdatedAt: playersUpdatedAt } = useSessionPlayers(sid, true)
-  const { joinPlaying, joinQueue, leaveQueue, leavePlaying } = useCourtActions(sessionId ?? '')
+  const { joinPlaying, joinQueue, leaveQueue, leavePlaying, voteEnd } = useCourtActions(sessionId ?? '')
 
   const toast = useToast()
   const qc = useQueryClient()
@@ -199,6 +199,7 @@ export function CourtPage() {
             onJoinQueue={() => joinQueue.mutate(court.court_id)}
             onLeaveQueue={() => leaveQueue.mutate(court.court_id)}
             onLeavePlaying={() => leavePlaying.mutate(court.court_id)}
+            onVoteEnd={() => voteEnd.mutate(court.court_id)}
           />
         ))}
       </div>

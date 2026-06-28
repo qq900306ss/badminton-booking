@@ -58,6 +58,9 @@ export interface CourtView {
   playing: PlayerSlot[]
   queue: PlayerSlot[]
   started_at?: string
+  can_undo?: boolean
+  end_votes?: string[] // player_ids who voted to end (only those still playing)
+  end_votes_needed?: number
 }
 
 export interface SessionView {
@@ -130,4 +133,9 @@ export const sessionApi = {
 
   leavePlaying: (sessionId: string, courtId: string) =>
     api.post(`/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/leave-playing`),
+
+  voteEnd: (sessionId: string, courtId: string) =>
+    api.post<{ data: { ended: boolean; votes: number; needed: number } }>(
+      `/api/sessions/${sessionId}/courts/${encodeURIComponent(courtId)}/vote-end`
+    ),
 }

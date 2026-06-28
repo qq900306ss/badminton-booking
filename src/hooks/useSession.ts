@@ -7,7 +7,9 @@ export function useSessionView(sessionId: string) {
   return useQuery({
     queryKey: ['session', sessionId],
     queryFn: () => sessionApi.getView(sessionId).then((r) => r.data.data),
-    refetchInterval: 3000,
+    // CourtPage connects a WebSocket that invalidates this on every change;
+    // this slow interval is only a fallback for a dropped socket.
+    refetchInterval: 30000,
     enabled: !!sessionId,
   })
 }
@@ -17,7 +19,7 @@ export function useSessionPlayers(sessionId: string, poll = false) {
     queryKey: ['session-players', sessionId],
     queryFn: () => sessionApi.getPlayers(sessionId).then((r) => r.data.data),
     enabled: !!sessionId,
-    refetchInterval: poll ? 5000 : false,
+    refetchInterval: poll ? 30000 : false, // WS-driven; slow fallback only
   })
 }
 
@@ -96,5 +98,14 @@ export function useCourtActions(sessionId: string) {
     onError: (e: unknown) => toast(errMsg(e)),
   })
 
-  return { joinPlaying, joinQueue, leaveQueue, leavePlaying }
+  const voteEnd = useMutation({
+    mutationFn: (courtId: string) => sessionApi.voteEnd(sessionId, courtId),
+    onSuccess: (r) => {
+      invalidate()
+      if (r.data.data.ended) toast('這場結束了,換下一組!', 'info')
+    },
+    onError: (e: unknown) => toast(errMsg(e)),
+  })
+
+  return { joinPlaying, joinQueue, leaveQueue, leavePlaying, voteEnd }
 }

@@ -103,9 +103,10 @@ interface Props {
   onJoinQueue: () => void
   onLeaveQueue: () => void
   onLeavePlaying: () => void
+  onVoteEnd: () => void
 }
 
-export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying }: Props) {
+export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying, onVoteEnd }: Props) {
   // playing is a fixed 4-slot array; empty slots have player_id === ''
   const slots = court.playing
   const filled = slots.filter((p) => p.player_id).length
@@ -173,9 +174,29 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
       )}
 
       {/* actions */}
-      {imPlaying && full && (
-        <div className="text-center text-sm font-bold text-emerald-600 py-1">⚡ 你在場上打!</div>
-      )}
+      {imPlaying && full && (() => {
+        const votes = court.end_votes ?? []
+        const needed = court.end_votes_needed ?? 3
+        const iVoted = myPlayerId ? votes.includes(myPlayerId) : false
+        return (
+          <div className="space-y-1.5">
+            <div className="text-center text-sm font-bold text-emerald-600">⚡ 你在場上打!</div>
+            <button
+              onClick={onVoteEnd}
+              className={`w-full text-sm rounded-2xl py-2 font-bold border-2 active:scale-95 transition-transform ${
+                iVoted
+                  ? 'bg-rose-50 border-rose-300 text-rose-500'
+                  : 'bg-gray-50 border-gray-200 text-gray-500'
+              }`}
+            >
+              {iVoted
+                ? `已投票結束 ${votes.length}/${needed}(再點取消)`
+                : `🗳 投票結束這場 ${votes.length}/${needed}`}
+            </button>
+            <p className="text-center text-[11px] text-gray-400">場上 {needed} 人同意就自動結束、換下一組</p>
+          </div>
+        )
+      })()}
       {imPlaying && !full && (
         <div className="space-y-1.5">
           <p className="text-center text-xs text-amber-600 font-semibold">👆 點其他空位可換位置 · 等湊滿 4 人開打</p>

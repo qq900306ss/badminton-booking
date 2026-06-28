@@ -98,7 +98,7 @@ export function LobbyPage() {
   const { data: sessions, isLoading } = useQuery({
     queryKey: ['open-sessions'],
     queryFn: () => sessionApi.listOpen().then((r) => r.data.data),
-    refetchInterval: 10000,
+    refetchInterval: 30000, // discovery list — no live room, just a slow refresh
   })
 
   const list = (sessions ?? []).slice().sort((a, b) =>
