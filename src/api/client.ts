@@ -4,18 +4,39 @@ const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
 export const api = axios.create({ baseURL: BASE })
 
-// attach player_id from localStorage on every request
+// attach the player JWT on every request (X-Player-ID is gone — pure JWT now)
 api.interceptors.request.use((config) => {
-  const playerId = localStorage.getItem('player_id')
-  if (playerId) config.headers['X-Player-ID'] = playerId
+  const token = localStorage.getItem('player_token')
+  if (token) config.headers['Authorization'] = `Bearer ${token}`
   return config
 })
+
+export interface Player {
+  player_id: string
+  provider: string
+  display_name: string
+  join_name?: string
+  avatar_url?: string
+  email?: string
+  created_at: string
+}
+
+export const playerApi = {
+  google: (code: string) =>
+    api.post<{ data: { token: string; player: Player } }>('/api/auth/player/google', { code }),
+  line: (code: string) =>
+    api.post<{ data: { token: string; player: Player } }>('/api/auth/player/line', { code }),
+  me: () => api.get<{ data: Player }>('/api/players/me'),
+  updateJoinName: (joinName: string) =>
+    api.put<{ data: Player }>('/api/players/me', { join_name: joinName }),
+}
 
 export interface PlayerSlot {
   player_id: string
   display_name: string
   level: number
   games: number
+  avatar_url?: string
 }
 
 export interface CourtView {

@@ -21,9 +21,12 @@ function elapsedMins(startedAt?: string): number | null {
 }
 
 function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
-  const initial = slot.display_name?.[0]?.toUpperCase() ?? '?'
+  // [...str][0] is emoji/surrogate-pair safe — str[0] splits a 🔥-style name into
+  // a broken half (the "亂碼" in the circle).
+  const initial = [...(slot.display_name ?? '')][0]?.toUpperCase() ?? '?'
   const tier = tierOf(slot.level)
   const bg = tier ? tier.avatarBg : fallbackColor(slot.player_id)
+  const ring = me ? 'ring-4 ring-amber-400' : 'ring-2 ring-white'
   return (
     <motion.div
       initial={{ scale: 0, opacity: 0 }}
@@ -32,11 +35,18 @@ function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
       className="flex flex-col items-center gap-1"
     >
       <div className="relative">
-        <div className={`w-11 h-11 rounded-full ${bg} flex items-center justify-center
-          text-base font-extrabold text-white shadow-md
-          ${me ? 'ring-4 ring-amber-400' : 'ring-2 ring-white'}`}>
-          {initial}
-        </div>
+        {slot.avatar_url ? (
+          <img
+            src={slot.avatar_url}
+            alt={slot.display_name}
+            className={`w-11 h-11 rounded-full object-cover shadow-md ${ring}`}
+          />
+        ) : (
+          <div className={`w-11 h-11 rounded-full ${bg} flex items-center justify-center
+            text-base font-extrabold text-white shadow-md ${ring}`}>
+            {initial}
+          </div>
+        )}
         {slot.level > 0 && (
           <span className="absolute -top-1 -right-1 bg-white text-gray-700 text-[10px] font-bold
             rounded-full w-5 h-5 flex items-center justify-center shadow border border-gray-100">

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { EntryPage } from './pages/EntryPage'
 import { CourtPage } from './pages/CourtPage'
 import { LobbyPage } from './pages/LobbyPage'
+import { AuthCallback } from './pages/AuthCallback'
 import { ToastProvider } from './components/Toast'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ConnectionBanner } from './components/ConnectionBanner'
@@ -24,6 +25,8 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/auth/callback" element={<AuthCallback provider="google" />} />
+          <Route path="/auth/line/callback" element={<AuthCallback provider="line" />} />
           <Route path="/court/:sessionId" element={<CourtPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

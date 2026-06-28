@@ -6,6 +6,8 @@ import { useSessionPlayers } from '../hooks/useSession'
 import { LevelPicker } from '../components/LevelPicker'
 import { tierOf } from '../lib/levels'
 import { requestNotify } from '../lib/alert'
+import { isLoggedIn, getAccount } from '../lib/playerAuth'
+import { LoginScreen } from '../components/LoginScreen'
 
 // per-session identity, so back-button can't re-pick / orphan a claimed name
 const idKey = (sid: string) => `badminton_${sid}`
@@ -19,7 +21,9 @@ export function EntryPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [name, setName] = useState('')
+  const [name, setName] = useState(
+    () => getAccount()?.join_name || getAccount()?.display_name || ''
+  )
   const [level, setLevel] = useState(0)
   const [showManual, setShowManual] = useState(false)
   const [chosen, setChosen] = useState<{ name: string; isTemp: boolean } | null>(null)
@@ -103,6 +107,11 @@ export function EntryPage() {
         </div>
       </div>
     )
+  }
+
+  // mandatory login: must have an account before joining a session
+  if (!isLoggedIn()) {
+    return <LoginScreen title="登入後加入這場" />
   }
 
   return (

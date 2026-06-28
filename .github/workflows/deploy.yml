@@ -20,6 +20,8 @@ jobs:
       - name: Build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_LINE_CHANNEL_ID: ${{ secrets.VITE_LINE_CHANNEL_ID }}
         run: npm run build
 
       - uses: aws-actions/configure-aws-credentials@v4
