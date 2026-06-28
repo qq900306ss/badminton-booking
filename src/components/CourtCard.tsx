@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import type { CourtView, PlayerSlot } from '../api/client'
 import { tierOf } from '../lib/levels'
+import { isPhotoUrl } from '../lib/avatar'
 
 const PALETTE = [
   'bg-brand-pink', 'bg-brand-mint', 'bg-brand-yellow',
@@ -35,16 +36,19 @@ function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
       className="flex flex-col items-center gap-1"
     >
       <div className="relative">
-        {slot.avatar_url ? (
+        {isPhotoUrl(slot.avatar_url) ? (
           <img
             src={slot.avatar_url}
             alt={slot.display_name}
             className={`w-11 h-11 rounded-full object-cover shadow-md ${ring}`}
           />
         ) : (
-          <div className={`w-11 h-11 rounded-full ${bg} flex items-center justify-center
-            text-base font-extrabold text-white shadow-md ${ring}`}>
-            {initial}
+          <div className={`w-11 h-11 rounded-full ${bg} flex items-center justify-center shadow-md ${ring}`}>
+            {slot.avatar_url ? (
+              <span className="text-xl">{slot.avatar_url}</span>
+            ) : (
+              <span className="text-base font-extrabold text-white">{initial}</span>
+            )}
           </div>
         )}
         {slot.level > 0 && (

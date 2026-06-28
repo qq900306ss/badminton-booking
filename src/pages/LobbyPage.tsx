@@ -8,6 +8,7 @@ import { TW_CITIES } from '../lib/twCities'
 import { InstallButton } from '../components/InstallButton'
 import { LevelPicker } from '../components/LevelPicker'
 import { ListSkeleton } from '../components/Skeleton'
+import { isPhotoUrl, AVATAR_EMOJIS } from '../lib/avatar'
 
 function fmtRange(s: SessionSummary): string {
   if (!s.start_at) return ''
@@ -121,6 +122,7 @@ export function LobbyPage() {
   const [editName, setEditName] = useState(false)
   const [nameInput, setNameInput] = useState('')
   const [levelInput, setLevelInput] = useState(0)
+  const [avatarInput, setAvatarInput] = useState('')
   const [savingName, setSavingName] = useState(false)
 
   async function saveName() {
@@ -128,7 +130,7 @@ export function LobbyPage() {
     if (!n) return
     setSavingName(true)
     try {
-      const r = await playerApi.updateProfile(n, levelInput)
+      const r = await playerApi.updateProfile(n, levelInput, avatarInput)
       updateAccount(r.data.data)
       setEditName(false)
     } catch {
@@ -147,18 +149,23 @@ export function LobbyPage() {
       {/* account bar — your identity has a home here */}
       <div className="bg-white shadow-sm px-4 py-2.5 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-2 min-w-0">
-          {account?.avatar_url ? (
-            <img src={account.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+          {isPhotoUrl(account?.avatar_url) ? (
+            <img src={account?.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
           ) : (
             <div className="w-8 h-8 rounded-full bg-brand-pink text-white flex items-center justify-center text-sm font-bold">
-              {[...myName][0]?.toUpperCase() ?? '?'}
+              {account?.avatar_url || [...myName][0]?.toUpperCase() || '?'}
             </div>
           )}
           <span className="font-semibold text-gray-700 text-sm truncate">{myName || '球友'}</span>
         </div>
         <div className="flex items-center gap-3 text-sm shrink-0">
           <button
-            onClick={() => { setNameInput(myName); setLevelInput(account?.default_level || 0); setEditName(true) }}
+            onClick={() => {
+              setNameInput(myName)
+              setLevelInput(account?.default_level || 0)
+              setAvatarInput(account?.avatar_url || '')
+              setEditName(true)
+            }}
             className="text-brand-pink font-semibold"
           >
             設定
@@ -190,6 +197,37 @@ export function LobbyPage() {
             <div>
               <span className="text-sm font-bold text-gray-600">預設程度</span>
               <LevelPicker value={levelInput} onChange={setLevelInput} />
+            </div>
+            <div>
+              <span className="text-sm font-bold text-gray-600">頭像</span>
+              <div className="mt-1 flex items-center gap-2">
+                <div className="w-12 h-12 rounded-full bg-brand-pink flex items-center justify-center shrink-0 overflow-hidden">
+                  {isPhotoUrl(avatarInput) ? (
+                    <img src={avatarInput} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-2xl">{avatarInput || '🏸'}</span>
+                  )}
+                </div>
+                {account?.photo_url && (
+                  <button
+                    onClick={() => setAvatarInput(account.photo_url!)}
+                    className="text-xs font-bold text-brand-pink border-2 border-brand-pink/40 rounded-full px-3 py-1.5"
+                  >
+                    用 Google / LINE 大頭貼
+                  </button>
+                )}
+              </div>
+              <div className="mt-2 grid grid-cols-8 gap-1.5">
+                {AVATAR_EMOJIS.map((e) => (
+                  <button
+                    key={e}
+                    onClick={() => setAvatarInput(e)}
+                    className={`text-xl rounded-lg py-1 ${avatarInput === e ? 'bg-brand-pink/20 ring-2 ring-brand-pink' : 'hover:bg-gray-100'}`}
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
             </div>
             <p className="text-xs text-gray-400 text-center">加入球局時預設帶入這些(每場仍可改)</p>
             <div className="flex gap-2">
