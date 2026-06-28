@@ -1,11 +1,15 @@
 import { useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { useSessionView, useCourtActions, useSessionPlayers } from '../hooks/useSession'
 import { CourtCard } from '../components/CourtCard'
 import { CourtSkeleton } from '../components/Skeleton'
 import { InstallButton } from '../components/InstallButton'
+import { NotificationBell } from '../components/NotificationBell'
 import { useToast } from '../components/Toast'
 import { playChime, vibrate, notifyTurn, subscribePush } from '../lib/alert'
+import { connectSessionWS } from '../lib/realtime'
+import { pushNotif } from '../lib/notifications'
 import { sessionApi } from '../api/client'
 
 export function CourtPage() {
@@ -39,6 +43,21 @@ export function CourtPage() {
   const { joinPlaying, joinQueue, leaveQueue, leavePlaying } = useCourtActions(sessionId ?? '')
 
   const toast = useToast()
+  const qc = useQueryClient()
+
+  // real-time: WS nudge → refetch instantly; targeted "removed" → toast + log
+  useEffect(() => {
+    if (!sid) return
+    return connectSessionWS(sid, (m) => {
+      qc.invalidateQueries({ queryKey: ['session', sid] })
+      qc.invalidateQueries({ queryKey: ['session-players', sid] })
+      if (m.t === 'removed' && m.player === myPlayerId) {
+        toast(m.msg, 'info')
+        vibrate()
+        pushNotif(m.msg)
+      }
+    })
+  }, [sid, myPlayerId, qc, toast])
 
   // if the leader removed me from the session, boot me back to entry.
   // require 2 consecutive "absent" polls so DB eventual-consistency right after
@@ -74,6 +93,10 @@ export function CourtPage() {
       ? 'playing'
       : 'queued'
 
+  // current name from live data (reflects a leader rename), fallback to stored
+  const displayName =
+    sessionPlayers?.find((p) => p.player_id === myPlayerId)?.display_name || myName
+
   // alert when promoted from queue → playing (輪到你了)
   const prevState = useRef<typeof myState | null>(null)
   useEffect(() => {
@@ -82,6 +105,7 @@ export function CourtPage() {
       toast('🏸 輪到你上場了!', 'success')
       playChime()
       vibrate()
+      pushNotif(`🏸 輪到你上場了(${where})`)
       if (document.hidden) notifyTurn(`${where} · 快回來上場`)
     }
     prevState.current = myState
@@ -140,11 +164,12 @@ export function CourtPage() {
           <span className="font-extrabold text-gray-800">球場即時</span>
         </div>
         <div className="flex items-center gap-2">
+          <NotificationBell />
           <div className="w-8 h-8 rounded-full bg-brand-pink flex items-center justify-center
             text-white font-bold text-sm">
-            {myName[0]?.toUpperCase()}
+            {[...displayName][0]?.toUpperCase() ?? '?'}
           </div>
-          <span className="text-sm font-semibold text-gray-600">{myName}</span>
+          <span className="text-sm font-semibold text-gray-600">{displayName}</span>
         </div>
       </div>
 
