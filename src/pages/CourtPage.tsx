@@ -53,6 +53,17 @@ export function CourtPage() {
   const myFamily = (sessionPlayers ?? []).filter((p) => p.owner_id === myPlayerId)
   const actingId = activePlayerId ?? myPlayerId
   const asPlayerArg = actingId === myPlayerId ? undefined : actingId ?? undefined
+
+  // ids this phone "owns" (me + my family members) — kept in a ref so the WS
+  // callback (which doesn't re-subscribe on every players change) can tell when a
+  // removed/renamed event is about someone I control, and toast accordingly.
+  const myIdsRef = useRef<Set<string>>(new Set())
+  useEffect(() => {
+    const s = new Set<string>()
+    if (myPlayerId) s.add(myPlayerId)
+    for (const p of sessionPlayers ?? []) if (p.owner_id === myPlayerId) s.add(p.player_id)
+    myIdsRef.current = s
+  }, [sessionPlayers, myPlayerId])
   // if the active family member was removed/rejected, fall back to myself.
   // depend on the actual data + current active id (no stale closure) so it
   // re-checks whenever the player list changes or the active identity switches.
@@ -73,7 +84,8 @@ export function CourtPage() {
       const scope = m.t === 'changed' ? m.scope ?? 'all' : 'all'
       qc.invalidateQueries({ queryKey: ['session', sid] })
       if (scope !== 'court') qc.invalidateQueries({ queryKey: ['session-players', sid] })
-      if ((m.t === 'removed' || m.t === 'renamed') && m.player === myPlayerId) {
+      // toast when the event is about me OR one of my family members
+      if ((m.t === 'removed' || m.t === 'renamed') && myIdsRef.current.has(m.player)) {
         toast(m.msg, 'info')
         vibrate()
         pushNotif(m.msg)
