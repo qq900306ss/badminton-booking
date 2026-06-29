@@ -26,3 +26,14 @@
     @apply bg-white rounded-3xl shadow-md p-4;
   }
 }
+
+@layer utilities {
+  /* hide the scrollbar on the horizontal weekday strip while keeping it scrollable */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

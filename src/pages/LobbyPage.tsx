@@ -111,15 +111,27 @@ export function LobbyPage() {
 
   const [cityFilter, setCityFilter] = useState('')
   const [districtFilter, setDistrictFilter] = useState('')
+  const [dayFilter, setDayFilter] = useState<number | null>(null) // Date.getDay() 0=日…6=六, null=全部
+  const [showLoc, setShowLoc] = useState(false)
   // 區 options derived from the open sessions in the chosen city (no fixed list)
   const districtOpts = [
     ...new Set(
       list.filter((s) => !cityFilter || s.city === cityFilter).map((s) => s.district).filter(Boolean)
     ),
   ] as string[]
-  const filtered = list.filter(
-    (s) => (!cityFilter || s.city === cityFilter) && (!districtFilter || s.district === districtFilter)
-  )
+  const filtered = list.filter((s) => {
+    if (cityFilter && s.city !== cityFilter) return false
+    if (districtFilter && s.district !== districtFilter) return false
+    if (dayFilter !== null) {
+      if (!s.start_at) return false
+      if (new Date(s.start_at).getDay() !== dayFilter) return false
+    }
+    return true
+  })
+  const locActive = !!(cityFilter || districtFilter)
+  const locLabel = locActive
+    ? `${cityFilter || '全部縣市'}${districtFilter ? ` · ${districtFilter}` : ''}`
+    : '全部地區'
 
   const account = getAccount()
   const myName = account?.join_name || account?.display_name || ''
@@ -301,27 +313,70 @@ export function LobbyPage() {
       <div className="max-w-md mx-auto p-4 space-y-3">
         <InstallButton />
 
-        {/* 縣市 / 區 篩選 */}
-        <div className="flex gap-2">
-          <select
-            value={cityFilter}
-            onChange={(e) => { setCityFilter(e.target.value); setDistrictFilter('') }}
-            className="flex-1 border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm bg-white
-              focus:outline-none focus:border-brand-pink"
-          >
-            <option value="">全部縣市</option>
-            {TW_CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-          <select
-            value={districtFilter}
-            onChange={(e) => setDistrictFilter(e.target.value)}
-            disabled={districtOpts.length === 0}
-            className="flex-1 border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm bg-white
-              disabled:opacity-40 focus:outline-none focus:border-brand-pink"
-          >
-            <option value="">全部區</option>
-            {districtOpts.map((d) => <option key={d} value={d}>{d}</option>)}
-          </select>
+        {/* 星期篩選 — 球團多為每週固定,依場次日期的星期分流 */}
+        <div className="flex gap-1.5 overflow-x-auto -mx-1 px-1 pb-1 no-scrollbar">
+          {[
+            { l: '全部', v: null as number | null },
+            { l: '週一', v: 1 }, { l: '週二', v: 2 }, { l: '週三', v: 3 },
+            { l: '週四', v: 4 }, { l: '週五', v: 5 }, { l: '週六', v: 6 }, { l: '週日', v: 0 },
+          ].map((d) => (
+            <button
+              key={d.l}
+              onClick={() => setDayFilter(d.v)}
+              className={`shrink-0 px-3.5 py-1.5 rounded-full text-sm font-bold transition-colors ${
+                dayFilter === d.v
+                  ? 'bg-brand-pink text-white shadow-sm'
+                  : 'bg-white text-gray-500 border border-gray-200'
+              }`}
+            >
+              {d.l}
+            </button>
+          ))}
+        </div>
+
+        {/* 地區篩選 — 收合,點開才出現縣市/區下拉 */}
+        <div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowLoc((v) => !v)}
+              className={`flex-1 flex items-center justify-between px-3.5 py-2 rounded-2xl text-sm font-semibold
+                border-2 ${locActive ? 'border-brand-pink text-brand-pink bg-brand-pink/5' : 'border-gray-200 text-gray-500 bg-white'}`}
+            >
+              <span>📍 {locLabel}</span>
+              <span className="text-xs">{showLoc ? '▲' : '▼'}</span>
+            </button>
+            {locActive && (
+              <button
+                onClick={() => { setCityFilter(''); setDistrictFilter('') }}
+                className="shrink-0 px-3 py-2 rounded-2xl text-sm font-semibold text-gray-400 bg-white border-2 border-gray-200"
+              >
+                ✕ 清除
+              </button>
+            )}
+          </div>
+          {showLoc && (
+            <div className="flex gap-2 mt-2">
+              <select
+                value={cityFilter}
+                onChange={(e) => { setCityFilter(e.target.value); setDistrictFilter('') }}
+                className="flex-1 border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm bg-white
+                  focus:outline-none focus:border-brand-pink"
+              >
+                <option value="">全部縣市</option>
+                {TW_CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <select
+                value={districtFilter}
+                onChange={(e) => setDistrictFilter(e.target.value)}
+                disabled={districtOpts.length === 0}
+                className="flex-1 border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm bg-white
+                  disabled:opacity-40 focus:outline-none focus:border-brand-pink"
+              >
+                <option value="">全部區</option>
+                {districtOpts.map((d) => <option key={d} value={d}>{d}</option>)}
+              </select>
+            </div>
+          )}
         </div>
 
         {isLoading && <ListSkeleton />}
@@ -329,8 +384,10 @@ export function LobbyPage() {
         {!isLoading && filtered.length === 0 && (
           <div className="card text-center py-10 space-y-2">
             <div className="text-4xl">😴</div>
-            <p className="font-bold text-gray-600">{cityFilter ? '這個地區目前沒有開團' : '目前沒有開放中的球局'}</p>
-            <p className="text-sm text-gray-400">換個地區、等團主開團,或直接掃 QR Code 進場</p>
+            <p className="font-bold text-gray-600">
+              {dayFilter !== null || locActive ? '找不到符合條件的球局' : '目前沒有開放中的球局'}
+            </p>
+            <p className="text-sm text-gray-400">換個星期/地區、等團主開團,或直接掃 QR Code 進場</p>
           </div>
         )}
 
