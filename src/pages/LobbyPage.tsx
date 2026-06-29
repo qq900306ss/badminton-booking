@@ -6,6 +6,7 @@ import { sessionApi, playerApi, type SessionSummary } from '../api/client'
 import { getAccount, logout, updateAccount } from '../lib/playerAuth'
 import { FeedbackButton } from '../components/FeedbackButton'
 import { ChangelogButton } from '../components/ChangelogButton'
+import { HelpButton } from '../components/HelpButton'
 import { forceUpdate } from '../lib/appUpdate'
 import { TW_CITIES } from '../lib/twCities'
 import { InstallButton } from '../components/InstallButton'
@@ -274,6 +275,7 @@ export function LobbyPage() {
             </div>
             {/* secondary actions tucked here so the top bar stays uncluttered */}
             <div className="border-t pt-3 grid grid-cols-2 gap-2">
+              <HelpButton className="btn-secondary text-sm col-span-2" />
               <ChangelogButton className="btn-secondary text-sm" />
               <FeedbackButton className="btn-secondary text-sm" />
               <button
