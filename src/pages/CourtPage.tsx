@@ -68,8 +68,11 @@ export function CourtPage() {
   useEffect(() => {
     if (!sid) return
     return connectSessionWS(sid, (m) => {
+      // refetch only what changed (server's scope); court-only changes skip the
+      // players query
+      const scope = m.t === 'changed' ? m.scope ?? 'all' : 'all'
       qc.invalidateQueries({ queryKey: ['session', sid] })
-      qc.invalidateQueries({ queryKey: ['session-players', sid] })
+      if (scope !== 'court') qc.invalidateQueries({ queryKey: ['session-players', sid] })
       if ((m.t === 'removed' || m.t === 'renamed') && m.player === myPlayerId) {
         toast(m.msg, 'info')
         vibrate()

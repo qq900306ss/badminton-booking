@@ -1,7 +1,7 @@
 // real-time: connect to a session's WebSocket room. The server sends a small
 // nudge on any change, plus a targeted "removed" event. Auto-reconnects.
 export type RTMessage =
-  | { t: 'changed' }
+  | { t: 'changed'; scope?: 'court' | 'player' | 'game' | 'all' }
   | { t: 'removed'; player: string; msg: string }
   | { t: 'renamed'; player: string; msg: string }
 
