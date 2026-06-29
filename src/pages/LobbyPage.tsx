@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { sessionApi, playerApi, type SessionSummary } from '../api/client'
 import { getAccount, logout, updateAccount } from '../lib/playerAuth'
 import { FeedbackButton } from '../components/FeedbackButton'
+import { forceUpdate } from '../lib/appUpdate'
 import { TW_CITIES } from '../lib/twCities'
 import { InstallButton } from '../components/InstallButton'
 import { LevelPicker } from '../components/LevelPicker'
@@ -191,6 +192,9 @@ export function LobbyPage() {
             className="text-brand-pink font-semibold"
           >
             設定
+          </button>
+          <button onClick={() => forceUpdate()} title="清除快取、更新到最新版" className="text-gray-400">
+            🔄 更新
           </button>
           <FeedbackButton className="text-gray-400" />
           <button onClick={doLogout} className="text-gray-400">登出</button>
