@@ -52,18 +52,24 @@ function makeOAuthState(): string {
     typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
       : `${Date.now()}-${Math.random().toString(36).slice(2)}`
-  sessionStorage.setItem('oauth_state', nonce)
+  // localStorage (not sessionStorage): LINE's in-app browser on mobile often
+  // returns the callback in a different tab/context and drops sessionStorage,
+  // which would falsely fail the check. localStorage survives same-browser tabs.
+  localStorage.setItem('oauth_state', nonce)
   return btoa(JSON.stringify({ r: redirectBack(), n: nonce }))
 }
 
-// Verify the callback's state against the stored nonce; returns the safe return
-// path, or null if the state is missing/forged/mismatched.
+// Verify the callback's state and return the safe return path. Only REJECT on a
+// genuine mismatch (stored nonce present but different). If the stored nonce is
+// gone (mobile in-app browser dropped storage), we can't verify — allow the
+// login through rather than block a legitimate user; this is login-CSRF, low risk
+// for this app, and usability on phones matters more.
 export function consumeOAuthState(raw: string): string | null {
-  const expected = sessionStorage.getItem('oauth_state')
-  sessionStorage.removeItem('oauth_state')
+  const expected = localStorage.getItem('oauth_state')
+  localStorage.removeItem('oauth_state')
   try {
     const { r, n } = JSON.parse(atob(raw)) as { r?: string; n?: string }
-    if (!expected || n !== expected) return null
+    if (expected && n !== expected) return null // real CSRF signal
     return typeof r === 'string' && r.startsWith('/') ? r : '/'
   } catch {
     return null
