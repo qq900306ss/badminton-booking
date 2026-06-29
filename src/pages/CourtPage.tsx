@@ -83,7 +83,10 @@ export function CourtPage() {
       // players query
       const scope = m.t === 'changed' ? m.scope ?? 'all' : 'all'
       qc.invalidateQueries({ queryKey: ['session', sid] })
-      if (scope !== 'court') qc.invalidateQueries({ queryKey: ['session-players', sid] })
+      // court/session-only scopes don't touch the roster → skip the players query
+      if (scope !== 'court' && scope !== 'session') {
+        qc.invalidateQueries({ queryKey: ['session-players', sid] })
+      }
       // toast when the event is about me OR one of my family members
       if ((m.t === 'removed' || m.t === 'renamed') && myIdsRef.current.has(m.player)) {
         toast(m.msg, 'info')
