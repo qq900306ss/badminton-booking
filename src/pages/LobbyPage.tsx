@@ -194,11 +194,6 @@ export function LobbyPage() {
           >
             設定
           </button>
-          <button onClick={() => forceUpdate()} title="清除快取、更新到最新版" className="text-gray-400">
-            🔄 更新
-          </button>
-          <FeedbackButton className="text-gray-400" />
-          <ChangelogButton className="text-gray-400" />
           <button onClick={doLogout} className="text-gray-400">登出</button>
         </div>
       </div>
@@ -275,6 +270,18 @@ export function LobbyPage() {
               <button onClick={() => setEditName(false)} className="btn-secondary flex-1">取消</button>
               <button onClick={saveName} disabled={savingName} className="btn-primary flex-1">
                 {savingName ? '儲存中…' : '儲存'}
+              </button>
+            </div>
+            {/* secondary actions tucked here so the top bar stays uncluttered */}
+            <div className="border-t pt-3 grid grid-cols-2 gap-2">
+              <ChangelogButton className="btn-secondary text-sm" />
+              <FeedbackButton className="btn-secondary text-sm" />
+              <button
+                onClick={() => forceUpdate()}
+                className="btn-secondary text-sm col-span-2"
+                title="清除快取、更新到最新版"
+              >
+                🔄 更新到最新版
               </button>
             </div>
           </div>
