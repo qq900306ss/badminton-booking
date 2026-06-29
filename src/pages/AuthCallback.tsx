@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { playerApi } from '../api/client'
-import { setAuth } from '../lib/playerAuth'
+import { setAuth, consumeOAuthState } from '../lib/playerAuth'
 
 // handles the OAuth redirect back from Google / LINE: exchange the code for a
 // player token, store it, then resume wherever the user was (the `state` param).
@@ -21,18 +21,17 @@ export function AuthCallback({ provider }: { provider: 'google' | 'line' }) {
       setError('登入失敗:沒有收到授權碼')
       return
     }
+    // CSRF: the callback's state must match the nonce we stored before redirecting
+    const back = consumeOAuthState(stateRaw)
+    if (back === null) {
+      setError('登入失敗:安全驗證不符,請重新登入')
+      return
+    }
 
     const req = provider === 'google' ? playerApi.google(code) : playerApi.line(code)
     req
       .then((r) => {
         setAuth(r.data.data.token, r.data.data.player)
-        let back = '/'
-        try {
-          back = provider === 'line' ? atob(stateRaw) || '/' : stateRaw || '/'
-        } catch {
-          back = '/'
-        }
-        if (!back.startsWith('/')) back = '/'
         nav(back, { replace: true })
       })
       .catch((e) => {

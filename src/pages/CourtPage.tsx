@@ -235,6 +235,7 @@ export function CourtPage() {
             onLeaveQueue={() => leaveQueue.mutate({ courtId: court.court_id, asPlayer: asPlayerArg })}
             onLeavePlaying={() => leavePlaying.mutate({ courtId: court.court_id, asPlayer: asPlayerArg })}
             onVoteEnd={() => voteEnd.mutate({ courtId: court.court_id, asPlayer: asPlayerArg })}
+            votePending={voteEnd.isPending}
           />
         ))}
       </div>

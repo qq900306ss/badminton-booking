@@ -33,11 +33,41 @@ export function updateAccount(player: Player) {
 export function logout() {
   localStorage.removeItem(TOKEN_KEY)
   localStorage.removeItem(PLAYER_KEY)
+  // also clear the per-session identity globals so a logged-out device can't
+  // carry a stale player_id into a court page
+  localStorage.removeItem('player_id')
+  localStorage.removeItem('display_name')
 }
 
 // where to come back to after the OAuth round-trip (e.g. "/?s=<sessionId>")
 function redirectBack(): string {
   return window.location.pathname + window.location.search
+}
+
+// OAuth `state` = base64({ return-path, random nonce }). The nonce is stashed in
+// sessionStorage and re-checked on the callback to block CSRF (a forged callback
+// from another page can't know/set this browser's nonce).
+function makeOAuthState(): string {
+  const nonce =
+    typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+  sessionStorage.setItem('oauth_state', nonce)
+  return btoa(JSON.stringify({ r: redirectBack(), n: nonce }))
+}
+
+// Verify the callback's state against the stored nonce; returns the safe return
+// path, or null if the state is missing/forged/mismatched.
+export function consumeOAuthState(raw: string): string | null {
+  const expected = sessionStorage.getItem('oauth_state')
+  sessionStorage.removeItem('oauth_state')
+  try {
+    const { r, n } = JSON.parse(atob(raw)) as { r?: string; n?: string }
+    if (!expected || n !== expected) return null
+    return typeof r === 'string' && r.startsWith('/') ? r : '/'
+  } catch {
+    return null
+  }
 }
 
 // Google OAuth — redirect_uri MUST match the backend's GOOGLE_PLAYER_REDIRECT_URI
@@ -50,7 +80,7 @@ export function googleLoginUrl(): string {
     response_type: 'code',
     scope: 'openid email profile',
     prompt: 'select_account',
-    state: redirectBack(),
+    state: makeOAuthState(),
   })
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`
 }
@@ -58,9 +88,7 @@ export function googleLoginUrl(): string {
 // LINE Login — redirect_uri must match the channel's Callback URL + backend LINE_REDIRECT_URI.
 export function lineLoginUrl(): string {
   const redirectUri = `${window.location.origin}/auth/line/callback`
-  // LINE requires a state param; stash the return path so the callback can resume.
-  const state = btoa(redirectBack())
-  sessionStorage.setItem('line_oauth_state', state)
+  const state = makeOAuthState() // return path + CSRF nonce
   const params = new URLSearchParams({
     response_type: 'code',
     client_id: LINE_CHANNEL_ID ?? '',

@@ -104,9 +104,10 @@ interface Props {
   onLeaveQueue: () => void
   onLeavePlaying: () => void
   onVoteEnd: () => void
+  votePending?: boolean
 }
 
-export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying, onVoteEnd }: Props) {
+export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying, onVoteEnd, votePending = false }: Props) {
   // playing is a fixed 4-slot array; empty slots have player_id === ''
   const slots = court.playing
   const filled = slots.filter((p) => p.player_id).length
@@ -183,7 +184,8 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
             <div className="text-center text-sm font-bold text-emerald-600">⚡ 你在場上打!</div>
             <button
               onClick={onVoteEnd}
-              className={`w-full text-sm rounded-2xl py-2 font-bold border-2 active:scale-95 transition-transform ${
+              disabled={votePending}
+              className={`w-full text-sm rounded-2xl py-2 font-bold border-2 active:scale-95 transition-transform disabled:opacity-50 ${
                 iVoted
                   ? 'bg-rose-50 border-rose-300 text-rose-500'
                   : 'bg-gray-50 border-gray-200 text-gray-500'
