@@ -335,30 +335,50 @@ export function LobbyPage() {
         )}
 
         {filtered.map((s) => (
-          <motion.button
+          <motion.div
             key={s.session_id}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            onClick={() => nav(`/?s=${s.session_id}`)}
-            className="card w-full text-left flex items-center justify-between
-              active:scale-[0.98] transition-transform"
+            className="card w-full"
           >
-            <div>
-              <p className="font-extrabold text-gray-800 text-lg">{s.title || '羽球團'}</p>
-              {(s.city || s.district) && (
-                <p className="text-xs text-brand-pink font-semibold mt-0.5">
-                  📍 {s.city}{s.district ? ` · ${s.district}` : ''}
+            <button
+              onClick={() => nav(`/?s=${s.session_id}`)}
+              className="w-full text-left flex items-center justify-between
+                active:scale-[0.98] transition-transform"
+            >
+              <div>
+                <p className="font-extrabold text-gray-800 text-lg">{s.title || '羽球團'}</p>
+                {(s.city || s.district) && (
+                  <p className="text-xs text-brand-pink font-semibold mt-0.5">
+                    📍 {s.city}{s.district ? ` · ${s.district}` : ''}
+                  </p>
+                )}
+                <p className="text-sm text-gray-400 mt-0.5">
+                  {fmtRange(s) && <span>{fmtRange(s)} · </span>}
+                  {s.num_courts} 個球場
                 </p>
-              )}
-              <p className="text-sm text-gray-400 mt-0.5">
-                {fmtRange(s) && <span>{fmtRange(s)} · </span>}
-                {s.num_courts} 個球場
-              </p>
-            </div>
-            <span className="bg-brand-pink text-white font-bold px-4 py-2 rounded-2xl text-sm">
-              加入 →
-            </span>
-          </motion.button>
+              </div>
+              <span className="bg-brand-pink text-white font-bold px-4 py-2 rounded-2xl text-sm shrink-0">
+                加入 →
+              </span>
+            </button>
+            {s.contact_url && (
+              <a
+                href={s.contact_url}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                onClick={(e) => {
+                  if (!confirm('這是團主提供的外部連結,內容與本服務無關,確定要前往嗎?')) {
+                    e.preventDefault()
+                  }
+                }}
+                className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-center gap-1.5
+                  text-sm font-semibold text-brand-pink active:opacity-60"
+              >
+                🔗 聯繫團主
+              </a>
+            )}
+          </motion.div>
         ))}
       </div>
     </div>

@@ -85,6 +85,7 @@ export interface SessionSummary {
   start_at?: string
   end_at?: string
   queue_open_at?: string
+  contact_url?: string // 團主提供的外部聯繫連結(選填)
   opened_at: string
 }
 
