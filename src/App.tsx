@@ -11,7 +11,17 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { ConnectionBanner } from './components/ConnectionBanner'
 import { UpdateBanner } from './components/UpdateBanner'
 
-const qc = new QueryClient()
+// real-time comes from the WebSocket; these defaults stop redundant refetch
+// storms (every query re-firing on each tab focus) so we don't hammer the API
+// — important with up to ~200 players online.
+const qc = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 10000,
+    },
+  },
+})
 
 // login is required up front: not logged in → login screen first; then the
 // entry flow when a session is in the URL (?s=…), else the lobby.
