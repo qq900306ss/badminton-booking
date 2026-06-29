@@ -9,6 +9,7 @@ import { isLoggedIn } from './lib/playerAuth'
 import { ToastProvider } from './components/Toast'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ConnectionBanner } from './components/ConnectionBanner'
+import { UpdateBanner } from './components/UpdateBanner'
 
 const qc = new QueryClient()
 
@@ -26,6 +27,7 @@ export default function App() {
       <ErrorBoundary>
       <ToastProvider>
       <ConnectionBanner />
+      <UpdateBanner />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
