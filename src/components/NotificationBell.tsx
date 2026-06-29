@@ -9,7 +9,7 @@ function relTime(ts: number): string {
   return `${Math.floor(s / 86400)} 天前`
 }
 
-export function NotificationBell() {
+export function NotificationBell({ sessionId }: { sessionId: string }) {
   const [open, setOpen] = useState(false)
   const [, bump] = useReducer((n) => n + 1, 0)
 
@@ -19,13 +19,13 @@ export function NotificationBell() {
     return () => window.removeEventListener('notifs-changed', h)
   }, [])
 
-  const notifs = listNotifs()
-  const unread = unreadCount()
+  const notifs = listNotifs(sessionId)
+  const unread = unreadCount(sessionId)
 
   return (
     <>
       <button
-        onClick={() => { setOpen(true); markSeen() }}
+        onClick={() => { setOpen(true); markSeen(sessionId) }}
         className="relative w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center active:scale-90 transition-transform"
         aria-label="通知"
       >
@@ -44,7 +44,7 @@ export function NotificationBell() {
               <span className="font-extrabold text-gray-800">🔔 通知</span>
               <div className="flex items-center gap-3 text-sm">
                 {notifs.length > 0 && (
-                  <button onClick={() => clearNotifs()} className="text-gray-400">清除</button>
+                  <button onClick={() => clearNotifs(sessionId)} className="text-gray-400">清除</button>
                 )}
                 <button onClick={() => setOpen(false)} className="text-gray-400 font-bold">✕</button>
               </div>

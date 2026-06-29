@@ -91,7 +91,7 @@ export function CourtPage() {
       if ((m.t === 'removed' || m.t === 'renamed') && myIdsRef.current.has(m.player)) {
         toast(m.msg, 'info')
         vibrate()
-        pushNotif(m.msg)
+        pushNotif(sid, m.msg)
       }
     })
   }, [sid, myPlayerId, qc, toast])
@@ -143,7 +143,7 @@ export function CourtPage() {
       toast('🏸 輪到你上場了!', 'success')
       playChime()
       vibrate()
-      pushNotif(`🏸 輪到你上場了(${where})`)
+      pushNotif(sid, `🏸 輪到你上場了(${where})`)
       if (document.hidden) notifyTurn(`${where} · 快回來上場`)
     }
     prevState.current = myState
@@ -202,7 +202,7 @@ export function CourtPage() {
           <span className="font-extrabold text-gray-800">球場即時</span>
         </div>
         <div className="flex items-center gap-2">
-          <NotificationBell />
+          <NotificationBell sessionId={sid} />
           <div className="w-8 h-8 rounded-full bg-brand-pink flex items-center justify-center
             text-white font-bold text-sm">
             {[...displayName][0]?.toUpperCase() ?? '?'}
