@@ -13,3 +13,5 @@ export const AVATAR_EMOJIS = [
 export function isPhotoUrl(s?: string): boolean {
   return !!s && /^https?:\/\//.test(s)
 }
+
+export const DEFAULT_ORG_AVATAR = '🐰' // 團主沒設定頭像時的預設

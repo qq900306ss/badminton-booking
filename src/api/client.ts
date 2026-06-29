@@ -72,6 +72,8 @@ export interface SessionView {
   start_at?: string
   end_at?: string
   queue_open_at?: string
+  contact_url?: string
+  avatar_url?: string // 團主頭像(emoji 或照片網址),空=預設 🐰
   courts: CourtView[]
 }
 
@@ -86,6 +88,7 @@ export interface SessionSummary {
   end_at?: string
   queue_open_at?: string
   contact_url?: string // 團主提供的外部聯繫連結(選填)
+  avatar_url?: string // 團主頭像(emoji 或照片網址),空=預設 🐰
   opened_at: string
 }
 

@@ -11,6 +11,7 @@ import { useToast } from '../components/Toast'
 import { playChime, vibrate, notifyTurn, subscribePush } from '../lib/alert'
 import { connectSessionWS } from '../lib/realtime'
 import { pushNotif } from '../lib/notifications'
+import { isPhotoUrl, DEFAULT_ORG_AVATAR } from '../lib/avatar'
 import { sessionApi } from '../api/client'
 
 export function CourtPage() {
@@ -211,9 +212,18 @@ export function CourtPage() {
         </div>
       </div>
 
-      {/* session title */}
+      {/* session title — 團主頭像 + 團名 */}
       {session.title && (
-        <p className="text-center font-extrabold text-gray-700 pt-3">{session.title}</p>
+        <div className="flex items-center justify-center gap-2 pt-3">
+          <div className="w-8 h-8 rounded-full bg-brand-pink/15 flex items-center justify-center shrink-0 overflow-hidden">
+            {isPhotoUrl(session.avatar_url) ? (
+              <img src={session.avatar_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-lg">{session.avatar_url || DEFAULT_ORG_AVATAR}</span>
+            )}
+          </div>
+          <p className="font-extrabold text-gray-700">{session.title}</p>
+        </div>
       )}
 
       {/* 家人共用手機:身份切換 + 帶家人 */}

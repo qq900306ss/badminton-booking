@@ -12,7 +12,7 @@ import { TW_CITIES } from '../lib/twCities'
 import { InstallButton } from '../components/InstallButton'
 import { LevelPicker } from '../components/LevelPicker'
 import { ListSkeleton } from '../components/Skeleton'
-import { isPhotoUrl, AVATAR_EMOJIS } from '../lib/avatar'
+import { isPhotoUrl, AVATAR_EMOJIS, DEFAULT_ORG_AVATAR } from '../lib/avatar'
 
 function fmtRange(s: SessionSummary): string {
   if (!s.start_at) return ''
@@ -400,11 +400,19 @@ export function LobbyPage() {
           >
             <button
               onClick={() => nav(`/?s=${s.session_id}`)}
-              className="w-full text-left flex items-center justify-between
+              className="w-full text-left flex items-center gap-3
                 active:scale-[0.98] transition-transform"
             >
-              <div>
-                <p className="font-extrabold text-gray-800 text-lg">{s.title || '羽球團'}</p>
+              {/* 團主頭像:左側圓形,emoji 配淡底 / 照片裁圓,沒設定用預設 🐰 */}
+              <div className="w-12 h-12 rounded-full bg-brand-pink/15 flex items-center justify-center shrink-0 overflow-hidden">
+                {isPhotoUrl(s.avatar_url) ? (
+                  <img src={s.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl">{s.avatar_url || DEFAULT_ORG_AVATAR}</span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-extrabold text-gray-800 text-lg truncate">{s.title || '羽球團'}</p>
                 {(s.city || s.district) && (
                   <p className="text-xs text-brand-pink font-semibold mt-0.5">
                     📍 {s.city}{s.district ? ` · ${s.district}` : ''}
