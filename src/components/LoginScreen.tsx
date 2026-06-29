@@ -1,8 +1,10 @@
 import { googleLoginUrl, lineLoginUrl, authProvidersConfigured } from '../lib/playerAuth'
+import { isInAppBrowser } from '../lib/inAppBrowser'
 
 // shown when a not-logged-in player tries to join. Browsing stays public;
 // joining/playing requires an account (Google or LINE).
 export function LoginScreen({ title = '登入後加入球場' }: { title?: string }) {
+  const inApp = isInAppBrowser()
   return (
     <div className="min-h-screen bg-brand-bg flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-sm text-center space-y-7">
@@ -11,6 +13,22 @@ export function LoginScreen({ title = '登入後加入球場' }: { title?: strin
           <h1 className="text-2xl font-extrabold text-gray-800">{title}</h1>
           <p className="text-gray-400 text-sm mt-1">用 LINE 或 Google 快速登入,記住你的身份、程度與場次</p>
         </div>
+
+        {inApp && (
+          <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-3 text-left space-y-2">
+            <p className="text-sm font-bold text-amber-700">⚠️ 請用瀏覽器開啟才能登入</p>
+            <p className="text-xs text-amber-600">
+              你現在是從 App 內建瀏覽器開啟的,Google 登入會被擋。請點右上角「⋯」或分享鍵 →
+              選「在瀏覽器開啟 / 用 Safari 開啟」後再登入。
+            </p>
+            <button
+              onClick={() => navigator.clipboard?.writeText(window.location.href)}
+              className="text-xs font-bold text-amber-700 underline"
+            >
+              📋 複製網址(貼到瀏覽器開)
+            </button>
+          </div>
+        )}
 
         <div className="space-y-3">
           {authProvidersConfigured.line && (
