@@ -412,7 +412,7 @@ export function LobbyPage() {
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-extrabold text-gray-800 text-lg break-words" title={s.title}>{s.title || '羽球團'}</p>
+                <p className="font-extrabold text-gray-800 text-lg break-words line-clamp-2" title={s.title}>{s.title || '羽球團'}</p>
                 {(s.city || s.district) && (
                   <p className="text-xs text-brand-pink font-semibold mt-0.5">
                     📍 {s.city}{s.district ? ` · ${s.district}` : ''}
