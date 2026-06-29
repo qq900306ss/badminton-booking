@@ -32,8 +32,10 @@ export function LoginScreen({ title = '登入後加入球場' }: { title?: strin
 
         <div className="space-y-3">
           {authProvidersConfigured.line && (
-            <a
-              href={lineLoginUrl()}
+            <button
+              onClick={() => {
+                window.location.href = lineLoginUrl()
+              }}
               className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-2xl font-bold
                 text-white bg-[#06C755] shadow active:scale-95 transition-transform"
             >
@@ -41,11 +43,13 @@ export function LoginScreen({ title = '登入後加入球場' }: { title?: strin
                 <path d="M12 2C6.48 2 2 5.7 2 10.26c0 4.08 3.55 7.5 8.35 8.15.32.07.77.21.88.49.1.25.06.64.03.89l-.14.85c-.04.25-.2.98.86.53 1.06-.45 5.7-3.36 7.78-5.75C21.4 13.79 22 12.1 22 10.26 22 5.7 17.52 2 12 2zM8.2 12.6H6.6c-.23 0-.42-.19-.42-.42V9.02c0-.23.19-.42.42-.42.24 0 .43.19.43.42v2.74h1.17c.24 0 .43.18.43.41 0 .24-.19.43-.43.43zm1.67-.42c0 .23-.19.42-.43.42a.42.42 0 0 1-.42-.42V9.02c0-.23.19-.42.42-.42.24 0 .43.19.43.42v3.16zm3.8 0c0 .18-.12.34-.29.4a.5.5 0 0 1-.14.02.42.42 0 0 1-.34-.17l-1.62-2.2v1.95c0 .23-.19.42-.43.42a.42.42 0 0 1-.42-.42V9.02c0-.18.11-.34.29-.4a.43.43 0 0 1 .48.15l1.63 2.2V9.02c0-.23.19-.42.42-.42.24 0 .43.19.43.42v3.16zm2.55-2c.24 0 .43.19.43.42 0 .24-.19.43-.43.43h-1.17v.73h1.17c.24 0 .43.19.43.42 0 .24-.19.43-.43.43h-1.6a.42.42 0 0 1-.42-.43V9.02c0-.23.19-.42.42-.42h1.6c.24 0 .43.19.43.42 0 .24-.19.43-.43.43h-1.17v.73h1.17z" />
               </svg>
               用 LINE 登入
-            </a>
+            </button>
           )}
           {authProvidersConfigured.google && (
-            <a
-              href={googleLoginUrl()}
+            <button
+              onClick={() => {
+                window.location.href = googleLoginUrl()
+              }}
               className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-2xl font-bold
                 bg-white border-2 border-gray-200 text-gray-700 shadow-sm active:scale-95 transition-transform"
             >
@@ -56,7 +60,7 @@ export function LoginScreen({ title = '登入後加入球場' }: { title?: strin
                 <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
               </svg>
               使用 Google 登入
-            </a>
+            </button>
           )}
           {!authProvidersConfigured.line && !authProvidersConfigured.google && (
             <p className="text-sm text-red-400">登入尚未設定,請聯絡管理員</p>
