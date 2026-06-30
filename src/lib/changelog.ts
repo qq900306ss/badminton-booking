@@ -4,6 +4,7 @@ export const CHANGELOG: { date: string; items: string[] }[] = [
   {
     date: '2026/06/30',
     items: [
+      '團主可開「公平讓分」:打太多的人會暫時讓給打少的人(開啟時看得到大家場數)',
       '修復 LINE 登入問題,現在可以正常用 LINE 登入了',
     ],
   },

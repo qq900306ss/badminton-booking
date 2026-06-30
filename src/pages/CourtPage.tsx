@@ -7,6 +7,7 @@ import { FamilyBar } from '../components/FamilyBar'
 import { CourtSkeleton } from '../components/Skeleton'
 import { InstallButton } from '../components/InstallButton'
 import { NotificationBell } from '../components/NotificationBell'
+import { FairPlayInfo } from '../components/FairPlayInfo'
 import { useToast } from '../components/Toast'
 import { playChime, vibrate, notifyTurn, subscribePush } from '../lib/alert'
 import { connectSessionWS } from '../lib/realtime'
@@ -248,6 +249,13 @@ export function CourtPage() {
           <p className="text-xs text-amber-600 mt-0.5">先看看球場狀況,時間到就能自己排上場囉</p>
         </div>
       )}
+
+      {/* 公平讓分 / 顯示場數 面板 */}
+      <FairPlayInfo
+        view={session}
+        players={sessionPlayers ?? []}
+        myIds={[myPlayerId, ...myFamily.map((p) => p.player_id)].filter((x): x is string => !!x)}
+      />
 
       {/* courts grid */}
       <div className="p-4 grid gap-4 sm:grid-cols-2">

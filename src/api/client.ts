@@ -74,6 +74,15 @@ export interface SessionView {
   queue_open_at?: string
   contact_url?: string
   avatar_url?: string // 團主頭像(emoji 或照片網址),空=預設 🐰
+  // 進階:公平讓分
+  show_games?: boolean
+  fair_play?: boolean
+  fair_grace_games?: number
+  fair_threshold?: number
+  fair_avg?: number
+  fair_limit?: number
+  fair_active?: number
+  fair_enforced?: boolean
   courts: CourtView[]
 }
 
@@ -98,6 +107,7 @@ export interface SessionPlayer {
   level: number
   claimed: boolean
   is_temp: boolean
+  games?: number // 打過幾場(公平讓分 / 顯示場數用)
   avatar_url?: string
   owner_id?: string // 家人子身份:帶它來的手機帳號
   pending?: boolean // 家人待團主核准
