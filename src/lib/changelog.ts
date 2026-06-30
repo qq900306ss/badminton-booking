@@ -2,6 +2,12 @@
 // short and in plain language (player audience).
 export const CHANGELOG: { date: string; items: string[] }[] = [
   {
+    date: '2026/06/30',
+    items: [
+      '修復 LINE 登入問題,現在可以正常用 LINE 登入了',
+    ],
+  },
+  {
     date: '2026/06/29',
     items: [
       '每個團會顯示團主頭像,更好認(團主沒設就用預設 🐰)',
