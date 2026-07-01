@@ -177,7 +177,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
       {/* actions */}
       {imPlaying && full && (() => {
         const votes = court.end_votes ?? []
-        const needed = court.end_votes_needed ?? 3
+        const needed = court.end_votes_needed ?? 2
         const iVoted = myPlayerId ? votes.includes(myPlayerId) : false
         return (
           <div className="space-y-1.5">

@@ -2,6 +2,12 @@
 // short and in plain language (player audience).
 export const CHANGELOG: { date: string; items: string[] }[] = [
   {
+    date: '2026/07/01',
+    items: [
+      '投票結束改成「2 票」就能結束這場、換下一組(原本 3 票)',
+    ],
+  },
+  {
     date: '2026/06/30',
     items: [
       '團主可開「公平讓分」:打太多的人會暫時讓給打少的人(開啟時看得到大家場數)',
