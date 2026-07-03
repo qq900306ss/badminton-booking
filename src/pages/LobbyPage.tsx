@@ -13,6 +13,7 @@ import { InstallButton } from '../components/InstallButton'
 import { LevelPicker } from '../components/LevelPicker'
 import { ListSkeleton } from '../components/Skeleton'
 import { isPhotoUrl, AVATAR_EMOJIS, DEFAULT_ORG_AVATAR } from '../lib/avatar'
+import { OnboardingCards, ONBOARD_KEY } from '../components/OnboardingCards'
 
 function fmtRange(s: SessionSummary): string {
   if (!s.start_at) return ''
@@ -98,6 +99,11 @@ export function LobbyPage() {
     sessionStorage.setItem('intro_seen', '1')
     setShowIntro(false)
   }
+
+  // 首次使用 → intro 動畫結束後接翻頁導覽;之後可從設定重看
+  const [showOnboard, setShowOnboard] = useState(
+    () => localStorage.getItem(ONBOARD_KEY) !== '1'
+  )
 
   const { data: sessions, isLoading } = useQuery({
     queryKey: ['open-sessions'],
@@ -288,6 +294,12 @@ export function LobbyPage() {
             {/* secondary actions tucked here so the top bar stays uncluttered */}
             <div className="border-t pt-3 grid grid-cols-2 gap-2">
               <HelpButton className="btn-secondary text-sm col-span-2" />
+              <button
+                onClick={() => { setEditName(false); setShowOnboard(true) }}
+                className="btn-secondary text-sm col-span-2"
+              >
+                📖 使用教學(重看導覽)
+              </button>
               <ChangelogButton className="btn-secondary text-sm" />
               <FeedbackButton className="btn-secondary text-sm" />
               <button
@@ -303,6 +315,7 @@ export function LobbyPage() {
       )}
 
       <AnimatePresence>{showIntro && <Intro onDone={dismissIntro} />}</AnimatePresence>
+      {!showIntro && showOnboard && <OnboardingCards onClose={() => setShowOnboard(false)} />}
 
       <header className="px-4 pt-8 pb-4 text-center">
         <div className="text-5xl mb-2">🏸</div>
