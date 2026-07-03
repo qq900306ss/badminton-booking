@@ -326,6 +326,36 @@ export function LobbyPage() {
       <div className="max-w-md mx-auto p-4 space-y-3">
         <InstallButton />
 
+        {/* 📋 我的場次:已加入 / 報名審核情況,一眼看到、一鍵回場 */}
+        {list.some((s) => s.my_status) && (
+          <div className="card space-y-2">
+            <span className="font-bold text-gray-700">📋 我的場次</span>
+            {list.filter((s) => s.my_status).map((s) => (
+              <button
+                key={s.session_id}
+                onClick={() => nav(`/?s=${s.session_id}`)}
+                className={`w-full text-left px-3 py-2.5 rounded-2xl flex items-center justify-between gap-2
+                  active:scale-[0.98] transition-transform
+                  ${s.my_status === 'member' ? 'bg-brand-mint/40' : 'bg-brand-yellow/40'}`}
+              >
+                <div className="min-w-0">
+                  <p className="font-bold text-gray-700 truncate">{s.title || '羽球團'}</p>
+                  <p className="text-xs text-gray-500">{fmtRange(s)}</p>
+                </div>
+                {s.my_status === 'member' ? (
+                  <span className="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full bg-white text-emerald-600">
+                    ✅ 已加入 · 進場 →
+                  </span>
+                ) : (
+                  <span className="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full bg-white text-amber-600">
+                    🙋 報名中 · 等核准
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* 星期篩選 — 球團多為每週固定,依場次日期的星期分流 */}
         <div className="flex gap-1.5 overflow-x-auto -mx-1 px-1 pb-1 no-scrollbar">
           {[
@@ -447,8 +477,16 @@ export function LobbyPage() {
                   <p className="text-xs text-gray-400 mt-1 line-clamp-2 whitespace-pre-wrap">{s.description}</p>
                 )}
               </div>
-              <span className="bg-brand-pink text-white font-bold px-4 py-2 rounded-2xl text-sm shrink-0">
-                {s.signup_open ? '加入/報名 →' : '加入 →'}
+              <span
+                className={`font-bold px-4 py-2 rounded-2xl text-sm shrink-0 ${
+                  s.my_status === 'member'
+                    ? 'bg-brand-mint text-emerald-700'
+                    : s.my_status === 'pending'
+                      ? 'bg-brand-yellow text-amber-700'
+                      : 'bg-brand-pink text-white'
+                }`}
+              >
+                {s.my_status === 'member' ? '✅ 進場 →' : s.my_status === 'pending' ? '🙋 報名中' : s.signup_open ? '加入/報名 →' : '加入 →'}
               </span>
             </button>
             {s.contact_url && (

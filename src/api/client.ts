@@ -111,6 +111,7 @@ export interface SessionSummary {
   signup_quota?: number
   joined_count?: number
   pending_signups?: number
+  my_status?: 'member' | 'pending' // 已加入 / 報名中(帶登入態打大廳才有)
 }
 
 export interface SessionPlayer {
