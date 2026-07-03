@@ -422,9 +422,20 @@ export function LobbyPage() {
                   {fmtRange(s) && <span>{fmtRange(s)} · </span>}
                   {s.num_courts} 個球場
                 </p>
+                {/* 開放報名的場次:已加入(/名額)· 報名中 */}
+                {s.signup_open && s.joined_count !== undefined && (
+                  <p className="text-xs font-semibold text-amber-600 mt-0.5">
+                    🙋 已加入 {s.joined_count}{(s.signup_quota ?? 0) > 0 ? `/${s.signup_quota}` : ''} 人
+                    {(s.pending_signups ?? 0) > 0 && <> · 報名中 {s.pending_signups}</>}
+                  </p>
+                )}
+                {/* 團簡介:卡片上最多兩行,點進去看全文 */}
+                {s.description && (
+                  <p className="text-xs text-gray-400 mt-1 line-clamp-2 whitespace-pre-wrap">{s.description}</p>
+                )}
               </div>
               <span className="bg-brand-pink text-white font-bold px-4 py-2 rounded-2xl text-sm shrink-0">
-                加入 →
+                {s.signup_open ? '加入/報名 →' : '加入 →'}
               </span>
             </button>
             {s.contact_url && (

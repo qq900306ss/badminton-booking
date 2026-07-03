@@ -2,6 +2,13 @@
 // short and in plain language (player audience).
 export const CHANGELOG: { date: string; items: string[] }[] = [
   {
+    date: '2026/07/03',
+    items: [
+      '沒密碼也能加入了!開放報名的團可以直接「🙋 報名」、留句話給團主,核准後自動進場',
+      '首頁球局卡會顯示團簡介和「已加入 X 人 · 報名中 N 人」,更好挑團',
+    ],
+  },
+  {
     date: '2026/07/01',
     items: [
       '投票結束改成「2 票」就能結束這場、換下一組(原本 3 票)',

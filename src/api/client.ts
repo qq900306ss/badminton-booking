@@ -74,6 +74,12 @@ export interface SessionView {
   queue_open_at?: string
   contact_url?: string
   avatar_url?: string // 團主頭像(emoji 或照片網址),空=預設 🐰
+  // 前台報名
+  description?: string // 團簡介(選填)
+  signup_open?: boolean // 這場開放前台報名
+  signup_quota?: number // 收人名額(0=不限,軟上限)
+  joined_count?: number // 已加入人數
+  pending_signups?: number // 報名中(等核准)人數
   // 進階:公平讓分
   show_games?: boolean
   fair_play?: boolean
@@ -99,6 +105,12 @@ export interface SessionSummary {
   contact_url?: string // 團主提供的外部聯繫連結(選填)
   avatar_url?: string // 團主頭像(emoji 或照片網址),空=預設 🐰
   opened_at: string
+  // 前台報名(只有開放報名的場次會帶 counts)
+  description?: string
+  signup_open?: boolean
+  signup_quota?: number
+  joined_count?: number
+  pending_signups?: number
 }
 
 export interface SessionPlayer {
@@ -134,6 +146,16 @@ export const sessionApi = {
 
   getView: (sessionId: string) =>
     api.get<{ data: SessionView }>(`/api/sessions/${sessionId}`),
+
+  // 前台報名(需登入):報名/改留言、取消、查自己的狀態
+  signup: (sessionId: string, message: string) =>
+    api.post<{ data: { status: string; message: string } }>(
+      `/api/sessions/${sessionId}/signup`, { message }),
+  cancelSignup: (sessionId: string) =>
+    api.delete(`/api/sessions/${sessionId}/signup`),
+  mySignup: (sessionId: string) =>
+    api.get<{ data: { status: 'none' | 'pending' | 'member'; message?: string } }>(
+      `/api/sessions/${sessionId}/signup`),
 
   getPlayers: (sessionId: string) =>
     api.get<{ data: SessionPlayer[] }>(`/api/sessions/${sessionId}/players`),
