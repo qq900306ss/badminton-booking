@@ -29,6 +29,7 @@ export function EntryPage() {
   const [signupMsg, setSignupMsg] = useState('')
   const [editingMsg, setEditingMsg] = useState(false)
   const [signupBusy, setSignupBusy] = useState(false)
+  const [familyNames, setFamilyNames] = useState<string[]>([]) // 一起報名的家人(≤5)
 
   const loggedIn = isLoggedIn()
 
@@ -133,7 +134,8 @@ export function EntryPage() {
     setSignupBusy(true)
     setError('')
     try {
-      await sessionApi.signup(sessionId, signupMsg.trim())
+      await sessionApi.signup(sessionId, signupMsg.trim(),
+        familyNames.map((n) => n.trim()).filter(Boolean))
       requestNotify() // 核准通知會用到
       setEditingMsg(false)
       qc.invalidateQueries({ queryKey: ['my-signup', sessionId] })
@@ -147,7 +149,8 @@ export function EntryPage() {
   }
 
   async function withdrawSignup() {
-    if (!window.confirm('取消報名?之後還是可以再報。')) return
+    const withFamily = (mySignup?.family_names?.length ?? 0) > 0
+    if (!window.confirm(withFamily ? '取消報名?一起報名的家人也會一併取消,之後還是可以再報。' : '取消報名?之後還是可以再報。')) return
     setSignupBusy(true)
     try {
       await sessionApi.cancelSignup(sessionId)
@@ -209,6 +212,12 @@ export function EntryPage() {
           <div className="card mb-4 border-2 border-amber-300 bg-amber-50 space-y-2">
             <p className="font-bold text-amber-700">🙋 報名中,等團主確認</p>
             <p className="text-xs text-amber-600">核准後這頁會自動帶你進場;也可以先關掉,核准會通知你。</p>
+            {(mySignup?.family_names?.length ?? 0) > 0 && (
+              <p className="text-sm text-gray-600">
+                👨‍👩‍👧 一起報名:{mySignup?.family_names?.join('、')}
+                <span className="text-xs text-gray-400">(要改的話取消報名再重報)</span>
+              </p>
+            )}
             {!editingMsg ? (
               <div className="flex items-center gap-2">
                 <p className="flex-1 text-sm text-gray-600 whitespace-pre-wrap">
@@ -291,13 +300,47 @@ export function EntryPage() {
               className="w-full border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm resize-none
                 focus:outline-none focus:border-brand-pink"
             />
+            {/* 帶家人一起報名(同一支手機的同行者,核准後由你代操作) */}
+            {familyNames.map((n, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  value={n}
+                  onChange={(e) =>
+                    setFamilyNames(familyNames.map((x, j) => (j === i ? e.target.value : x)))
+                  }
+                  placeholder={`家人 ${i + 1} 的名字`}
+                  maxLength={40}
+                  autoFocus={n === ''}
+                  className="flex-1 border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm
+                    focus:outline-none focus:border-brand-pink"
+                />
+                <button
+                  onClick={() => setFamilyNames(familyNames.filter((_, j) => j !== i))}
+                  className="text-gray-300 hover:text-red-400 font-bold px-1"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {familyNames.length < 5 && (
+              <button
+                onClick={() => setFamilyNames([...familyNames, ''])}
+                className="w-full text-xs font-semibold text-brand-pink py-1"
+              >
+                ＋ 帶家人一起報名(最多 5 位)
+              </button>
+            )}
             <button
               onClick={submitSignup}
               disabled={signupBusy}
               className="w-full text-sm font-bold py-2.5 rounded-2xl bg-brand-yellow text-amber-700
                 active:scale-95 transition-transform disabled:opacity-40"
             >
-              {signupBusy ? '送出中…' : '🙋 送出報名'}
+              {signupBusy
+                ? '送出中…'
+                : familyNames.filter((n) => n.trim()).length > 0
+                  ? `🙋 送出報名(共 ${1 + familyNames.filter((n) => n.trim()).length} 人)`
+                  : '🙋 送出報名'}
             </button>
           </div>
         )}

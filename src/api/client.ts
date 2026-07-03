@@ -147,14 +147,14 @@ export const sessionApi = {
   getView: (sessionId: string) =>
     api.get<{ data: SessionView }>(`/api/sessions/${sessionId}`),
 
-  // 前台報名(需登入):報名/改留言、取消、查自己的狀態
-  signup: (sessionId: string, message: string) =>
-    api.post<{ data: { status: string; message: string } }>(
-      `/api/sessions/${sessionId}/signup`, { message }),
+  // 前台報名(需登入):報名/改留言/帶家人、取消、查自己的狀態
+  signup: (sessionId: string, message: string, familyNames: string[] = []) =>
+    api.post<{ data: { status: string; message: string; family_names: string[] } }>(
+      `/api/sessions/${sessionId}/signup`, { message, family_names: familyNames }),
   cancelSignup: (sessionId: string) =>
     api.delete(`/api/sessions/${sessionId}/signup`),
   mySignup: (sessionId: string) =>
-    api.get<{ data: { status: 'none' | 'pending' | 'member'; message?: string } }>(
+    api.get<{ data: { status: 'none' | 'pending' | 'member'; message?: string; family_names?: string[] } }>(
       `/api/sessions/${sessionId}/signup`),
 
   getPlayers: (sessionId: string) =>
