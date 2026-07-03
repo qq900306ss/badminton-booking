@@ -199,11 +199,31 @@ export function EntryPage() {
           )}
         </div>
 
-        {/* 團簡介(團主選填) */}
-        {view?.description && (
+        {/* 團簡介 + 聯繫團主(團主選填;人家簡介常寫「先聯繫團長」,按鈕就要在旁邊) */}
+        {(view?.description || view?.contact_url) && (
           <div className="card mb-4">
-            <p className="text-xs font-bold text-gray-400 mb-1">📣 團主的話</p>
-            <p className="text-sm text-gray-600 whitespace-pre-wrap">{view.description}</p>
+            {view.description && (
+              <>
+                <p className="text-xs font-bold text-gray-400 mb-1">📣 團主的話</p>
+                <p className="text-sm text-gray-600 whitespace-pre-wrap">{view.description}</p>
+              </>
+            )}
+            {view.contact_url && (
+              <a
+                href={view.contact_url}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                onClick={(e) => {
+                  if (!window.confirm('這是團主提供的外部連結,內容與本服務無關,確定要前往嗎?')) {
+                    e.preventDefault()
+                  }
+                }}
+                className={`flex items-center justify-center gap-1.5 text-sm font-semibold
+                  text-brand-pink active:opacity-60 ${view.description ? 'mt-3 pt-3 border-t border-gray-100' : ''}`}
+              >
+                🔗 聯繫團主
+              </a>
+            )}
           </div>
         )}
 
