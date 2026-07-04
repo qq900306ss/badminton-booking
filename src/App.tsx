@@ -1,10 +1,14 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { EntryPage } from './pages/EntryPage'
-import { CourtPage } from './pages/CourtPage'
-import { LobbyPage } from './pages/LobbyPage'
-import { AuthCallback } from './pages/AuthCallback'
 import { LoginScreen } from './components/LoginScreen'
+
+// route-level code splitting:首包只留登入畫面與外殼,頁面各自成 chunk,
+// 場館爛 wifi 首次開啟快很多(568KB 單包 → 拆小)
+const EntryPage = lazy(() => import('./pages/EntryPage').then((m) => ({ default: m.EntryPage })))
+const CourtPage = lazy(() => import('./pages/CourtPage').then((m) => ({ default: m.CourtPage })))
+const LobbyPage = lazy(() => import('./pages/LobbyPage').then((m) => ({ default: m.LobbyPage })))
+const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })))
 import { isLoggedIn } from './lib/playerAuth'
 import { ToastProvider } from './components/Toast'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -39,13 +43,15 @@ export default function App() {
       <ConnectionBanner />
       <UpdateBanner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/auth/callback" element={<AuthCallback provider="google" />} />
-          <Route path="/auth/line/callback" element={<AuthCallback provider="line" />} />
-          <Route path="/court/:sessionId" element={<CourtPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={<div className="min-h-screen bg-brand-bg" />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/auth/callback" element={<AuthCallback provider="google" />} />
+            <Route path="/auth/line/callback" element={<AuthCallback provider="line" />} />
+            <Route path="/court/:sessionId" element={<CourtPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
       </ToastProvider>
       </ErrorBoundary>

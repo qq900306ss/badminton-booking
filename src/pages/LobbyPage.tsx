@@ -449,7 +449,7 @@ export function LobbyPage() {
               {/* 團主頭像:左側圓形,emoji 配淡底 / 照片裁圓,沒設定用預設 🐰 */}
               <div className="w-12 h-12 rounded-full bg-brand-pink/15 flex items-center justify-center shrink-0 overflow-hidden">
                 {isPhotoUrl(s.avatar_url) ? (
-                  <img src={s.avatar_url} alt="" className="w-full h-full object-cover" />
+                  <img src={s.avatar_url} alt="" loading="lazy" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-2xl">{s.avatar_url || DEFAULT_ORG_AVATAR}</span>
                 )}

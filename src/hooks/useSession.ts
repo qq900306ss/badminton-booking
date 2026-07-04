@@ -3,23 +3,25 @@ import { sessionApi } from '../api/client'
 import type { SessionView, PlayerSlot } from '../api/client'
 import { useToast, errMsg } from '../components/Toast'
 
-export function useSessionView(sessionId: string) {
+// 推送求快、輪詢對帳:WS 活著時資料由伺服器主動推,輪詢降到 60 秒只做
+// 「對帳」(萬一哪則推播漏了,最多慢一分鐘自己追平);WS 斷線時回到 30 秒。
+const reconcileMs = (live: boolean) => (live ? 60000 : 30000)
+
+export function useSessionView(sessionId: string, live = false) {
   return useQuery({
     queryKey: ['session', sessionId],
     queryFn: () => sessionApi.getView(sessionId).then((r) => r.data.data),
-    // CourtPage connects a WebSocket that invalidates this on every change;
-    // this slow interval is only a fallback for a dropped socket.
-    refetchInterval: 30000,
+    refetchInterval: reconcileMs(live),
     enabled: !!sessionId,
   })
 }
 
-export function useSessionPlayers(sessionId: string, poll = false) {
+export function useSessionPlayers(sessionId: string, poll = false, live = false) {
   return useQuery({
     queryKey: ['session-players', sessionId],
     queryFn: () => sessionApi.getPlayers(sessionId).then((r) => r.data.data),
     enabled: !!sessionId,
-    refetchInterval: poll ? 30000 : false, // WS-driven; slow fallback only
+    refetchInterval: poll ? reconcileMs(live) : false,
   })
 }
 
@@ -55,8 +57,9 @@ export function useCourtActions(sessionId: string) {
       onError: (e: unknown, _v: V, ctx: { prev?: SessionView } | undefined) => {
         if (ctx?.prev) qc.setQueryData(key, ctx.prev)
         toast(errMsg(e))
+        invalidate() // 回滾後跟伺服器對一次帳
       },
-      onSettled: () => invalidate(),
+      // 成功不再 invalidate:WS 會推最新 view 過來(自己也收得到),省一次重抓
     }
   }
 
@@ -100,8 +103,16 @@ export function useCourtActions(sessionId: string) {
   const joinQueue = useMutation({
     mutationFn: (v: { courtId: string; asPlayer?: string }) =>
       sessionApi.joinQueue(sessionId, v.courtId, v.asPlayer),
-    onSuccess: invalidate,
-    onError: (e: unknown) => toast(errMsg(e)),
+    ...optimistic<{ courtId: string; asPlayer?: string }>((draft, v) => {
+      if (v.asPlayer) return // family action: skip optimistic, rely on WS
+      const id = myId()
+      draft.courts.forEach((c) => {
+        c.playing = c.playing.map((p) => (p.player_id === id ? emptySlot() : p))
+        c.queue = c.queue.filter((p) => p.player_id !== id)
+      })
+      const c = draft.courts.find((cc) => cc.court_id === v.courtId)
+      if (c && c.queue.length < 4) c.queue.push(meSlot())
+    }),
   })
 
   const voteEnd = useMutation({

@@ -41,8 +41,9 @@ export function CourtPage() {
     )
   }, [sid]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const { data: session, isLoading } = useSessionView(sessionId ?? '')
-  const { data: sessionPlayers, dataUpdatedAt: playersUpdatedAt } = useSessionPlayers(sid, true)
+  const [wsUp, setWsUp] = useState(false) // WS 活著 → 輪詢降頻成 60 秒對帳
+  const { data: session, isLoading } = useSessionView(sessionId ?? '', wsUp)
+  const { data: sessionPlayers, dataUpdatedAt: playersUpdatedAt } = useSessionPlayers(sid, true, wsUp)
   const { joinPlaying, joinQueue, leaveQueue, leavePlaying, voteEnd, addFamily, removeFamily } =
     useCourtActions(sessionId ?? '')
 
@@ -77,25 +78,40 @@ export function CourtPage() {
     if (!stillUsable) setActivePlayerId(myPlayerId)
   }, [sessionPlayers, activePlayerId, myPlayerId])
 
-  // real-time: WS nudge → refetch instantly; targeted "removed" → toast + log
+  // real-time: 伺服器直接把最新資料夾在 WS 訊息裡 → setQueryData 零重抓;
+  // 沒帶 payload(舊格式/伺服器組失敗)才 fallback 成 invalidate→refetch。
+  // lastApplied 擋亂序:只套用比上次新的訊息(伺服器帶 at 時間戳)。
+  const lastApplied = useRef(0)
   useEffect(() => {
     if (!sid) return
-    return connectSessionWS(sid, (m) => {
-      // refetch only what changed (server's scope); court-only changes skip the
-      // players query
-      const scope = m.t === 'changed' ? m.scope ?? 'all' : 'all'
-      qc.invalidateQueries({ queryKey: ['session', sid] })
-      // court/session-only scopes don't touch the roster → skip the players query
-      if (scope !== 'court' && scope !== 'session') {
-        qc.invalidateQueries({ queryKey: ['session-players', sid] })
-      }
-      // toast when the event is about me OR one of my family members
-      if ((m.t === 'removed' || m.t === 'renamed') && myIdsRef.current.has(m.player)) {
-        toast(m.msg, 'info')
-        vibrate()
-        pushNotif(sid, m.msg)
-      }
-    })
+    return connectSessionWS(
+      sid,
+      (m) => {
+        if (m.t === 'changed') {
+          if (m.view) {
+            const at = m.at ?? Date.now()
+            if (at >= lastApplied.current) {
+              lastApplied.current = at
+              qc.setQueryData(['session', sid], m.view)
+              if (m.players) qc.setQueryData(['session-players', sid], m.players)
+            }
+          } else {
+            const scope = m.scope ?? 'all'
+            qc.invalidateQueries({ queryKey: ['session', sid] })
+            if (scope !== 'court' && scope !== 'session') {
+              qc.invalidateQueries({ queryKey: ['session-players', sid] })
+            }
+          }
+        }
+        // toast when the event is about me OR one of my family members
+        if ((m.t === 'removed' || m.t === 'renamed') && myIdsRef.current.has(m.player)) {
+          toast(m.msg, 'info')
+          vibrate()
+          pushNotif(sid, m.msg)
+        }
+      },
+      setWsUp
+    )
   }, [sid, myPlayerId, qc, toast])
 
   // if the leader removed me from the session, boot me back to entry.
