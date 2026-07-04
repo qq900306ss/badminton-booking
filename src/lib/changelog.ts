@@ -2,6 +2,12 @@
 // short and in plain language (player audience).
 export const CHANGELOG: { date: string; items: string[] }[] = [
   {
+    date: '2026/07/05',
+    items: [
+      '⚡ 全面提速:上場、排隊點了立刻反應,大家的操作即時同步到你畫面,網頁開啟也更快了',
+    ],
+  },
+  {
     date: '2026/07/03',
     items: [
       '沒密碼也能加入了!開放報名的團可以直接「🙋 報名」、留句話給團主,核准後自動進場',
