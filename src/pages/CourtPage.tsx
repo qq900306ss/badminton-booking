@@ -78,10 +78,24 @@ export function CourtPage() {
     if (!stillUsable) setActivePlayerId(myPlayerId)
   }, [sessionPlayers, activePlayerId, myPlayerId])
 
+  // 鎖屏/切走時 OS 凍結頁面,WS 被掐死、期間廣播全錯過 —— 回到前景那一刻
+  // 立刻對帳,別等 60 秒輪詢(全域 refetchOnWindowFocus 是關的,這裡自己補)
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && sid) {
+        qc.invalidateQueries({ queryKey: ['session', sid] })
+        qc.invalidateQueries({ queryKey: ['session-players', sid] })
+      }
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [sid, qc])
+
   // real-time: 伺服器直接把最新資料夾在 WS 訊息裡 → setQueryData 零重抓;
   // 沒帶 payload(舊格式/伺服器組失敗)才 fallback 成 invalidate→refetch。
   // lastApplied 擋亂序:只套用比上次新的訊息(伺服器帶 at 時間戳)。
   const lastApplied = useRef(0)
+  const wasDown = useRef(false) // WS 斷過 → 重連成功那刻補一次對帳(斷線期間的廣播救不回來)
   useEffect(() => {
     if (!sid) return
     return connectSessionWS(
@@ -110,7 +124,16 @@ export function CourtPage() {
           pushNotif(sid, m.msg)
         }
       },
-      setWsUp
+      (up) => {
+        setWsUp(up)
+        if (up && wasDown.current) {
+          // 剛從斷線恢復:斷線期間的推播已經丟了,主動拉一次真相
+          wasDown.current = false
+          qc.invalidateQueries({ queryKey: ['session', sid] })
+          qc.invalidateQueries({ queryKey: ['session-players', sid] })
+        }
+        if (!up) wasDown.current = true
+      }
     )
   }, [sid, myPlayerId, qc, toast])
 
