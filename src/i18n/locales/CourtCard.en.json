@@ -1,0 +1,24 @@
+{
+  "CourtCard": {
+    "me": "Me",
+    "joinThisSlot": "Join this slot",
+    "courtLabel": "Court {{num}}",
+    "empty": "Empty",
+    "playing": "In progress",
+    "elapsed": " · {{mins}} min played",
+    "filling": "Filling up {{filled}}/4",
+    "queue": "Queue",
+    "youArePlaying": "⚡ You're on court!",
+    "votedEnd": "Voted to end {{votes}}/{{needed}} (tap to undo)",
+    "voteEnd": "🗳 Vote to end this game {{votes}}/{{needed}}",
+    "voteHint": "When {{needed}} players on court agree, the game ends automatically and the next group is up",
+    "moveHint": "👆 Tap another open slot to switch · waiting for 4 players to start",
+    "leaveCourt": "Leave court (switch)",
+    "leaveQueue": "Leave queue (Court {{num}})",
+    "inAnotherCourt": "You're already in another court",
+    "notOpen": "Not open yet",
+    "tapToPlay": "👆 Tap an open slot to go on court",
+    "waitInQueue": "Join queue",
+    "queueOnly": "Just queue for now (don't go on court)"
+  }
+}

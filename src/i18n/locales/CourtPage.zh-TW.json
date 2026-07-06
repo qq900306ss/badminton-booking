@@ -1,0 +1,18 @@
+{
+  "CourtPage": {
+    "removedFromSession": "你已被移出本場,請重新選身份",
+    "yourTurnToast": "🏸 輪到你上場了!",
+    "yourTurnNotif": "🏸 輪到你上場了({{where}})",
+    "comeBackToPlay": "{{where}} · 快回來上場",
+    "courtLabel": "場地 {{num}}",
+    "sessionNotFound": "找不到這場球局",
+    "sessionEnded": "這場球局已結束",
+    "thanksSeeYou": "感謝參與,下次再來!",
+    "backToLobby": "回大廳",
+    "liveCourt": "球場即時",
+    "queueOpensAt": "排隊 {{time}} 開放",
+    "queueLockedHint": "先看看球場狀況,時間到就能自己排上場囉",
+    "installLabel": "📲 裝到桌面 · 收「輪到你了」通知",
+    "liveUpdateFooter": "⚡ 即時更新(WebSocket)"
+  }
+}

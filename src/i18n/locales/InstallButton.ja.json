@@ -1,0 +1,44 @@
+{
+  "InstallButton": {
+    "installLabel": "📲 ホーム画面に追加",
+    "gotIt": "わかりました",
+    "copied": "URL をコピーしました",
+    "copyLink": "URL をコピー(ブラウザに貼り付け)",
+    "inapp": {
+      "title": "まずブラウザで開いてください",
+      "body": "現在アプリ(FB / Messenger / IG / LINE)の内蔵ブラウザを使っているため、**インストールできません**。",
+      "useInstead": "",
+      "or": " または ",
+      "openSuffix": " で開いてください:",
+      "step1Prefix": "画面右上の ",
+      "step1Suffix": "(またはメニュー)をタップ",
+      "step2Prefix": "",
+      "step2Bold": "「外部ブラウザで開く」/「Chromeで開く」",
+      "step2Suffix": "を選択",
+      "step3": "そこでもう一度「ホーム画面に追加」をタップ"
+    },
+    "ios": {
+      "title": "iPhone にインストール",
+      "step1Prefix": "",
+      "step1Suffix": " でこのサイトを開く",
+      "step2Prefix": "下部中央の",
+      "step2Bold": "「共有」",
+      "step2Suffix": "ボタン(上矢印付きの四角)をタップ",
+      "step3Prefix": "下にスクロールして",
+      "step3Bold": "「ホーム画面に追加」",
+      "step3Suffix": "をタップ",
+      "step4Prefix": "右上の",
+      "step4Bold": "「追加」",
+      "step4Suffix": "をタップ"
+    },
+    "generic": {
+      "title": "ホーム画面に追加",
+      "part1": "ブラウザのメニュー(",
+      "part2": " または共有ボタン)から",
+      "bold1": "「アプリをインストール」",
+      "mid": " または ",
+      "bold2": "「ホーム画面に追加」",
+      "part3": "を選べば完了です。"
+    }
+  }
+}

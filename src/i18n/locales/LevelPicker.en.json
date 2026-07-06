@@ -1,0 +1,10 @@
+{
+  "LevelPicker": {
+    "refTitle": "Badminton skill levels",
+    "refSubtitle": "Grading system by the Chinese Taipei Badminton Association — pick the one closest to you",
+    "yourLevel": "Your badminton level",
+    "seeGuide": "See level guide",
+    "tierLevel": "{{tier}} · Level {{level}}",
+    "notSure": "Not sure? Just put 3 — the host can adjust it for you later 👍"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "FamilyBar": {
+    "operating": "Operating as",
+    "pending": "Pending",
+    "removeFamily": "Remove family member",
+    "bringFamily": "＋Bring family",
+    "addHint": "Bring one family member (shares this phone, needs host approval)",
+    "namePlaceholder": "Family member's name",
+    "pickAvatar": "Pick an avatar",
+    "submitting": "Submitting...",
+    "submit": "Add (awaiting host approval)",
+    "operatingNote": "👪 You're operating for a family member — going on/off court and queuing are recorded under their name"
+  }
+}

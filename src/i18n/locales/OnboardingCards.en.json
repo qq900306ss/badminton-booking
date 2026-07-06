@@ -1,0 +1,36 @@
+{
+  "OnboardingCards": {
+    "find": {
+      "title": "Find a meetup",
+      "lines": [
+        "The home page is the game lobby — filter open meetups by city and day of the week.",
+        "Each card shows the meetup's intro, time and how many have joined — pick one and tap in."
+      ]
+    },
+    "join": {
+      "title": "Join this session",
+      "lines": [
+        "Got a password (from the host)? → Just enter it to go straight in.",
+        "No password? For meetups open to sign-ups you can register in one tap, leave a note, and even '+Bring family' to sign up together — you're in automatically once the host approves."
+      ]
+    },
+    "queue": {
+      "title": "Queue to play",
+      "lines": [
+        "Once inside, pick a court and 'Go on court' or 'Queue' — you can only hold one court at a time, so it's fair with no spot-grabbing.",
+        "You'll get a notification when it's your turn, so you won't miss it even if you step away."
+      ]
+    },
+    "rotate": {
+      "title": "Rotate after each game",
+      "lines": [
+        "The game starts automatically once 4 players are on court; when 2 of them vote to end, it wraps up and the next group is up.",
+        "Games played and minutes are tracked automatically; when the host turns on 'Fair Play', anyone who's played a lot yields to those who've played less."
+      ]
+    },
+    "skip": "Skip ✕",
+    "prev": "Back",
+    "startPlaying": "Start playing 🏸",
+    "next": "Next →"
+  }
+}

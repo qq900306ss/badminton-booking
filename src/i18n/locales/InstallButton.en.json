@@ -1,0 +1,44 @@
+{
+  "InstallButton": {
+    "installLabel": "📲 Install to home screen",
+    "gotIt": "Got it",
+    "copied": "Link copied",
+    "copyLink": "Copy link (paste in a browser)",
+    "inapp": {
+      "title": "Open in a browser first",
+      "body": "You're in an in-app browser (FB / Messenger / IG / LINE), so you **can't install** here.",
+      "useInstead": "Please open with ",
+      "or": " or ",
+      "openSuffix": ":",
+      "step1Prefix": "Tap the ",
+      "step1Suffix": " (or menu) at the top right",
+      "step2Prefix": "Choose ",
+      "step2Bold": "Open in external browser / Open in Chrome",
+      "step2Suffix": "",
+      "step3": "Tap \"Install to home screen\" again there"
+    },
+    "ios": {
+      "title": "Install on iPhone",
+      "step1Prefix": "Open this site in ",
+      "step1Suffix": "",
+      "step2Prefix": "Tap the ",
+      "step2Bold": "Share",
+      "step2Suffix": " button at the bottom center (a box with an up arrow)",
+      "step3Prefix": "Scroll down and tap ",
+      "step3Bold": "Add to Home Screen",
+      "step3Suffix": "",
+      "step4Prefix": "Tap ",
+      "step4Bold": "Add",
+      "step4Suffix": " at the top right"
+    },
+    "generic": {
+      "title": "Install to home screen",
+      "part1": "In the browser menu (",
+      "part2": " or the share button), find ",
+      "bold1": "Install app",
+      "mid": " or ",
+      "bold2": "Add to Home Screen",
+      "part3": "."
+    }
+  }
+}

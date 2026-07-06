@@ -1,0 +1,12 @@
+{
+  "NotificationBell": {
+    "aria": "通知",
+    "title": "通知",
+    "clear": "クリア",
+    "empty": "通知はまだありません",
+    "justNow": "たった今",
+    "minutesAgo": "{{n}}分前",
+    "hoursAgo": "{{n}}時間前",
+    "daysAgo": "{{n}}日前"
+  }
+}

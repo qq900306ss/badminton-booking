@@ -1,0 +1,13 @@
+{
+  "LoginScreen": {
+    "defaultTitle": "登入後加入球場",
+    "subtitle": "用 LINE 或 Google 快速登入,記住你的身份、程度與場次",
+    "inAppTitle": "⚠️ 請用瀏覽器開啟才能登入",
+    "inAppBody": "你現在是從 App 內建瀏覽器開啟的,Google 登入會被擋。請點右上角「⋯」或分享鍵 → 選「在瀏覽器開啟 / 用 Safari 開啟」後再登入。",
+    "copyUrl": "📋 複製網址(貼到瀏覽器開)",
+    "lineLogin": "用 LINE 登入",
+    "googleLogin": "使用 Google 登入",
+    "notConfigured": "登入尚未設定,請聯絡管理員",
+    "privacyNote": "登入只用來辨識你的身份,你的 email 不會公開給團主"
+  }
+}

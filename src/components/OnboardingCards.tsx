@@ -1,46 +1,20 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 
 // 首次使用的翻頁式導覽(玩家端):整體流程 4 張卡。看完/略過記在
 // localStorage,之後可從「設定 → 📖 使用教學」重看。
 export const ONBOARD_KEY = 'onboard_player_v1'
 
 const CARDS = [
-  {
-    emoji: '🔍',
-    title: '找團',
-    lines: [
-      '首頁就是球局大廳,依縣市、星期篩選正在開放的團。',
-      '卡片上看得到團簡介、時間、已加入人數,挑好直接點進去。',
-    ],
-  },
-  {
-    emoji: '🙋',
-    title: '加入這場',
-    lines: [
-      '有密碼(團主給的)→ 輸入就直接進場。',
-      '沒密碼?開放報名的團可以一鍵報名、留句話,還能「＋帶家人」一起報,團主核准後自動進場。',
-    ],
-  },
-  {
-    emoji: '🏸',
-    title: '排隊上場',
-    lines: [
-      '進場後選一個場地「上場」或「排隊」,一人同時只佔一場,公平不搶位。',
-      '輪到你的時候會收到通知,去晃一下也不會錯過。',
-    ],
-  },
-  {
-    emoji: '🗳',
-    title: '打完換人',
-    lines: [
-      '場上滿 4 人自動開打;打完場上 2 票同意就結束、換下一組上。',
-      '打了幾場、多少分鐘都自動統計,團主開「公平讓分」時打太多會先讓給打少的。',
-    ],
-  },
+  { emoji: '🔍', key: 'find' },
+  { emoji: '🙋', key: 'join' },
+  { emoji: '🏸', key: 'queue' },
+  { emoji: '🗳', key: 'rotate' },
 ]
 
 export function OnboardingCards({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation()
   const [idx, setIdx] = useState(0)
   const [dir, setDir] = useState(1)
   const last = idx === CARDS.length - 1
@@ -60,7 +34,7 @@ export function OnboardingCards({ onClose }: { onClose: () => void }) {
       <div className="bg-white rounded-3xl w-full max-w-sm p-6 space-y-5 overflow-hidden">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-gray-300">{idx + 1} / {CARDS.length}</span>
-          <button onClick={finish} className="text-xs text-gray-400 font-semibold">略過 ✕</button>
+          <button onClick={finish} className="text-xs text-gray-400 font-semibold">{t('OnboardingCards.skip')}</button>
         </div>
 
         <AnimatePresence mode="wait" custom={dir}>
@@ -88,8 +62,8 @@ export function OnboardingCards({ onClose }: { onClose: () => void }) {
             >
               {card.emoji}
             </motion.div>
-            <h2 className="text-xl font-extrabold text-gray-800">{card.title}</h2>
-            {card.lines.map((l, i) => (
+            <h2 className="text-xl font-extrabold text-gray-800">{t(`OnboardingCards.${card.key}.title`)}</h2>
+            {(t(`OnboardingCards.${card.key}.lines`, { returnObjects: true }) as string[]).map((l, i) => (
               <p key={i} className="text-sm text-gray-500 leading-relaxed">{l}</p>
             ))}
           </motion.div>
@@ -107,13 +81,13 @@ export function OnboardingCards({ onClose }: { onClose: () => void }) {
 
         <div className="flex gap-2">
           {idx > 0 && (
-            <button onClick={() => go(idx - 1)} className="btn-secondary px-4 text-sm">上一頁</button>
+            <button onClick={() => go(idx - 1)} className="btn-secondary px-4 text-sm">{t('OnboardingCards.prev')}</button>
           )}
           <button
             onClick={() => (last ? finish() : go(idx + 1))}
             className="btn-primary flex-1 text-sm"
           >
-            {last ? '開始打球 🏸' : '下一頁 →'}
+            {last ? t('OnboardingCards.startPlaying') : t('OnboardingCards.next')}
           </button>
         </div>
       </div>

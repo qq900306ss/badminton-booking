@@ -1,5 +1,7 @@
 # badminton-booking — 臨打人前端
 
+**中文** · [English](README.en.md) · [日本語](README.ja.md)
+
 羽球場地管理系統:臨打人掃 QR code 進場 → 選身份 → 選程度 → 排隊/上場 → 看球場即時狀態。
 
 🔗 **線上**:https://d2mg2bpjvlg672.cloudfront.net

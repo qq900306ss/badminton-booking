@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
+import i18n from '../i18n'
 import { motion, AnimatePresence } from 'framer-motion'
 import { sessionApi, playerApi, type SessionSummary } from '../api/client'
 import { getAccount, logout, updateAccount } from '../lib/playerAuth'
@@ -21,21 +23,21 @@ async function shareSession(s: SessionSummary) {
   const when = fmtRange(s)
   const where = s.city ? `@${s.city}${s.district ? s.district : ''}` : ''
   const r = await shareContent({
-    title: s.title || '羽球團',
-    text: `🏸 ${s.title || '羽球團'}${when ? ` ${when}` : ''}${where} — 一起來打球!報名排隊都在手機上點一點`,
+    title: s.title || i18n.t('LobbyPage.defaultGroupName'),
+    text: `🏸 ${s.title || i18n.t('LobbyPage.defaultGroupName')}${when ? ` ${when}` : ''}${where} — ${i18n.t('LobbyPage.shareSessionTail')}`,
     url: `${window.location.origin}/?s=${s.session_id}`,
   })
-  if (r === 'copied') alert('已複製這場的連結,貼給球友吧!')
+  if (r === 'copied') alert(i18n.t('LobbyPage.sessionLinkCopied'))
 }
 
 // 推薦整個 App(設定裡的「推薦給朋友」)
 async function shareApp() {
   const r = await shareContent({
-    title: '羽球揪團',
-    text: '推薦一個羽球揪團工具:找場、報名、排隊、上場一指搞定,完全免費 🏸',
+    title: i18n.t('LobbyPage.appName'),
+    text: i18n.t('LobbyPage.shareAppText'),
     url: window.location.origin,
   })
-  if (r === 'copied') alert('已複製介紹和連結,貼給朋友吧!')
+  if (r === 'copied') alert(i18n.t('LobbyPage.appLinkCopied'))
 }
 
 function fmtRange(s: SessionSummary): string {
@@ -49,9 +51,10 @@ function fmtRange(s: SessionSummary): string {
 }
 
 function Intro({ onDone }: { onDone: () => void }) {
+  const { t } = useTranslation()
   useEffect(() => {
-    const t = setTimeout(onDone, 2600)
-    return () => clearTimeout(t)
+    const timer = setTimeout(onDone, 2600)
+    return () => clearTimeout(timer)
   }, [onDone])
 
   return (
@@ -90,7 +93,7 @@ function Intro({ onDone }: { onDone: () => void }) {
         transition={{ delay: 0.3 }}
         className="text-4xl font-extrabold text-white drop-shadow-md"
       >
-        羽球揪團
+        {t('LobbyPage.appName')}
       </motion.h1>
       <motion.p
         initial={{ opacity: 0 }}
@@ -98,7 +101,7 @@ function Intro({ onDone }: { onDone: () => void }) {
         transition={{ delay: 0.6 }}
         className="text-white/90 font-semibold mt-2"
       >
-        找場、排隊、上場 一指搞定
+        {t('LobbyPage.tagline')}
       </motion.p>
 
       <button
@@ -106,7 +109,7 @@ function Intro({ onDone }: { onDone: () => void }) {
         className="absolute bottom-10 bg-white/90 text-gray-700 font-bold
           px-6 py-2.5 rounded-2xl shadow-lg active:scale-95 transition-transform"
       >
-        跳過 →
+        {t('LobbyPage.skip')}
       </button>
     </motion.div>
   )
@@ -114,6 +117,7 @@ function Intro({ onDone }: { onDone: () => void }) {
 
 export function LobbyPage() {
   const nav = useNavigate()
+  const { t } = useTranslation()
   const [showIntro, setShowIntro] = useState(
     () => sessionStorage.getItem('intro_seen') !== '1'
   )
@@ -159,8 +163,8 @@ export function LobbyPage() {
   })
   const locActive = !!(cityFilter || districtFilter)
   const locLabel = locActive
-    ? `${cityFilter || '全部縣市'}${districtFilter ? ` · ${districtFilter}` : ''}`
-    : '全部地區'
+    ? `${cityFilter || t('LobbyPage.allCities')}${districtFilter ? ` · ${districtFilter}` : ''}`
+    : t('LobbyPage.allAreas')
 
   const account = getAccount()
   const myName = account?.join_name || account?.display_name || ''
@@ -173,7 +177,7 @@ export function LobbyPage() {
 
   async function uploadPhoto(file: File) {
     if (file.size > 3 * 1024 * 1024) {
-      alert('照片請小於 3MB')
+      alert(t('LobbyPage.photoTooLarge'))
       return
     }
     setUploading(true)
@@ -185,7 +189,7 @@ export function LobbyPage() {
       if (!put.ok) throw new Error('upload failed')
       setAvatarInput(public_url)
     } catch {
-      alert('上傳失敗,請再試一次')
+      alert(t('LobbyPage.uploadFailed'))
     } finally {
       setUploading(false)
     }
@@ -222,7 +226,7 @@ export function LobbyPage() {
               {account?.avatar_url || [...myName][0]?.toUpperCase() || '?'}
             </div>
           )}
-          <span className="font-semibold text-gray-700 text-sm truncate">{myName || '球友'}</span>
+          <span className="font-semibold text-gray-700 text-sm truncate">{myName || t('LobbyPage.defaultPlayer')}</span>
         </div>
         <div className="flex items-center gap-3 text-sm shrink-0">
           <button
@@ -234,9 +238,9 @@ export function LobbyPage() {
             }}
             className="text-brand-pink font-semibold"
           >
-            設定
+            {t('LobbyPage.settings')}
           </button>
-          <button onClick={doLogout} className="text-gray-400">登出</button>
+          <button onClick={doLogout} className="text-gray-400">{t('LobbyPage.logout')}</button>
         </div>
       </div>
 
@@ -249,9 +253,9 @@ export function LobbyPage() {
             className="bg-white rounded-3xl p-6 w-full max-w-sm space-y-4 max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="font-bold text-gray-700 text-center">你的資料</p>
+            <p className="font-bold text-gray-700 text-center">{t('LobbyPage.yourProfile')}</p>
             <div>
-              <span className="text-sm font-bold text-gray-600">加入名稱</span>
+              <span className="text-sm font-bold text-gray-600">{t('LobbyPage.joinName')}</span>
               <input
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
@@ -261,11 +265,11 @@ export function LobbyPage() {
               />
             </div>
             <div>
-              <span className="text-sm font-bold text-gray-600">預設程度</span>
+              <span className="text-sm font-bold text-gray-600">{t('LobbyPage.defaultLevel')}</span>
               <LevelPicker value={levelInput} onChange={setLevelInput} />
             </div>
             <div>
-              <span className="text-sm font-bold text-gray-600">頭像</span>
+              <span className="text-sm font-bold text-gray-600">{t('LobbyPage.avatar')}</span>
               <div className="mt-1 flex items-center gap-2">
                 <div className="w-12 h-12 rounded-full bg-brand-pink flex items-center justify-center shrink-0 overflow-hidden">
                   {isPhotoUrl(avatarInput) ? (
@@ -279,11 +283,11 @@ export function LobbyPage() {
                     onClick={() => setAvatarInput(account.photo_url!)}
                     className="text-xs font-bold text-brand-pink border-2 border-brand-pink/40 rounded-full px-3 py-1.5"
                   >
-                    用 Google / LINE 大頭貼
+                    {t('LobbyPage.useOAuthPhoto')}
                   </button>
                 )}
                 <label className="text-xs font-bold text-brand-pink border-2 border-brand-pink/40 rounded-full px-3 py-1.5 cursor-pointer">
-                  {uploading ? '上傳中…' : '上傳照片'}
+                  {uploading ? t('LobbyPage.uploading') : t('LobbyPage.uploadPhoto')}
                   <input
                     type="file"
                     accept="image/*"
@@ -307,11 +311,11 @@ export function LobbyPage() {
                 ))}
               </div>
             </div>
-            <p className="text-xs text-gray-400 text-center">加入球局時預設帶入這些(每場仍可改)</p>
+            <p className="text-xs text-gray-400 text-center">{t('LobbyPage.profileHint')}</p>
             <div className="flex gap-2">
-              <button onClick={() => setEditName(false)} className="btn-secondary flex-1">取消</button>
+              <button onClick={() => setEditName(false)} className="btn-secondary flex-1">{t('LobbyPage.cancel')}</button>
               <button onClick={saveName} disabled={savingName} className="btn-primary flex-1">
-                {savingName ? '儲存中…' : '儲存'}
+                {savingName ? t('LobbyPage.saving') : t('LobbyPage.save')}
               </button>
             </div>
             {/* secondary actions tucked here so the top bar stays uncluttered */}
@@ -321,19 +325,19 @@ export function LobbyPage() {
                 onClick={() => { setEditName(false); setShowOnboard(true) }}
                 className="btn-secondary text-sm col-span-2"
               >
-                📖 使用教學(重看導覽)
+                📖 {t('LobbyPage.tutorial')}
               </button>
               <button onClick={shareApp} className="btn-secondary text-sm col-span-2">
-                📣 推薦給朋友
+                📣 {t('LobbyPage.recommend')}
               </button>
               <ChangelogButton className="btn-secondary text-sm" />
               <FeedbackButton className="btn-secondary text-sm" />
               <button
                 onClick={() => forceUpdate()}
                 className="btn-secondary text-sm col-span-2"
-                title="清除快取、更新到最新版"
+                title={t('LobbyPage.updateTooltip')}
               >
-                🔄 更新到最新版
+                🔄 {t('LobbyPage.updateLatest')}
               </button>
             </div>
           </div>
@@ -345,8 +349,8 @@ export function LobbyPage() {
 
       <header className="px-4 pt-8 pb-4 text-center">
         <div className="text-5xl mb-2">🏸</div>
-        <h1 className="text-2xl font-extrabold text-gray-800">今天打哪場?</h1>
-        <p className="text-gray-400 text-sm mt-1">選一個正在開放的球局加入</p>
+        <h1 className="text-2xl font-extrabold text-gray-800">{t('LobbyPage.whichSession')}</h1>
+        <p className="text-gray-400 text-sm mt-1">{t('LobbyPage.subtitle')}</p>
       </header>
 
       <div className="max-w-md mx-auto p-4 space-y-3">
@@ -355,7 +359,7 @@ export function LobbyPage() {
         {/* 📋 我的場次:已加入 / 報名審核情況,一眼看到、一鍵回場 */}
         {list.some((s) => s.my_status) && (
           <div className="card space-y-2">
-            <span className="font-bold text-gray-700">📋 我的場次</span>
+            <span className="font-bold text-gray-700">📋 {t('LobbyPage.mySessions')}</span>
             {list.filter((s) => s.my_status).map((s) => (
               <button
                 key={s.session_id}
@@ -365,16 +369,16 @@ export function LobbyPage() {
                   ${s.my_status === 'member' ? 'bg-brand-mint/40' : 'bg-brand-yellow/40'}`}
               >
                 <div className="min-w-0">
-                  <p className="font-bold text-gray-700 truncate">{s.title || '羽球團'}</p>
+                  <p className="font-bold text-gray-700 truncate">{s.title || t('LobbyPage.defaultGroupName')}</p>
                   <p className="text-xs text-gray-500">{fmtRange(s)}</p>
                 </div>
                 {s.my_status === 'member' ? (
                   <span className="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full bg-white text-emerald-600">
-                    ✅ 已加入 · 進場 →
+                    ✅ {t('LobbyPage.memberBadge')} →
                   </span>
                 ) : (
                   <span className="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full bg-white text-amber-600">
-                    🙋 報名中 · 等核准
+                    🙋 {t('LobbyPage.pendingBadge')}
                   </span>
                 )}
               </button>
@@ -385,9 +389,9 @@ export function LobbyPage() {
         {/* 星期篩選 — 球團多為每週固定,依場次日期的星期分流 */}
         <div className="flex gap-1.5 overflow-x-auto -mx-1 px-1 pb-1 no-scrollbar">
           {[
-            { l: '全部', v: null as number | null },
-            { l: '週一', v: 1 }, { l: '週二', v: 2 }, { l: '週三', v: 3 },
-            { l: '週四', v: 4 }, { l: '週五', v: 5 }, { l: '週六', v: 6 }, { l: '週日', v: 0 },
+            { l: t('LobbyPage.dayAll'), v: null as number | null },
+            { l: t('LobbyPage.mon'), v: 1 }, { l: t('LobbyPage.tue'), v: 2 }, { l: t('LobbyPage.wed'), v: 3 },
+            { l: t('LobbyPage.thu'), v: 4 }, { l: t('LobbyPage.fri'), v: 5 }, { l: t('LobbyPage.sat'), v: 6 }, { l: t('LobbyPage.sun'), v: 0 },
           ].map((d) => (
             <button
               key={d.l}
@@ -419,7 +423,7 @@ export function LobbyPage() {
                 onClick={() => { setCityFilter(''); setDistrictFilter('') }}
                 className="shrink-0 px-3 py-2 rounded-2xl text-sm font-semibold text-gray-400 bg-white border-2 border-gray-200"
               >
-                ✕ 清除
+                ✕ {t('LobbyPage.clear')}
               </button>
             )}
           </div>
@@ -431,7 +435,7 @@ export function LobbyPage() {
                 className="flex-1 border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm bg-white
                   focus:outline-none focus:border-brand-pink"
               >
-                <option value="">全部縣市</option>
+                <option value="">{t('LobbyPage.allCities')}</option>
                 {TW_CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
               <select
@@ -441,7 +445,7 @@ export function LobbyPage() {
                 className="flex-1 border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm bg-white
                   disabled:opacity-40 focus:outline-none focus:border-brand-pink"
               >
-                <option value="">全部區</option>
+                <option value="">{t('LobbyPage.allDistricts')}</option>
                 {districtOpts.map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
             </div>
@@ -454,9 +458,9 @@ export function LobbyPage() {
           <div className="card text-center py-10 space-y-2">
             <div className="text-4xl">😴</div>
             <p className="font-bold text-gray-600">
-              {dayFilter !== null || locActive ? '找不到符合條件的球局' : '目前沒有開放中的球局'}
+              {dayFilter !== null || locActive ? t('LobbyPage.noMatch') : t('LobbyPage.noOpen')}
             </p>
-            <p className="text-sm text-gray-400">換個星期/地區、等團主開團,或直接掃 QR Code 進場</p>
+            <p className="text-sm text-gray-400">{t('LobbyPage.emptyHint')}</p>
           </div>
         )}
 
@@ -481,7 +485,7 @@ export function LobbyPage() {
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-extrabold text-gray-800 text-lg break-words line-clamp-2" title={s.title}>{s.title || '羽球團'}</p>
+                <p className="font-extrabold text-gray-800 text-lg break-words line-clamp-2" title={s.title}>{s.title || t('LobbyPage.defaultGroupName')}</p>
                 {(s.city || s.district) && (
                   <p className="text-xs text-brand-pink font-semibold mt-0.5">
                     📍 {s.city}{s.district ? ` · ${s.district}` : ''}
@@ -489,13 +493,13 @@ export function LobbyPage() {
                 )}
                 <p className="text-sm text-gray-400 mt-0.5">
                   {fmtRange(s) && <span>{fmtRange(s)} · </span>}
-                  {s.num_courts} 個球場
+                  {t('LobbyPage.numCourts', { n: s.num_courts })}
                 </p>
                 {/* 開放報名的場次:已加入(/名額)· 報名中 */}
                 {s.signup_open && s.joined_count !== undefined && (
                   <p className="text-xs font-semibold text-amber-600 mt-0.5">
-                    🙋 已加入 {s.joined_count}{(s.signup_quota ?? 0) > 0 ? `/${s.signup_quota}` : ''} 人
-                    {(s.pending_signups ?? 0) > 0 && <> · 報名中 {s.pending_signups}</>}
+                    🙋 {t('LobbyPage.joinedLabel')} {s.joined_count}{(s.signup_quota ?? 0) > 0 ? `/${s.signup_quota}` : ''} {t('LobbyPage.peopleUnit')}
+                    {(s.pending_signups ?? 0) > 0 && <>{t('LobbyPage.pendingInline', { n: s.pending_signups })}</>}
                   </p>
                 )}
                 {/* 團簡介:卡片上最多兩行,點進去看全文 */}
@@ -512,7 +516,7 @@ export function LobbyPage() {
                       : 'bg-brand-pink text-white'
                 }`}
               >
-                {s.my_status === 'member' ? '✅ 進場 →' : s.my_status === 'pending' ? '🙋 報名中' : s.signup_open ? '加入/報名 →' : '加入 →'}
+                {s.my_status === 'member' ? t('LobbyPage.enterBadge') : s.my_status === 'pending' ? t('LobbyPage.pendingBadgeShort') : s.signup_open ? t('LobbyPage.joinOrSignup') : t('LobbyPage.join')}
               </span>
             </button>
             {/* 卡片底部:聯繫團主(選填)+ 分享這場(揪人=推薦) */}
@@ -523,14 +527,14 @@ export function LobbyPage() {
                   target="_blank"
                   rel="noopener noreferrer nofollow"
                   onClick={(e) => {
-                    if (!confirm('這是團主提供的外部連結,內容與本服務無關,確定要前往嗎?')) {
+                    if (!confirm(t('LobbyPage.externalLinkConfirm'))) {
                       e.preventDefault()
                     }
                   }}
                   className="flex-1 flex items-center justify-center gap-1.5
                     text-sm font-semibold text-brand-pink active:opacity-60"
                 >
-                  🔗 聯繫團主
+                  🔗 {t('LobbyPage.contactHost')}
                 </a>
               )}
               <button
@@ -539,7 +543,7 @@ export function LobbyPage() {
                   text-sm font-semibold text-gray-400 active:opacity-60
                   ${s.contact_url ? 'border-l border-gray-100' : ''}`}
               >
-                ↗ 揪球友
+                ↗ {t('LobbyPage.inviteBuddies')}
               </button>
             </div>
           </motion.div>

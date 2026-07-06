@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { sessionApi } from '../api/client'
 import { LevelPicker } from '../components/LevelPicker'
@@ -15,6 +16,7 @@ export function EntryPage() {
   const sessionId = params.get('s') ?? ''
   const nav = useNavigate()
   const qc = useQueryClient()
+  const { t } = useTranslation()
 
   const [step, setStep] = useState<'password' | 'pick'>('password')
   const [password, setPassword] = useState('')
@@ -99,7 +101,7 @@ export function EntryPage() {
       setStep('pick')
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status
-      setError(status === 401 ? '密碼錯誤,請再試一次' : status === 410 ? '這場已結束' : '無法驗證,請稍後再試')
+      setError(status === 401 ? t('EntryPage.wrongPasswordRetry') : status === 410 ? t('EntryPage.sessionEnded') : t('EntryPage.verifyFailed'))
     } finally {
       setLoading(false)
     }
@@ -108,7 +110,7 @@ export function EntryPage() {
   async function confirmJoin() {
     const n = name.trim()
     if (!n) {
-      setError('請輸入名字')
+      setError(t('EntryPage.enterNamePrompt'))
       return
     }
     requestNotify() // 趁這個使用者點擊,順便要通知權限(輪到你了會用到)
@@ -124,7 +126,7 @@ export function EntryPage() {
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error
-      setError(status === 401 ? '密碼錯誤' : msg ?? '加入失敗')
+      setError(status === 401 ? t('EntryPage.wrongPassword') : msg ?? t('EntryPage.joinFailed'))
     } finally {
       setLoading(false)
     }
@@ -142,7 +144,7 @@ export function EntryPage() {
       qc.invalidateQueries({ queryKey: ['entry-session', sessionId] })
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error
-      setError(msg ?? '報名失敗,請稍後再試')
+      setError(msg ?? t('EntryPage.signupFailed'))
     } finally {
       setSignupBusy(false)
     }
@@ -150,7 +152,7 @@ export function EntryPage() {
 
   async function withdrawSignup() {
     const withFamily = (mySignup?.family_names?.length ?? 0) > 0
-    if (!window.confirm(withFamily ? '取消報名?一起報名的家人也會一併取消,之後還是可以再報。' : '取消報名?之後還是可以再報。')) return
+    if (!window.confirm(withFamily ? t('EntryPage.cancelSignupConfirmFamily') : t('EntryPage.cancelSignupConfirm'))) return
     setSignupBusy(true)
     try {
       await sessionApi.cancelSignup(sessionId)
@@ -167,7 +169,7 @@ export function EntryPage() {
       <div className="min-h-screen flex items-center justify-center bg-brand-bg p-6">
         <div className="card text-center">
           <div className="text-4xl mb-3">🏸</div>
-          <p className="text-gray-500">請掃描 QR Code 進入球場</p>
+          <p className="text-gray-500">{t('EntryPage.scanQrPrompt')}</p>
         </div>
       </div>
     )
@@ -175,7 +177,7 @@ export function EntryPage() {
 
   // mandatory login: must have an account before joining a session
   if (!loggedIn) {
-    return <LoginScreen title="登入後加入這場" />
+    return <LoginScreen title={t('EntryPage.loginToJoin')} />
   }
 
   const quota = view?.signup_quota ?? 0
@@ -189,12 +191,12 @@ export function EntryPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
           <div className="text-5xl mb-2">🏸</div>
-          <h1 className="text-2xl font-extrabold text-gray-800">{view?.title || '加入球場'}</h1>
+          <h1 className="text-2xl font-extrabold text-gray-800">{view?.title || t('EntryPage.defaultTitle')}</h1>
           {/* 已加入 X(/名額)· 報名中 N — 開放報名的場次才顯示 */}
           {view?.signup_open && joined !== undefined && (
             <p className="text-sm font-semibold text-gray-500 mt-1.5">
-              已加入 <span className="text-brand-pink font-bold">{joined}{quota > 0 ? `/${quota}` : ''}</span> 人
-              {pendingCount > 0 && <> · 報名中 {pendingCount} 人</>}
+              {t('EntryPage.joinedPrefix')} <span className="text-brand-pink font-bold">{joined}{quota > 0 ? `/${quota}` : ''}</span> {t('EntryPage.peopleUnit')}
+              {pendingCount > 0 && <>{t('EntryPage.pendingInline', { n: pendingCount })}</>}
             </p>
           )}
         </div>
@@ -204,7 +206,7 @@ export function EntryPage() {
           <div className="card mb-4">
             {view.description && (
               <>
-                <p className="text-xs font-bold text-gray-400 mb-1">📣 團主的話</p>
+                <p className="text-xs font-bold text-gray-400 mb-1">📣 {t('EntryPage.hostMessage')}</p>
                 <p className="text-sm text-gray-600 whitespace-pre-wrap">{view.description}</p>
               </>
             )}
@@ -214,14 +216,14 @@ export function EntryPage() {
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 onClick={(e) => {
-                  if (!window.confirm('這是團主提供的外部連結,內容與本服務無關,確定要前往嗎?')) {
+                  if (!window.confirm(t('EntryPage.externalLinkConfirm'))) {
                     e.preventDefault()
                   }
                 }}
                 className={`flex items-center justify-center gap-1.5 text-sm font-semibold
                   text-brand-pink active:opacity-60 ${view.description ? 'mt-3 pt-3 border-t border-gray-100' : ''}`}
               >
-                🔗 聯繫團主
+                🔗 {t('EntryPage.contactHost')}
               </a>
             )}
           </div>
@@ -230,24 +232,24 @@ export function EntryPage() {
         {/* 報名中 → 狀態橫幅(可改留言 / 取消),密碼表單照常提供 */}
         {isPending && (
           <div className="card mb-4 border-2 border-amber-300 bg-amber-50 space-y-2">
-            <p className="font-bold text-amber-700">🙋 報名中,等團主確認</p>
-            <p className="text-xs text-amber-600">核准後這頁會自動帶你進場;也可以先關掉,核准會通知你。</p>
+            <p className="font-bold text-amber-700">🙋 {t('EntryPage.pendingBanner')}</p>
+            <p className="text-xs text-amber-600">{t('EntryPage.pendingHint')}</p>
             {(mySignup?.family_names?.length ?? 0) > 0 && (
               <p className="text-sm text-gray-600">
-                👨‍👩‍👧 一起報名:{mySignup?.family_names?.join('、')}
-                <span className="text-xs text-gray-400">(要改的話取消報名再重報)</span>
+                👨‍👩‍👧 {t('EntryPage.signupTogether')}{mySignup?.family_names?.join('、')}
+                <span className="text-xs text-gray-400">{t('EntryPage.changeNote')}</span>
               </p>
             )}
             {!editingMsg ? (
               <div className="flex items-center gap-2">
                 <p className="flex-1 text-sm text-gray-600 whitespace-pre-wrap">
-                  {mySignup?.message ? `💬 ${mySignup.message}` : '(沒有留言)'}
+                  {mySignup?.message ? `💬 ${mySignup.message}` : t('EntryPage.noMessage')}
                 </p>
                 <button
                   onClick={() => { setSignupMsg(mySignup?.message ?? ''); setEditingMsg(true) }}
                   className="text-xs font-bold text-brand-pink shrink-0"
                 >
-                  改留言
+                  {t('EntryPage.editMessage')}
                 </button>
               </div>
             ) : (
@@ -263,9 +265,9 @@ export function EntryPage() {
                 />
                 <div className="flex gap-2">
                   <button onClick={submitSignup} disabled={signupBusy} className="btn-primary flex-1 py-2 text-sm disabled:opacity-40">
-                    {signupBusy ? '儲存中…' : '儲存留言'}
+                    {signupBusy ? t('EntryPage.savingMessage') : t('EntryPage.saveMessage')}
                   </button>
-                  <button onClick={() => setEditingMsg(false)} className="btn-secondary px-4 text-sm">取消</button>
+                  <button onClick={() => setEditingMsg(false)} className="btn-secondary px-4 text-sm">{t('EntryPage.cancel')}</button>
                 </div>
               </div>
             )}
@@ -274,7 +276,7 @@ export function EntryPage() {
               disabled={signupBusy}
               className="w-full text-xs text-gray-400 underline disabled:opacity-40"
             >
-              取消報名
+              {t('EntryPage.cancelSignup')}
             </button>
           </div>
         )}
@@ -283,12 +285,12 @@ export function EntryPage() {
         {step === 'password' && (
           <form onSubmit={handlePasswordSubmit} className="card space-y-4">
             <label className="block">
-              <span className="text-sm font-bold text-gray-600">場地密碼</span>
+              <span className="text-sm font-bold text-gray-600">{t('EntryPage.courtPassword')}</span>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="輸入密碼"
+                placeholder={t('EntryPage.enterPassword')}
                 className="mt-1 w-full border-2 border-gray-200 rounded-2xl px-4 py-3
                   focus:outline-none focus:border-brand-pink text-center text-lg font-bold"
                 autoFocus
@@ -296,7 +298,7 @@ export function EntryPage() {
             </label>
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
             <button type="submit" disabled={!password.trim() || loading} className="btn-primary w-full">
-              {loading ? '驗證中...' : '進入 →'}
+              {loading ? t('EntryPage.verifying') : t('EntryPage.enter')}
             </button>
           </form>
         )}
@@ -305,16 +307,16 @@ export function EntryPage() {
         {step === 'password' && view?.signup_open && !isPending && (
           <div className="card mt-4 space-y-3">
             <div>
-              <span className="font-bold text-gray-700">🙋 沒有密碼?直接報名</span>
+              <span className="font-bold text-gray-700">🙋 {t('EntryPage.noPasswordTitle')}</span>
               <p className="text-xs text-gray-400 mt-1">
-                送出後由團主決定收不收,核准就直接加入。
-                {quotaFull && '(名額已滿,仍可報名,由團主決定)'}
+                {t('EntryPage.signupDesc')}
+                {quotaFull && t('EntryPage.quotaFullNote')}
               </p>
             </div>
             <textarea
               value={signupMsg}
               onChange={(e) => setSignupMsg(e.target.value)}
-              placeholder="留句話給團主(選填):幾點到、程度、單雙打…"
+              placeholder={t('EntryPage.signupMsgPlaceholder')}
               maxLength={100}
               rows={2}
               className="w-full border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm resize-none
@@ -328,7 +330,7 @@ export function EntryPage() {
                   onChange={(e) =>
                     setFamilyNames(familyNames.map((x, j) => (j === i ? e.target.value : x)))
                   }
-                  placeholder={`家人 ${i + 1} 的名字`}
+                  placeholder={t('EntryPage.familyNamePlaceholder', { n: i + 1 })}
                   maxLength={40}
                   autoFocus={n === ''}
                   className="flex-1 border-2 border-gray-200 rounded-2xl px-3 py-2 text-sm
@@ -347,7 +349,7 @@ export function EntryPage() {
                 onClick={() => setFamilyNames([...familyNames, ''])}
                 className="w-full text-xs font-semibold text-brand-pink py-1"
               >
-                ＋ 帶家人一起報名(最多 5 位)
+                ＋ {t('EntryPage.addFamily')}
               </button>
             )}
             <button
@@ -357,10 +359,10 @@ export function EntryPage() {
                 active:scale-95 transition-transform disabled:opacity-40"
             >
               {signupBusy
-                ? '送出中…'
+                ? t('EntryPage.submitting')
                 : familyNames.filter((n) => n.trim()).length > 0
-                  ? `🙋 送出報名(共 ${1 + familyNames.filter((n) => n.trim()).length} 人)`
-                  : '🙋 送出報名'}
+                  ? t('EntryPage.submitSignupCount', { count: 1 + familyNames.filter((n) => n.trim()).length })
+                  : t('EntryPage.submitSignup')}
             </button>
           </div>
         )}
@@ -369,24 +371,24 @@ export function EntryPage() {
         {step === 'pick' && (
           <div className="card space-y-4">
             <div>
-              <span className="text-sm font-bold text-gray-600">你的名字</span>
+              <span className="text-sm font-bold text-gray-600">{t('EntryPage.yourName')}</span>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="輸入你的名字"
+                placeholder={t('EntryPage.yourNamePlaceholder')}
                 autoFocus
                 className="mt-1 w-full border-2 border-gray-200 rounded-2xl px-4 py-3
                   focus:outline-none focus:border-brand-pink text-center text-lg font-bold"
               />
             </div>
             <div>
-              <span className="text-sm font-bold text-gray-600">程度</span>
+              <span className="text-sm font-bold text-gray-600">{t('EntryPage.level')}</span>
               <LevelPicker value={level} onChange={setLevel} />
             </div>
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
             <button onClick={confirmJoin} disabled={loading || !name.trim()} className="btn-primary w-full">
-              {loading ? '加入中...' : '進入球場 →'}
+              {loading ? t('EntryPage.joining') : t('EntryPage.enterCourt')}
             </button>
           </div>
         )}

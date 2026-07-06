@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation, Trans } from 'react-i18next'
 import type { SessionView, SessionPlayer } from '../api/client'
 import { isPhotoUrl } from '../lib/avatar'
 
@@ -15,6 +16,7 @@ export function FairPlayInfo({
   players: SessionPlayer[]
   myIds: string[]
 }) {
+  const { t } = useTranslation()
   const [openList, setOpenList] = useState(false)
   if (!view.show_games && !view.fair_play) return null
 
@@ -28,20 +30,24 @@ export function FairPlayInfo({
     <div className="mx-4 mt-3 bg-white rounded-2xl shadow-sm p-3 space-y-2">
       {view.fair_play && (
         <div>
-          <p className="font-bold text-brand-pink text-sm">⚖️ 本場實施公平讓分</p>
+          <p className="font-bold text-brand-pink text-sm">{t('FairPlayInfo.banner')}</p>
           <p className="text-xs text-gray-500 mt-0.5">
             {view.fair_enforced ? (
-              <>打超過 <b>{view.fair_limit?.toFixed(0)}</b> 場的人會暫時不能上場/排隊,讓打較少的人先打;追上後自動恢復。</>
+              <Trans
+                i18nKey="FairPlayInfo.enforced"
+                values={{ limit: view.fair_limit?.toFixed(0) }}
+                components={{ b: <b /> }}
+              />
             ) : (
-              <>目前在場人數還不多,暫時自由上場(人多了才會開始讓分)。</>
+              <>{t('FairPlayInfo.notEnforced')}</>
             )}
           </p>
           <details className="text-xs text-gray-500 mt-1.5">
-            <summary className="cursor-pointer text-gray-400">怎麼運作?</summary>
+            <summary className="cursor-pointer text-gray-400">{t('FairPlayInfo.howItWorks')}</summary>
             <div className="mt-1 space-y-1 leading-relaxed">
-              <p>• 系統算「打最多那群人」的平均場數,打超過(平均＋團主設定)的人先讓一下。</p>
-              <p>• 還沒打滿寬限場數的人不受限;大家追上後被擋的人自動恢復。</p>
-              <p>• 想打卻被擋時,等別人也打幾場、平均上來,你就能再排了。</p>
+              <p>{t('FairPlayInfo.rule1')}</p>
+              <p>{t('FairPlayInfo.rule2')}</p>
+              <p>{t('FairPlayInfo.rule3')}</p>
             </div>
           </details>
         </div>
@@ -51,8 +57,8 @@ export function FairPlayInfo({
         onClick={() => setOpenList((v) => !v)}
         className="w-full flex items-center justify-between text-sm font-bold text-gray-600"
       >
-        <span>📊 大家打的場數</span>
-        <span className="text-xs text-gray-400">{openList ? '收合 ▲' : '展開 ▼'}</span>
+        <span>{t('FairPlayInfo.gamesTitle')}</span>
+        <span className="text-xs text-gray-400">{openList ? t('FairPlayInfo.collapse') : t('FairPlayInfo.expand')}</span>
       </button>
 
       {openList && (
@@ -74,9 +80,9 @@ export function FairPlayInfo({
                   )}
                 </div>
                 <span className={`flex-1 text-sm truncate ${mine ? 'font-bold text-gray-700' : 'text-gray-600'}`}>
-                  {p.display_name}{mine && ' (你)'}
+                  {p.display_name}{mine && t('FairPlayInfo.youSuffix')}
                 </span>
-                {over && <span className="text-[10px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">讓分中</span>}
+                {over && <span className="text-[10px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">{t('FairPlayInfo.yielding')}</span>}
                 <span className="text-sm font-bold text-gray-700 tabular-nums">{p.games || 0}</span>
               </div>
             )

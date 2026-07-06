@@ -1,0 +1,18 @@
+{
+  "CourtPage": {
+    "removedFromSession": "You've been removed from this session. Please pick your identity again.",
+    "yourTurnToast": "🏸 It's your turn to play!",
+    "yourTurnNotif": "🏸 It's your turn to play ({{where}})",
+    "comeBackToPlay": "{{where}} · come back and play",
+    "courtLabel": "Court {{num}}",
+    "sessionNotFound": "Session not found",
+    "sessionEnded": "This session has ended",
+    "thanksSeeYou": "Thanks for playing — see you next time!",
+    "backToLobby": "Back to lobby",
+    "liveCourt": "Live court",
+    "queueOpensAt": "Queue opens at {{time}}",
+    "queueLockedHint": "Take a look at the courts for now — once it opens you can queue up yourself",
+    "installLabel": "📲 Add to home screen · get \"your turn\" alerts",
+    "liveUpdateFooter": "⚡ Real-time updates (WebSocket)"
+  }
+}

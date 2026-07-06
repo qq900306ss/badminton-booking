@@ -1,5 +1,7 @@
 // "輪到你了" alert helpers — sound (Web Audio, no asset), vibration, notification.
 
+import i18n from '../i18n'
+
 let ctx: AudioContext | null = null
 
 export function playChime() {
@@ -38,7 +40,7 @@ export function vibrate() {
 export function notifyTurn(body: string) {
   try {
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('🏸 輪到你上場了!', { body, icon: '/icon.svg' })
+      new Notification(i18n.t('alert.turnTitle'), { body, icon: '/icon.svg' })
     }
   } catch {
     // ignore

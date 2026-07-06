@@ -1,0 +1,13 @@
+{
+  "LoginScreen": {
+    "defaultTitle": "Log in to join the court",
+    "subtitle": "Log in quickly with LINE or Google to remember your identity, skill level and sessions",
+    "inAppTitle": "⚠️ Please open in a browser to log in",
+    "inAppBody": "You're currently in an in-app browser, so Google login will be blocked. Tap the \"⋯\" or share button in the top corner → choose \"Open in browser / Open in Safari\", then log in.",
+    "copyUrl": "📋 Copy link (paste into a browser)",
+    "lineLogin": "Log in with LINE",
+    "googleLogin": "Log in with Google",
+    "notConfigured": "Login isn't set up yet — please contact the admin",
+    "privacyNote": "Login is only used to identify you; your email is never shared with the host"
+  }
+}

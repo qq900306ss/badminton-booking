@@ -1,0 +1,36 @@
+{
+  "HelpButton": {
+    "button": "How to use",
+    "title": "Drop-in player guide",
+    "steps": {
+      "login": {
+        "title": "Log in",
+        "body": "Log in with Google or LINE. The first time, we'll set up your profile (name, avatar, level) for you."
+      },
+      "enter": {
+        "title": "Enter the court",
+        "body": "Tap a meetup from the home page, or scan the host's QR; enter the host's access code to get in."
+      },
+      "play": {
+        "title": "Play / Queue",
+        "body": "Tap an empty \"+\" slot on the court to go on; when it's full (4 players), tap \"Queue\" to wait. The timer starts once four players are set."
+      },
+      "turn": {
+        "title": "Your turn",
+        "body": "You'll get a notification when it's your turn (install the app to your home screen to also get phone push). Tap the bell at the top right to see this session's notifications."
+      },
+      "family": {
+        "title": "Bring family",
+        "body": "Use \"+ Add family\" at the top to add family members who didn't bring a phone (enter a name, pick a cute avatar, set a level); once the host approves, you can queue them together with you."
+      },
+      "vote": {
+        "title": "End by vote",
+        "body": "When all four are on court, tap \"Vote to end this game\"; once it reaches 2 votes it ends automatically and the next group goes on."
+      },
+      "profile": {
+        "title": "Edit your profile",
+        "body": "Use \"Settings\" at the top right to change your name, default level, or avatar (pick a cute icon)."
+      }
+    }
+  }
+}

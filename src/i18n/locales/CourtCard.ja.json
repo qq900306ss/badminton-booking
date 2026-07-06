@@ -1,0 +1,24 @@
+{
+  "CourtCard": {
+    "me": "あなた",
+    "joinThisSlot": "この位置に入る",
+    "courtLabel": "コート {{num}}",
+    "empty": "空きコート",
+    "playing": "プレー中",
+    "elapsed": " · {{mins}}分経過",
+    "filling": "募集中 {{filled}}/4",
+    "queue": "順番待ち",
+    "youArePlaying": "⚡ あなたが出場中!",
+    "votedEnd": "終了に投票済み {{votes}}/{{needed}}(もう一度タップで取消)",
+    "voteEnd": "🗳 このゲームの終了に投票 {{votes}}/{{needed}}",
+    "voteHint": "コートの{{needed}}人が同意すると自動で終了し、次の組と交代します",
+    "moveHint": "👆 他の空き位置をタップで移動 · 4人揃うと開始",
+    "leaveCourt": "コートを出る(移動)",
+    "leaveQueue": "順番待ちをやめる(コート {{num}})",
+    "inAnotherCourt": "すでに他のコートにいます",
+    "notOpen": "まだ開放されていません",
+    "tapToPlay": "👆 空き位置をタップしてそのまま出場",
+    "waitInQueue": "順番待ちに入る",
+    "queueOnly": "とりあえず順番待ちだけ(出場しない)"
+  }
+}

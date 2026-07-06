@@ -1,0 +1,9 @@
+{
+  "AuthCallback": {
+    "loginFailedNoCode": "登入失敗:沒有收到授權碼",
+    "loginFailedBadState": "登入失敗:安全驗證不符,請重新登入",
+    "loginFailedRetry": "登入失敗,請再試一次",
+    "backHome": "回首頁",
+    "loggingIn": "登入中…"
+  }
+}

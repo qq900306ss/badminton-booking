@@ -1,0 +1,35 @@
+{
+  "changelog": {
+    "2026/07/06": [
+      "Session cards now have “↗ Invite buddies”: share a game to LINE/IG in one tap, and friends can sign up straight from the link",
+      "Added “📣 Recommend to friends” in Settings — if you like the app, help us spread the word 🙏"
+    ],
+    "2026/07/05": [
+      "⚡ Faster all around: going on court and queuing respond instantly, everyone's actions sync to your screen in real time, and the site loads faster too",
+      "📱 Turn your screen off and back on and the view updates to the latest state right away (before it could take a minute or a manual refresh)"
+    ],
+    "2026/07/03": [
+      "No password needed to join! For groups open to sign-ups, just tap “🙋 Sign up”, leave a note for the host, and you're in automatically once approved",
+      "You can “＋ bring family along” when signing up (up to 5), and once the host approves, you operate for them from your phone just like existing family members",
+      "New “📋 My sessions” on the home screen: which groups you signed up for, whether you're approved, and one-tap entry for ones you've joined — all in one place",
+      "Home session cards now show the group intro and “X joined · N signing up”, making groups easier to pick"
+    ],
+    "2026/07/01": [
+      "Ending a game by vote now takes just “2 votes” to end it and switch to the next group (was 3)"
+    ],
+    "2026/06/30": [
+      "Hosts can turn on “Fair Play”: players who've played a lot temporarily give way to those who've played less (everyone's game counts are visible when it's on)",
+      "Fixed the LINE login issue — you can now log in with LINE normally"
+    ],
+    "2026/06/29": [
+      "Each group now shows the host's avatar so it's easier to recognize (defaults to 🐰 if the host hasn't set one)",
+      "Filter games quickly by day of the week on the home screen, and the area filter now collapses for a cleaner look",
+      "When the host has added a link, the session card has a one-tap “Contact host”",
+      "You can bring family to play together (host approval required)",
+      "Once four players fill a court, you can vote to end the game",
+      "Pick a cute avatar and set your default name and level",
+      "Court status syncs in real time and uses less data",
+      "You'll be prompted automatically to update when a new version is out"
+    ]
+  }
+}

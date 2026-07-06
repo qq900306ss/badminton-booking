@@ -1,0 +1,9 @@
+{
+  "AuthCallback": {
+    "loginFailedNoCode": "ログインに失敗しました:認証コードを受け取れませんでした",
+    "loginFailedBadState": "ログインに失敗しました:セキュリティ検証が一致しません。もう一度ログインしてください",
+    "loginFailedRetry": "ログインに失敗しました。もう一度お試しください",
+    "backHome": "ホームに戻る",
+    "loggingIn": "ログイン中…"
+  }
+}

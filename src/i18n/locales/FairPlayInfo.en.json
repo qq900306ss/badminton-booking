@@ -1,0 +1,16 @@
+{
+  "FairPlayInfo": {
+    "banner": "⚖️ Fair Play is on for this session",
+    "enforced": "Players who've played more than <b>{{limit}}</b> games are temporarily blocked from going on court or queuing, so those who've played less go first; they're restored automatically once caught up.",
+    "notEnforced": "There aren't many players here yet, so anyone can play freely for now (yielding kicks in once it gets busier).",
+    "howItWorks": "How does it work?",
+    "rule1": "• The system takes the average game count of the \"most-played\" group; anyone above (that average + the host's setting) yields for a while.",
+    "rule2": "• Players who haven't used up their grace games aren't limited; blocked players are restored automatically once everyone catches up.",
+    "rule3": "• If you want to play but you're blocked, wait for others to play a few games and raise the average — then you can queue again.",
+    "gamesTitle": "📊 Everyone's game count",
+    "collapse": "Collapse ▲",
+    "expand": "Expand ▼",
+    "youSuffix": " (you)",
+    "yielding": "Yielding"
+  }
+}

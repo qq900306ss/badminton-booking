@@ -1,0 +1,12 @@
+{
+  "FeedbackButton": {
+    "button": "Feedback",
+    "title": "Feedback",
+    "prompt": "Any questions or suggestions? Let us know",
+    "placeholder": "What's on your mind…",
+    "done": "Sent, thank you!",
+    "sending": "Sending…",
+    "submit": "Send",
+    "sendFailed": "Failed to send, please try again later"
+  }
+}
