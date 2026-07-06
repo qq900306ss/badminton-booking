@@ -2,6 +2,13 @@
 // short and in plain language (player audience).
 export const CHANGELOG: { date: string; items: string[] }[] = [
   {
+    date: '2026/07/06',
+    items: [
+      '球局卡新增「↗ 揪球友」:一鍵把這場分享到 LINE/IG,朋友點開直接報名',
+      '設定裡新增「📣 推薦給朋友」,喜歡的話幫我們傳出去 🙏',
+    ],
+  },
+  {
     date: '2026/07/05',
     items: [
       '⚡ 全面提速:上場、排隊點了立刻反應,大家的操作即時同步到你畫面,網頁開啟也更快了',

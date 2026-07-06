@@ -14,6 +14,29 @@ import { LevelPicker } from '../components/LevelPicker'
 import { ListSkeleton } from '../components/Skeleton'
 import { isPhotoUrl, AVATAR_EMOJIS, DEFAULT_ORG_AVATAR } from '../lib/avatar'
 import { OnboardingCards, ONBOARD_KEY } from '../components/OnboardingCards'
+import { shareContent } from '../lib/share'
+
+// 分享某一場給球友(揪人來打 = 最自然的推薦):原生分享面板,退回剪貼簿
+async function shareSession(s: SessionSummary) {
+  const when = fmtRange(s)
+  const where = s.city ? `@${s.city}${s.district ? s.district : ''}` : ''
+  const r = await shareContent({
+    title: s.title || '羽球團',
+    text: `🏸 ${s.title || '羽球團'}${when ? ` ${when}` : ''}${where} — 一起來打球!報名排隊都在手機上點一點`,
+    url: `${window.location.origin}/?s=${s.session_id}`,
+  })
+  if (r === 'copied') alert('已複製這場的連結,貼給球友吧!')
+}
+
+// 推薦整個 App(設定裡的「推薦給朋友」)
+async function shareApp() {
+  const r = await shareContent({
+    title: '羽球揪團',
+    text: '推薦一個羽球揪團工具:找場、報名、排隊、上場一指搞定,完全免費 🏸',
+    url: window.location.origin,
+  })
+  if (r === 'copied') alert('已複製介紹和連結,貼給朋友吧!')
+}
 
 function fmtRange(s: SessionSummary): string {
   if (!s.start_at) return ''
@@ -300,6 +323,9 @@ export function LobbyPage() {
               >
                 📖 使用教學(重看導覽)
               </button>
+              <button onClick={shareApp} className="btn-secondary text-sm col-span-2">
+                📣 推薦給朋友
+              </button>
               <ChangelogButton className="btn-secondary text-sm" />
               <FeedbackButton className="btn-secondary text-sm" />
               <button
@@ -489,22 +515,33 @@ export function LobbyPage() {
                 {s.my_status === 'member' ? '✅ 進場 →' : s.my_status === 'pending' ? '🙋 報名中' : s.signup_open ? '加入/報名 →' : '加入 →'}
               </span>
             </button>
-            {s.contact_url && (
-              <a
-                href={s.contact_url}
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                onClick={(e) => {
-                  if (!confirm('這是團主提供的外部連結,內容與本服務無關,確定要前往嗎?')) {
-                    e.preventDefault()
-                  }
-                }}
-                className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-center gap-1.5
-                  text-sm font-semibold text-brand-pink active:opacity-60"
+            {/* 卡片底部:聯繫團主(選填)+ 分享這場(揪人=推薦) */}
+            <div className="mt-3 pt-3 border-t border-gray-100 flex">
+              {s.contact_url && (
+                <a
+                  href={s.contact_url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  onClick={(e) => {
+                    if (!confirm('這是團主提供的外部連結,內容與本服務無關,確定要前往嗎?')) {
+                      e.preventDefault()
+                    }
+                  }}
+                  className="flex-1 flex items-center justify-center gap-1.5
+                    text-sm font-semibold text-brand-pink active:opacity-60"
+                >
+                  🔗 聯繫團主
+                </a>
+              )}
+              <button
+                onClick={() => shareSession(s)}
+                className={`flex-1 flex items-center justify-center gap-1.5
+                  text-sm font-semibold text-gray-400 active:opacity-60
+                  ${s.contact_url ? 'border-l border-gray-100' : ''}`}
               >
-                🔗 聯繫團主
-              </a>
-            )}
+                ↗ 揪球友
+              </button>
+            </div>
           </motion.div>
         ))}
       </div>
