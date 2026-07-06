@@ -7,8 +7,9 @@ import i18n from '../i18n'
 const DATES = ['2026/07/06', '2026/07/05', '2026/07/03', '2026/07/01', '2026/06/30', '2026/06/29']
 
 export function getChangelog(): { date: string; items: string[] }[] {
-  return DATES.map((date) => ({
-    date,
-    items: i18n.t(`changelog.${date}`, { returnObjects: true }) as unknown as string[],
-  }))
+  return DATES.map((date) => {
+    const items = i18n.t(`changelog.${date}`, { returnObjects: true })
+    // guard: missing translation makes t() return a string — never crash on .map
+    return { date, items: Array.isArray(items) ? (items as string[]) : [] }
+  })
 }

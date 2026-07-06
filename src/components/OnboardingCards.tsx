@@ -63,7 +63,11 @@ export function OnboardingCards({ onClose }: { onClose: () => void }) {
               {card.emoji}
             </motion.div>
             <h2 className="text-xl font-extrabold text-gray-800">{t(`OnboardingCards.${card.key}.title`)}</h2>
-            {(t(`OnboardingCards.${card.key}.lines`, { returnObjects: true }) as string[]).map((l, i) => (
+            {/* guard: missing translation makes t() return a string — never crash on .map */}
+            {(Array.isArray(t(`OnboardingCards.${card.key}.lines`, { returnObjects: true }))
+              ? (t(`OnboardingCards.${card.key}.lines`, { returnObjects: true }) as string[])
+              : []
+            ).map((l, i) => (
               <p key={i} className="text-sm text-gray-500 leading-relaxed">{l}</p>
             ))}
           </motion.div>
