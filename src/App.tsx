@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { LoginScreen } from './components/LoginScreen'
 
@@ -14,6 +15,7 @@ import { ToastProvider } from './components/Toast'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ConnectionBanner } from './components/ConnectionBanner'
 import { UpdateBanner } from './components/UpdateBanner'
+import { LanguageSwitcher } from './components/LanguageSwitcher'
 
 // real-time comes from the WebSocket; these defaults stop redundant refetch
 // storms (every query re-firing on each tab focus) so we don't hammer the API
@@ -30,8 +32,9 @@ const qc = new QueryClient({
 // login is required up front: not logged in → login screen first; then the
 // entry flow when a session is in the URL (?s=…), else the lobby.
 function Home() {
+  const { t } = useTranslation()
   const [params] = useSearchParams()
-  if (!isLoggedIn()) return <LoginScreen title="登入開始揪球 🏸" />
+  if (!isLoggedIn()) return <LoginScreen title={t('App.loginTitle')} />
   return params.get('s') ? <EntryPage /> : <LobbyPage />
 }
 
@@ -40,6 +43,7 @@ export default function App() {
     <QueryClientProvider client={qc}>
       <ErrorBoundary>
       <ToastProvider>
+      <LanguageSwitcher />
       <ConnectionBanner />
       <UpdateBanner />
       <BrowserRouter>

@@ -1,0 +1,24 @@
+{
+  "CourtCard": {
+    "me": "我",
+    "joinThisSlot": "加入這個位置",
+    "courtLabel": "場地 {{num}}",
+    "empty": "空場",
+    "playing": "進行中",
+    "elapsed": " · 已打 {{mins}} 分",
+    "filling": "湊人中 {{filled}}/4",
+    "queue": "排隊",
+    "youArePlaying": "⚡ 你在場上打!",
+    "votedEnd": "已投票結束 {{votes}}/{{needed}}(再點取消)",
+    "voteEnd": "🗳 投票結束這場 {{votes}}/{{needed}}",
+    "voteHint": "場上 {{needed}} 人同意就自動結束、換下一組",
+    "moveHint": "👆 點其他空位可換位置 · 等湊滿 4 人開打",
+    "leaveCourt": "離開場地(換場)",
+    "leaveQueue": "退出排隊(場地 {{num}})",
+    "inAnotherCourt": "你已在其他場地",
+    "notOpen": "尚未開放",
+    "tapToPlay": "👆 點空位直接上場",
+    "waitInQueue": "排隊等待",
+    "queueOnly": "我先排隊就好(不上場)"
+  }
+}

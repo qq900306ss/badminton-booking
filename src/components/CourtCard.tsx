@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import type { CourtView, PlayerSlot } from '../api/client'
 import { tierOf } from '../lib/levels'
 import { isPhotoUrl } from '../lib/avatar'
@@ -22,6 +23,7 @@ function elapsedMins(startedAt?: string): number | null {
 }
 
 function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
+  const { t } = useTranslation()
   // [...str][0] is emoji/surrogate-pair safe — str[0] splits a 🔥-style name into
   // a broken half (the "亂碼" in the circle).
   const initial = [...(slot.display_name ?? '')][0]?.toUpperCase() ?? '?'
@@ -61,7 +63,7 @@ function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
         {me && (
           <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-amber-400 text-white text-[9px]
             font-bold rounded-full px-1.5 leading-4 shadow">
-            我
+            {t('CourtCard.me')}
           </span>
         )}
       </div>
@@ -73,6 +75,7 @@ function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
 }
 
 function EmptySlot({ canJoin, onJoin }: { canJoin: boolean; onJoin: () => void }) {
+  const { t } = useTranslation()
   // same flex-col + name-line height as Avatar, so swapping doesn't shift layout
   return (
     <div className="flex flex-col items-center gap-1">
@@ -82,7 +85,7 @@ function EmptySlot({ canJoin, onJoin }: { canJoin: boolean; onJoin: () => void }
           className="w-11 h-11 rounded-full border-2 border-dashed border-brand-pink/70 text-brand-pink
             flex items-center justify-center text-xl font-bold bg-white/40
             hover:bg-brand-pink hover:text-white active:scale-90 transition-all"
-          aria-label="加入這個位置"
+          aria-label={t('CourtCard.joinThisSlot')}
         >
           +
         </button>
@@ -108,6 +111,7 @@ interface Props {
 }
 
 export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying, onVoteEnd, votePending = false }: Props) {
+  const { t } = useTranslation()
   // playing is a fixed 4-slot array; empty slots have player_id === ''
   const slots = court.playing
   const filled = slots.filter((p) => p.player_id).length
@@ -123,16 +127,16 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
   return (
     <div className="card relative overflow-hidden">
       <div className="flex items-center justify-between mb-2">
-        <span className="font-extrabold text-gray-700">{court.name?.trim() ? court.name : `場地 ${court.court_num}`}</span>
+        <span className="font-extrabold text-gray-700">{court.name?.trim() ? court.name : t('CourtCard.courtLabel', { num: court.court_num })}</span>
         {filled === 0 ? (
-          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">空場</span>
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">{t('CourtCard.empty')}</span>
         ) : full ? (
           <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-mint text-emerald-700">
-            進行中{mins !== null ? ` · 已打 ${mins} 分` : ''}
+            {t('CourtCard.playing')}{mins !== null ? t('CourtCard.elapsed', { mins }) : ''}
           </span>
         ) : (
           <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-yellow text-amber-700">
-            湊人中 {filled}/4
+            {t('CourtCard.filling', { filled })}
           </span>
         )}
       </div>
@@ -164,7 +168,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
       {/* queue */}
       {court.queue.length > 0 && (
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className="text-xs text-gray-400 font-semibold">排隊</span>
+          <span className="text-xs text-gray-400 font-semibold">{t('CourtCard.queue')}</span>
           {court.queue.map((p) => (
             <motion.div key={p.player_id} animate={{ y: [0, -3, 0] }}
               transition={{ repeat: Infinity, duration: 2 }}>
@@ -181,7 +185,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
         const iVoted = myPlayerId ? votes.includes(myPlayerId) : false
         return (
           <div className="space-y-1.5">
-            <div className="text-center text-sm font-bold text-emerald-600">⚡ 你在場上打!</div>
+            <div className="text-center text-sm font-bold text-emerald-600">{t('CourtCard.youArePlaying')}</div>
             <button
               onClick={onVoteEnd}
               disabled={votePending}
@@ -192,34 +196,34 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
               }`}
             >
               {iVoted
-                ? `已投票結束 ${votes.length}/${needed}(再點取消)`
-                : `🗳 投票結束這場 ${votes.length}/${needed}`}
+                ? t('CourtCard.votedEnd', { votes: votes.length, needed })
+                : t('CourtCard.voteEnd', { votes: votes.length, needed })}
             </button>
-            <p className="text-center text-[11px] text-gray-400">場上 {needed} 人同意就自動結束、換下一組</p>
+            <p className="text-center text-[11px] text-gray-400">{t('CourtCard.voteHint', { needed })}</p>
           </div>
         )
       })()}
       {imPlaying && !full && (
         <div className="space-y-1.5">
-          <p className="text-center text-xs text-amber-600 font-semibold">👆 點其他空位可換位置 · 等湊滿 4 人開打</p>
-          <button onClick={onLeavePlaying} className="btn-secondary w-full text-sm">離開場地(換場)</button>
+          <p className="text-center text-xs text-amber-600 font-semibold">{t('CourtCard.moveHint')}</p>
+          <button onClick={onLeavePlaying} className="btn-secondary w-full text-sm">{t('CourtCard.leaveCourt')}</button>
         </div>
       )}
       {imQueued && (
-        <button onClick={onLeaveQueue} className="btn-secondary w-full text-sm">退出排隊(場地 {court.court_num})</button>
+        <button onClick={onLeaveQueue} className="btn-secondary w-full text-sm">{t('CourtCard.leaveQueue', { num: court.court_num })}</button>
       )}
       {!imPlaying && !imQueued && inAnotherCourt && (
-        <p className="text-center text-xs text-gray-300">你已在其他場地</p>
+        <p className="text-center text-xs text-gray-300">{t('CourtCard.inAnotherCourt')}</p>
       )}
       {!imPlaying && !imQueued && !inAnotherCourt && locked && (
-        <p className="text-center text-xs text-gray-300">尚未開放</p>
+        <p className="text-center text-xs text-gray-300">{t('CourtCard.notOpen')}</p>
       )}
       {canPlace && !imPlaying && (
-        <p className="text-center text-xs text-brand-pink font-semibold">👆 點空位直接上場</p>
+        <p className="text-center text-xs text-brand-pink font-semibold">{t('CourtCard.tapToPlay')}</p>
       )}
       {canJoinQueue && (
         <button onClick={onJoinQueue} className="btn-secondary w-full text-sm">
-          {full ? '排隊等待' : '我先排隊就好(不上場)'}
+          {full ? t('CourtCard.waitInQueue') : t('CourtCard.queueOnly')}
         </button>
       )}
     </div>

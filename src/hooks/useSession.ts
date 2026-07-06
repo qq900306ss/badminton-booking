@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { sessionApi } from '../api/client'
 import type { SessionView, PlayerSlot } from '../api/client'
 import { useToast, errMsg } from '../components/Toast'
+import i18n from '../i18n'
 
 // 推送求快、輪詢對帳:WS 活著時資料由伺服器主動推,輪詢降到 60 秒只做
 // 「對帳」(萬一哪則推播漏了,最多慢一分鐘自己追平);WS 斷線時回到 30 秒。
@@ -120,7 +121,7 @@ export function useCourtActions(sessionId: string) {
       sessionApi.voteEnd(sessionId, v.courtId, v.asPlayer),
     onSuccess: (r) => {
       invalidate()
-      if (r.data.data.ended) toast('這場結束了,換下一組!', 'info')
+      if (r.data.data.ended) toast(i18n.t('useSession.gameEnded'), 'info')
     },
     onError: (e: unknown) => toast(errMsg(e)),
   })
@@ -130,7 +131,7 @@ export function useCourtActions(sessionId: string) {
       sessionApi.addFamily(sessionId, v.name, v.level, v.avatar),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['session-players', sessionId] })
-      toast('已送出,等團主核准就能幫他排囉', 'info')
+      toast(i18n.t('useSession.familySubmitted'), 'info')
     },
     onError: (e: unknown) => toast(errMsg(e)),
   })

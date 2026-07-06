@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TIERS, LEVEL_DESC, tierOf } from '../lib/levels'
 
 export function LevelReference({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation()
   return (
     <motion.div
       className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-0 sm:p-4"
@@ -19,10 +21,10 @@ export function LevelReference({ onClose }: { onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-extrabold text-gray-800 text-lg">羽球程度分級</h3>
+          <h3 className="font-extrabold text-gray-800 text-lg">{t('LevelPicker.refTitle')}</h3>
           <button onClick={onClose} className="text-gray-400 text-xl">✕</button>
         </div>
-        <p className="text-xs text-gray-400 mb-4">台灣羽球推廣協會 分級制度,挑一個最接近自己的</p>
+        <p className="text-xs text-gray-400 mb-4">{t('LevelPicker.refSubtitle')}</p>
         <div className="space-y-4">
           {TIERS.map((t) => (
             <div key={t.name}>
@@ -54,19 +56,20 @@ interface Props {
 }
 
 export function LevelPicker({ value, onChange }: Props) {
+  const { t } = useTranslation()
   const [showRef, setShowRef] = useState(false)
   const tier = tierOf(value)
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-bold text-gray-600">你的羽球程度</span>
+        <span className="text-sm font-bold text-gray-600">{t('LevelPicker.yourLevel')}</span>
         <button
           type="button"
           onClick={() => setShowRef(true)}
           className="text-xs text-brand-pink font-semibold"
         >
-          ❓ 看分級說明
+          ❓ {t('LevelPicker.seeGuide')}
         </button>
       </div>
 
@@ -90,7 +93,7 @@ export function LevelPicker({ value, onChange }: Props) {
       </div>
 
       <p className="text-xs text-gray-400 h-4">
-        {tier ? `${tier.name} · 第 ${value} 級` : '不確定就先填 3,團主之後可再幫你調整 👍'}
+        {tier ? t('LevelPicker.tierLevel', { tier: tier.name, level: value }) : t('LevelPicker.notSure')}
       </p>
 
       <AnimatePresence>

@@ -1,53 +1,14 @@
 // User-facing changelog shown in the「更新資訊」modal. Newest first. Keep entries
 // short and in plain language (player audience).
-export const CHANGELOG: { date: string; items: string[] }[] = [
-  {
-    date: '2026/07/06',
-    items: [
-      '球局卡新增「↗ 揪球友」:一鍵把這場分享到 LINE/IG,朋友點開直接報名',
-      '設定裡新增「📣 推薦給朋友」,喜歡的話幫我們傳出去 🙏',
-    ],
-  },
-  {
-    date: '2026/07/05',
-    items: [
-      '⚡ 全面提速:上場、排隊點了立刻反應,大家的操作即時同步到你畫面,網頁開啟也更快了',
-      '📱 螢幕關掉再打開,畫面立刻更新成最新狀態(以前可能要等一分鐘或手動刷新)',
-    ],
-  },
-  {
-    date: '2026/07/03',
-    items: [
-      '沒密碼也能加入了!開放報名的團可以直接「🙋 報名」、留句話給團主,核准後自動進場',
-      '報名可以「＋帶家人一起」(最多 5 位),團主核准後跟現有家人一樣由你的手機代操作',
-      '首頁新增「📋 我的場次」:報名了哪些團、核准了沒、已加入的一鍵進場,通通看得到',
-      '首頁球局卡會顯示團簡介和「已加入 X 人 · 報名中 N 人」,更好挑團',
-    ],
-  },
-  {
-    date: '2026/07/01',
-    items: [
-      '投票結束改成「2 票」就能結束這場、換下一組(原本 3 票)',
-    ],
-  },
-  {
-    date: '2026/06/30',
-    items: [
-      '團主可開「公平讓分」:打太多的人會暫時讓給打少的人(開啟時看得到大家場數)',
-      '修復 LINE 登入問題,現在可以正常用 LINE 登入了',
-    ],
-  },
-  {
-    date: '2026/06/29',
-    items: [
-      '每個團會顯示團主頭像,更好認(團主沒設就用預設 🐰)',
-      '首頁可用「星期」快速篩選球局,地區篩選改成收合更清爽',
-      '團主有放連結時,球局卡片可一鍵「聯繫團主」',
-      '可以帶家人一起打(需團主核准)',
-      '場上湊滿四人後可投票結束這場',
-      '可選可愛頭像、設定預設名稱與程度',
-      '球場狀態即時同步、更省流量',
-      '有新版本會自動提醒更新',
-    ],
-  },
-]
+import i18n from '../i18n'
+
+// Dates are data (not translated); the bullet items live in the changelog
+// locale fragments keyed by date and are read lazily at call time.
+const DATES = ['2026/07/06', '2026/07/05', '2026/07/03', '2026/07/01', '2026/06/30', '2026/06/29']
+
+export function getChangelog(): { date: string; items: string[] }[] {
+  return DATES.map((date) => ({
+    date,
+    items: i18n.t(`changelog.${date}`, { returnObjects: true }) as unknown as string[],
+  }))
+}

@@ -1,5 +1,6 @@
 import { createContext, useContext, useCallback, useState, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import i18n from '../i18n'
 
 type ToastType = 'error' | 'success' | 'info'
 interface ToastItem {
@@ -51,6 +52,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 }
 
 // pull a human message out of an axios error
-export function errMsg(e: unknown, fallback = '操作失敗'): string {
+export function errMsg(e: unknown, fallback = i18n.t('Toast.actionFailed')): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? fallback
 }

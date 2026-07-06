@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSessionView, useCourtActions, useSessionPlayers } from '../hooks/useSession'
 import { CourtCard } from '../components/CourtCard'
@@ -19,6 +20,7 @@ export function CourtPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const sid = sessionId ?? ''
   const nav = useNavigate()
+  const { t } = useTranslation()
 
   // identity is bound to this session; bounce to entry if not joined yet
   const saved = localStorage.getItem(`badminton_${sid}`)
@@ -150,7 +152,7 @@ export function CourtPage() {
     absentCount.current += 1
     if (absentCount.current >= 2) {
       localStorage.removeItem(`badminton_${sid}`)
-      toast('你已被移出本場,請重新選身份', 'info')
+      toast(t('CourtPage.removedFromSession'), 'info')
       nav(`/?s=${sid}`, { replace: true })
     }
     // depend on playersUpdatedAt so this runs on EVERY poll (React Query reuses
@@ -180,12 +182,12 @@ export function CourtPage() {
   const prevState = useRef<typeof myState | null>(null)
   useEffect(() => {
     if (prevState.current === 'queued' && myState === 'playing') {
-      const where = myCourt?.name?.trim() ? myCourt.name : `場地 ${myCourt?.court_num}`
-      toast('🏸 輪到你上場了!', 'success')
+      const where = myCourt?.name?.trim() ? myCourt.name : t('CourtPage.courtLabel', { num: myCourt?.court_num })
+      toast(t('CourtPage.yourTurnToast'), 'success')
       playChime()
       vibrate()
-      pushNotif(sid, `🏸 輪到你上場了(${where})`)
-      if (document.hidden) notifyTurn(`${where} · 快回來上場`)
+      pushNotif(sid, t('CourtPage.yourTurnNotif', { where }))
+      if (document.hidden) notifyTurn(t('CourtPage.comeBackToPlay', { where }))
     }
     prevState.current = myState
   }, [myState, myCourt, toast])
@@ -209,7 +211,7 @@ export function CourtPage() {
     return (
       <div className="min-h-screen bg-brand-bg flex items-center justify-center p-6">
         <div className="card text-center">
-          <p className="text-gray-500">找不到這場球局</p>
+          <p className="text-gray-500">{t('CourtPage.sessionNotFound')}</p>
         </div>
       </div>
     )
@@ -220,8 +222,8 @@ export function CourtPage() {
       <div className="min-h-screen bg-brand-bg flex items-center justify-center p-6">
         <div className="card text-center space-y-2">
           <div className="text-4xl">🎉</div>
-          <p className="font-bold text-gray-700">這場球局已結束</p>
-          <p className="text-gray-400 text-sm">感謝參與,下次再來!</p>
+          <p className="font-bold text-gray-700">{t('CourtPage.sessionEnded')}</p>
+          <p className="text-gray-400 text-sm">{t('CourtPage.thanksSeeYou')}</p>
         </div>
       </div>
     )
@@ -235,12 +237,12 @@ export function CourtPage() {
           <button
             onClick={() => nav('/')}
             className="text-gray-400 hover:text-brand-pink text-lg font-bold px-1"
-            aria-label="回大廳"
+            aria-label={t('CourtPage.backToLobby')}
           >
             ←
           </button>
           <span className="text-2xl">🏸</span>
-          <span className="font-extrabold text-gray-800">球場即時</span>
+          <span className="font-extrabold text-gray-800">{t('CourtPage.liveCourt')}</span>
         </div>
         <div className="flex items-center gap-2">
           <NotificationBell sessionId={sid} />
@@ -284,8 +286,8 @@ export function CourtPage() {
       {/* queue-open gate banner */}
       {locked && (
         <div className="mx-4 mt-3 bg-brand-yellow/60 rounded-2xl px-4 py-3 text-center">
-          <p className="font-bold text-amber-700">⏰ 排隊 {openTimeStr} 開放</p>
-          <p className="text-xs text-amber-600 mt-0.5">先看看球場狀況,時間到就能自己排上場囉</p>
+          <p className="font-bold text-amber-700">⏰ {t('CourtPage.queueOpensAt', { time: openTimeStr })}</p>
+          <p className="text-xs text-amber-600 mt-0.5">{t('CourtPage.queueLockedHint')}</p>
         </div>
       )}
 
@@ -317,9 +319,9 @@ export function CourtPage() {
 
       {/* refresh hint */}
       <div className="max-w-md mx-auto px-4 pb-2">
-        <InstallButton label="📲 裝到桌面 · 收「輪到你了」通知" />
+        <InstallButton label={t('CourtPage.installLabel')} />
       </div>
-      <p className="text-center text-xs text-gray-300 pb-6">⚡ 即時更新(WebSocket)</p>
+      <p className="text-center text-xs text-gray-300 pb-6">{t('CourtPage.liveUpdateFooter')}</p>
     </div>
   )
 }

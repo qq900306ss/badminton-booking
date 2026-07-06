@@ -1,0 +1,10 @@
+{
+  "LevelPicker": {
+    "refTitle": "羽球程度分級",
+    "refSubtitle": "台灣羽球推廣協會 分級制度,挑一個最接近自己的",
+    "yourLevel": "你的羽球程度",
+    "seeGuide": "看分級說明",
+    "tierLevel": "{{tier}} · 第 {{level}} 級",
+    "notSure": "不確定就先填 3,團主之後可再幫你調整 👍"
+  }
+}

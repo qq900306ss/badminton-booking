@@ -1,0 +1,14 @@
+{
+  "FamilyBar": {
+    "operating": "操作中",
+    "pending": "承認待ち",
+    "removeFamily": "家族を削除",
+    "bringFamily": "＋家族を連れてくる",
+    "addHint": "家族を1人連れてくる(このスマホを共有、主催者の承認が必要)",
+    "namePlaceholder": "家族の名前",
+    "pickAvatar": "アバターを選ぶ",
+    "submitting": "送信中...",
+    "submit": "追加(主催者の承認待ち)",
+    "operatingNote": "👪 家族の代わりに操作中 — 出場・退場・順番待ちはその人の名義で記録されます"
+  }
+}

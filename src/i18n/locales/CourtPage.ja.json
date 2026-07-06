@@ -1,0 +1,18 @@
+{
+  "CourtPage": {
+    "removedFromSession": "このセッションから外されました。もう一度参加者を選んでください。",
+    "yourTurnToast": "🏸 あなたの番です!",
+    "yourTurnNotif": "🏸 あなたの番です({{where}})",
+    "comeBackToPlay": "{{where}} · 早く戻ってプレー",
+    "courtLabel": "コート {{num}}",
+    "sessionNotFound": "セッションが見つかりません",
+    "sessionEnded": "このセッションは終了しました",
+    "thanksSeeYou": "ご参加ありがとうございました。また次回!",
+    "backToLobby": "ロビーに戻る",
+    "liveCourt": "コート ライブ",
+    "queueOpensAt": "順番待ちは{{time}}に開放",
+    "queueLockedHint": "まずはコートの様子をチェック。時間になったら自分で順番待ちできます",
+    "installLabel": "📲 ホーム画面に追加・「あなたの番」通知を受け取る",
+    "liveUpdateFooter": "⚡ リアルタイム更新(WebSocket)"
+  }
+}

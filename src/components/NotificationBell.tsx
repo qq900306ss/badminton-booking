@@ -1,15 +1,18 @@
 import { useEffect, useReducer, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n'
 import { listNotifs, unreadCount, markSeen, clearNotifs } from '../lib/notifications'
 
 function relTime(ts: number): string {
   const s = Math.floor((Date.now() - ts) / 1000)
-  if (s < 60) return '剛剛'
-  if (s < 3600) return `${Math.floor(s / 60)} 分鐘前`
-  if (s < 86400) return `${Math.floor(s / 3600)} 小時前`
-  return `${Math.floor(s / 86400)} 天前`
+  if (s < 60) return i18n.t('NotificationBell.justNow')
+  if (s < 3600) return i18n.t('NotificationBell.minutesAgo', { n: Math.floor(s / 60) })
+  if (s < 86400) return i18n.t('NotificationBell.hoursAgo', { n: Math.floor(s / 3600) })
+  return i18n.t('NotificationBell.daysAgo', { n: Math.floor(s / 86400) })
 }
 
 export function NotificationBell({ sessionId }: { sessionId: string }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [, bump] = useReducer((n) => n + 1, 0)
 
@@ -27,7 +30,7 @@ export function NotificationBell({ sessionId }: { sessionId: string }) {
       <button
         onClick={() => { setOpen(true); markSeen(sessionId) }}
         className="relative w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center active:scale-90 transition-transform"
-        aria-label="通知"
+        aria-label={t('NotificationBell.aria')}
       >
         <span className="text-lg">🔔</span>
         {unread > 0 && (
@@ -41,17 +44,17 @@ export function NotificationBell({ sessionId }: { sessionId: string }) {
         <div className="fixed inset-0 z-50 bg-black/40 flex items-start justify-center pt-16 px-4" onClick={() => setOpen(false)}>
           <div className="bg-white rounded-3xl w-full max-w-sm max-h-[70vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
             <div className="px-4 py-3 border-b flex items-center justify-between shrink-0">
-              <span className="font-extrabold text-gray-800">🔔 通知</span>
+              <span className="font-extrabold text-gray-800">🔔 {t('NotificationBell.title')}</span>
               <div className="flex items-center gap-3 text-sm">
                 {notifs.length > 0 && (
-                  <button onClick={() => clearNotifs(sessionId)} className="text-gray-400">清除</button>
+                  <button onClick={() => clearNotifs(sessionId)} className="text-gray-400">{t('NotificationBell.clear')}</button>
                 )}
                 <button onClick={() => setOpen(false)} className="text-gray-400 font-bold">✕</button>
               </div>
             </div>
             <div className="overflow-y-auto p-3 space-y-2">
               {notifs.length === 0 ? (
-                <p className="text-center text-sm text-gray-300 py-8">目前沒有通知</p>
+                <p className="text-center text-sm text-gray-300 py-8">{t('NotificationBell.empty')}</p>
               ) : (
                 notifs.map((n) => (
                   <div key={n.id} className="bg-gray-50 rounded-2xl px-3 py-2.5">

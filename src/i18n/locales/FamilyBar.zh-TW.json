@@ -1,0 +1,14 @@
+{
+  "FamilyBar": {
+    "operating": "操作中",
+    "pending": "待核准",
+    "removeFamily": "移除家人",
+    "bringFamily": "＋帶家人",
+    "addHint": "帶一位家人(共用這支手機,需團主核准)",
+    "namePlaceholder": "家人的名字",
+    "pickAvatar": "選個頭像",
+    "submitting": "送出中...",
+    "submit": "加入(等團主核准)",
+    "operatingNote": "👪 正在幫家人操作中 — 上下場/排隊都會記在他名下"
+  }
+}
