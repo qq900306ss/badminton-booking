@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import type { CourtView, PlayerSlot } from '../api/client'
 import { tierOf } from '../lib/levels'
 import { isPhotoUrl } from '../lib/avatar'
+import { useToast } from './Toast'
 
 const PALETTE = [
   'bg-brand-pink', 'bg-brand-mint', 'bg-brand-yellow',
@@ -74,7 +75,7 @@ function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
   )
 }
 
-function EmptySlot({ canJoin, onJoin }: { canJoin: boolean; onJoin: () => void }) {
+function EmptySlot({ canJoin, onJoin, locked = false, onLockedTap }: { canJoin: boolean; onJoin: () => void; locked?: boolean; onLockedTap?: () => void }) {
   const { t } = useTranslation()
   // same flex-col + name-line height as Avatar, so swapping doesn't shift layout
   return (
@@ -88,6 +89,16 @@ function EmptySlot({ canJoin, onJoin }: { canJoin: boolean; onJoin: () => void }
           aria-label={t('CourtCard.joinThisSlot')}
         >
           +
+        </button>
+      ) : locked ? (
+        // 團主鎖定:看起來變灰不可用,但點下去仍解釋原因(跳提示),不靜默
+        <button
+          onClick={onLockedTap}
+          className="w-11 h-11 rounded-full border-2 border-dashed border-gray-300 text-gray-300
+            flex items-center justify-center text-base bg-white/20 active:scale-90 transition-all"
+          aria-label={t('CourtCard.lockedByHost')}
+        >
+          🔒
         </button>
       ) : (
         <div className="w-11 h-11 rounded-full border-2 border-dashed border-white/70 bg-white/20" />
@@ -112,33 +123,44 @@ interface Props {
 
 export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying, onVoteEnd, votePending = false }: Props) {
   const { t } = useTranslation()
+  const toast = useToast()
   // playing is a fixed 4-slot array; empty slots have player_id === ''
   const slots = court.playing
   const filled = slots.filter((p) => p.player_id).length
   const imPlaying = slots.some((p) => p.player_id === myPlayerId)
   const imQueued = court.queue.some((p) => p.player_id === myPlayerId)
   const full = filled === 4
+  // 團主手動鎖定這個場地:擋所有玩家端自助上場/排隊(團主後台仍可排人)
+  const courtLocked = !!court.locked
   // empty slot tappable: to join (not in any court) or to move (already playing here)
-  const canPlace = !locked && !inAnotherCourt && !imQueued && filled < 4
+  const canPlace = !locked && !courtLocked && !inAnotherCourt && !imQueued && filled < 4
   // a player may choose to queue at any time, even when slots are open
-  const canJoinQueue = !locked && !inAnotherCourt && !imPlaying && !imQueued && court.queue.length < 4
+  const canJoinQueue = !locked && !courtLocked && !inAnotherCourt && !imPlaying && !imQueued && court.queue.length < 4
+  // 鎖定時空位/排隊改成「灰但可點 → 跳提示」(只對本來有機會加入的人)
+  const showLockedAffordance = courtLocked && !imPlaying && !imQueued && !inAnotherCourt
+  const notifyLocked = () => toast(t('CourtCard.lockedByHost'), 'error')
   const mins = elapsedMins(court.started_at)
 
   return (
-    <div className="card relative overflow-hidden">
+    <div className={`card relative overflow-hidden ${courtLocked ? 'ring-2 ring-rose-200' : ''}`}>
       <div className="flex items-center justify-between mb-2">
         <span className="font-extrabold text-gray-700">{court.name?.trim() ? court.name : t('CourtCard.courtLabel', { num: court.court_num })}</span>
-        {filled === 0 ? (
-          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">{t('CourtCard.empty')}</span>
-        ) : full ? (
-          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-mint text-emerald-700">
-            {t('CourtCard.playing')}{mins !== null ? t('CourtCard.elapsed', { mins }) : ''}
-          </span>
-        ) : (
-          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-yellow text-amber-700">
-            {t('CourtCard.filling', { filled })}
-          </span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {courtLocked && (
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-600">🔒 {t('CourtCard.lockedBadge')}</span>
+          )}
+          {filled === 0 ? (
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">{t('CourtCard.empty')}</span>
+          ) : full ? (
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-mint text-emerald-700">
+              {t('CourtCard.playing')}{mins !== null ? t('CourtCard.elapsed', { mins }) : ''}
+            </span>
+          ) : (
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-yellow text-amber-700">
+              {t('CourtCard.filling', { filled })}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* badminton court */}
@@ -158,7 +180,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
               {slot.player_id ? (
                 <Avatar slot={slot} me={slot.player_id === myPlayerId} />
               ) : (
-                <EmptySlot canJoin={canPlace} onJoin={() => onJoinPlaying(i)} />
+                <EmptySlot canJoin={canPlace} onJoin={() => onJoinPlaying(i)} locked={showLockedAffordance} onLockedTap={notifyLocked} />
               )}
             </div>
           ))}
@@ -215,7 +237,15 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
       {!imPlaying && !imQueued && inAnotherCourt && (
         <p className="text-center text-xs text-gray-300">{t('CourtCard.inAnotherCourt')}</p>
       )}
-      {!imPlaying && !imQueued && !inAnotherCourt && locked && (
+      {!imPlaying && !imQueued && !inAnotherCourt && courtLocked && (
+        <button
+          onClick={notifyLocked}
+          className="w-full text-sm rounded-2xl py-2 font-bold bg-gray-100 text-gray-400 active:scale-95 transition-transform"
+        >
+          🔒 {t('CourtCard.lockedByHost')}
+        </button>
+      )}
+      {!imPlaying && !imQueued && !inAnotherCourt && locked && !courtLocked && (
         <p className="text-center text-xs text-gray-300">{t('CourtCard.notOpen')}</p>
       )}
       {canPlace && !imPlaying && (

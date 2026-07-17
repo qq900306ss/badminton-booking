@@ -55,6 +55,7 @@ export interface CourtView {
   court_id: string
   court_num: number
   name?: string
+  locked?: boolean // 團主鎖定中:不能自助上場/排隊
   status: 'empty' | 'playing'
   playing: PlayerSlot[]
   queue: PlayerSlot[]

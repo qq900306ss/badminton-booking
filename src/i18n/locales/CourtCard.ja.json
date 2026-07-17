@@ -17,6 +17,8 @@
     "leaveQueue": "順番待ちをやめる(コート {{num}})",
     "inAnotherCourt": "すでに他のコートにいます",
     "notOpen": "まだ開放されていません",
+    "lockedBadge": "ロック中",
+    "lockedByHost": "このコートは主催者がロックしました",
     "tapToPlay": "👆 空き位置をタップしてそのまま出場",
     "waitInQueue": "順番待ちに入る",
     "queueOnly": "とりあえず順番待ちだけ(出場しない)"

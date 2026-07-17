@@ -17,6 +17,8 @@
     "leaveQueue": "Leave queue (Court {{num}})",
     "inAnotherCourt": "You're already in another court",
     "notOpen": "Not open yet",
+    "lockedBadge": "Locked",
+    "lockedByHost": "This court has been locked by the host",
     "tapToPlay": "👆 Tap an open slot to go on court",
     "waitInQueue": "Join queue",
     "queueOnly": "Just queue for now (don't go on court)"

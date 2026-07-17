@@ -17,6 +17,8 @@
     "leaveQueue": "退出排隊(場地 {{num}})",
     "inAnotherCourt": "你已在其他場地",
     "notOpen": "尚未開放",
+    "lockedBadge": "已鎖定",
+    "lockedByHost": "此場地已被團主鎖起來",
     "tapToPlay": "👆 點空位直接上場",
     "waitInQueue": "排隊等待",
     "queueOnly": "我先排隊就好(不上場)"
