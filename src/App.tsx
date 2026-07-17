@@ -16,6 +16,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { ConnectionBanner } from './components/ConnectionBanner'
 import { UpdateBanner } from './components/UpdateBanner'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
+import { HostCta } from './components/HostCta'
 
 // real-time comes from the WebSocket; these defaults stop redundant refetch
 // storms (every query re-firing on each tab focus) so we don't hammer the API
@@ -46,6 +47,7 @@ export default function App() {
       <LanguageSwitcher />
       <ConnectionBanner />
       <UpdateBanner />
+      <HostCta />
       <BrowserRouter>
         <Suspense fallback={<div className="min-h-screen bg-brand-bg" />}>
           <Routes>
