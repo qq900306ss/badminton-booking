@@ -3,6 +3,16 @@
     "bubble": "你也想自己開團嗎?",
     "button": "開團",
     "aria": "前往開團後台,自己揪一場羽球團(免費)",
-    "dismiss": "關閉"
+    "dismiss": "關閉",
+    "sheetTitle": "自己開一團!",
+    "sheetDesc": "開團後台是另一個網站,完全免費。先把網址複製起來(傳到自己的 LINE 或記事本),下次才找得回來!",
+    "copyUrl": "複製網址",
+    "copied": "已複製",
+    "copyHint": "貼給自己存起來,之後直接用這個網址進開團後台",
+    "openSite": "前往開團後台",
+    "installTitle": "可以安裝成 App,以後點圖示就開",
+    "installAndroid": "Android:用 Chrome 開啟 → 右上「⋮」選單 →「加到主畫面 / 安裝應用程式」",
+    "installIos": "iPhone:一定要用 Safari 開啟 → 點下方「分享」鈕 →「加入主畫面」",
+    "installInApp": "※ 在 LINE / FB 裡開的話,要先點「用瀏覽器開啟」才能安裝"
   }
 }

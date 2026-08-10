@@ -3,6 +3,16 @@
     "bubble": "自分でも開催してみませんか?",
     "button": "開催",
     "aria": "主催コンソールへ移動して、自分の練習会を開く(無料)",
-    "dismiss": "閉じる"
+    "dismiss": "閉じる",
+    "sheetTitle": "自分で開催してみよう!",
+    "sheetDesc": "主催コンソールは別サイトで、完全無料。まずURLをコピーして(自分のLINEやメモに送って)、次回も迷わず戻れるようにしましょう!",
+    "copyUrl": "URLをコピー",
+    "copied": "コピー済み",
+    "copyHint": "保存しておけば、このURLからいつでも主催コンソールに入れます",
+    "openSite": "主催コンソールを開く",
+    "installTitle": "アプリとしてインストールできます",
+    "installAndroid": "Android:Chromeで開く → 右上「⋮」→「ホーム画面に追加 / アプリをインストール」",
+    "installIos": "iPhone:必ずSafariで開く → 下の「共有」ボタン →「ホーム画面に追加」",
+    "installInApp": "※ LINE / FB 内で開いた場合は、先に「ブラウザで開く」を押してください"
   }
 }

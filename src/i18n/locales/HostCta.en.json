@@ -3,6 +3,16 @@
     "bubble": "Want to host your own games?",
     "button": "Host",
     "aria": "Go to the host console and start your own badminton group (free)",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "sheetTitle": "Host your own games!",
+    "sheetDesc": "The host console is a separate site — completely free. Copy the URL first (send it to yourself) so you can find your way back next time!",
+    "copyUrl": "Copy URL",
+    "copied": "Copied",
+    "copyHint": "Save it somewhere — this URL is how you get back to the host console",
+    "openSite": "Open the host console",
+    "installTitle": "Installable as an app — one tap from your home screen",
+    "installAndroid": "Android: open in Chrome → \"⋮\" menu → \"Add to Home screen / Install app\"",
+    "installIos": "iPhone: must open in Safari → tap the Share button → \"Add to Home Screen\"",
+    "installInApp": "※ Inside LINE / FB, tap \"Open in browser\" first — in-app browsers can't install"
   }
 }
