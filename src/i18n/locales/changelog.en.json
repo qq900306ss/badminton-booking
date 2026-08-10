@@ -32,7 +32,8 @@
       "You'll be prompted automatically to update when a new version is out"
     ],
     "2026/08/10": [
-      "New \"📢 Announcement\" in the session: messages from the host (e.g. dinner afterwards) show above the courts — collapsible, and re-opens when there's a new one"
+      "New \"📢 Announcement\" in the session: messages from the host (e.g. dinner afterwards) show above the courts — collapsible, and re-opens when there's a new one",
+      "The \"Host\" button now shows the host-console URL to copy and save, plus how to install it as an app (iPhone: Safari → Add to Home Screen)"
     ]
   }
 }
