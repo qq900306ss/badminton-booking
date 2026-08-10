@@ -9,6 +9,7 @@ import { CourtSkeleton } from '../components/Skeleton'
 import { InstallButton } from '../components/InstallButton'
 import { NotificationBell } from '../components/NotificationBell'
 import { FairPlayInfo } from '../components/FairPlayInfo'
+import { AnnouncementBanner } from '../components/AnnouncementBanner'
 import { useToast } from '../components/Toast'
 import { playChime, vibrate, notifyTurn, subscribePush } from '../lib/alert'
 import { connectSessionWS } from '../lib/realtime'
@@ -267,6 +268,9 @@ export function CourtPage() {
           <p className="font-extrabold text-gray-700">{session.title}</p>
         </div>
       )}
+
+      {/* 📢 場內公告(團主寫的,可收起;內容一改會自動重新展開) */}
+      <AnnouncementBanner sessionId={sid} text={session.announcement} />
 
       {/* 家人共用手機:身份切換 + 帶家人 */}
       <FamilyBar

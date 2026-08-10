@@ -30,6 +30,9 @@
       "Pick a cute avatar and set your default name and level",
       "Court status syncs in real time and uses less data",
       "You'll be prompted automatically to update when a new version is out"
+    ],
+    "2026/08/10": [
+      "New \"📢 Announcement\" in the session: messages from the host (e.g. dinner afterwards) show above the courts — collapsible, and re-opens when there's a new one"
     ]
   }
 }

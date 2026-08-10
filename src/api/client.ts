@@ -75,6 +75,7 @@ export interface SessionView {
   queue_open_at?: string
   contact_url?: string
   avatar_url?: string // 團主頭像(emoji 或照片網址),空=預設 🐰
+  announcement?: string // 場內公告(團主寫給場內成員,選填)
   // 前台報名
   description?: string // 團簡介(選填)
   signup_open?: boolean // 這場開放前台報名
