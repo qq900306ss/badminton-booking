@@ -27,7 +27,7 @@ function HostSheet({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="pointer-events-auto fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-3" onClick={onClose}>
+    <div className="fixed inset-0 z-[80] bg-black/40 flex items-end sm:items-center justify-center p-3" onClick={onClose}>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -103,6 +103,7 @@ export function HostCta() {
   }, [])
 
   return (
+    <>
     <div className="fixed bottom-6 right-5 z-40 flex flex-col items-end gap-2 pointer-events-none">
       <AnimatePresence>
         {showBubble && (
@@ -153,9 +154,14 @@ export function HostCta() {
         </button>
       </motion.div>
 
-      <AnimatePresence>
-        {sheet && <HostSheet onClose={() => setSheet(false)} />}
-      </AnimatePresence>
     </div>
+
+    {/* sheet 一定要在 z-40 wrapper「外面」:fixed+z-index 的 wrapper 會建立
+        stacking context,關在裡面的話整個彈窗有效層級只有 40,會被
+        LanguageSwitcher(z-60)/Toast(z-60) 蓋住還被搶點擊 */}
+    <AnimatePresence>
+      {sheet && <HostSheet onClose={() => setSheet(false)} />}
+    </AnimatePresence>
+    </>
   )
 }
