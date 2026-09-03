@@ -50,7 +50,6 @@
     "emptyHint": "曜日やエリアを変える、主催者の開催を待つ、またはQRコードをスキャンして入場",
     "numCourts": "コート {{n}}面",
     "joinedLabel": "参加",
-    "playedCount": "{{n}}人プレー済み",
     "ongoingBadge": "進行中",
     "notStartedBadge": "開始前",
     "peopleUnit": "人",

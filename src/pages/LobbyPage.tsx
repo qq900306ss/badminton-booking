@@ -514,11 +514,10 @@ export function LobbyPage() {
                     {t('LobbyPage.numCourts', { n: s.num_courts })}
                   </span>
                 </p>
-                {/* 團內人數:已加入(/名額)· 打過人數 · 報名中 */}
-                {s.joined_count !== undefined && (
+                {/* 開放報名的場次:已加入(/名額)· 報名中 */}
+                {s.signup_open && s.joined_count !== undefined && (
                   <p className="text-xs font-semibold text-amber-600 mt-0.5">
-                    🙋 {t('LobbyPage.joinedLabel')} {s.joined_count}{s.signup_open && (s.signup_quota ?? 0) > 0 ? `/${s.signup_quota}` : ''} {t('LobbyPage.peopleUnit')}
-                    {' · '}{t('LobbyPage.playedCount', { n: s.played_count ?? 0 })}
+                    🙋 {t('LobbyPage.joinedLabel')} {s.joined_count}{(s.signup_quota ?? 0) > 0 ? `/${s.signup_quota}` : ''} {t('LobbyPage.peopleUnit')}
                     {(s.pending_signups ?? 0) > 0 && <>{t('LobbyPage.pendingInline', { n: s.pending_signups })}</>}
                   </p>
                 )}
