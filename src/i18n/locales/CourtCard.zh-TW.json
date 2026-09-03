@@ -5,7 +5,7 @@
     "courtLabel": "場地 {{num}}",
     "empty": "空場",
     "playing": "進行中",
-    "elapsed": " · 已打 {{mins}} 分",
+    "elapsed": " · 已打 {{mins}} 分鐘",
     "filling": "湊人中 {{filled}}/4",
     "queue": "排隊",
     "youArePlaying": "⚡ 你在場上打!",

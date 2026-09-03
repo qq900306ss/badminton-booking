@@ -142,6 +142,13 @@ export function LobbyPage() {
     (a.start_at || a.opened_at).localeCompare(b.start_at || b.opened_at)
   )
 
+  // 現在時刻放 state(render 保持純),每分鐘更新 → 「尚未開始」時間到自動變「進行中」
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000)
+    return () => clearInterval(id)
+  }, [])
+
   const [cityFilter, setCityFilter] = useState('')
   const [districtFilter, setDistrictFilter] = useState('')
   const [dayFilter, setDayFilter] = useState<number | null>(null) // Date.getDay() 0=日…6=六, null=全部
@@ -491,14 +498,27 @@ export function LobbyPage() {
                     📍 {s.city}{s.district ? ` · ${s.district}` : ''}
                   </p>
                 )}
-                <p className="text-sm text-gray-400 mt-0.5">
-                  {fmtRange(s) && <span>{fmtRange(s)} · </span>}
-                  {t('LobbyPage.numCourts', { n: s.num_courts })}
+                <p className="text-sm text-gray-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                  {/* 「進行中」= 開打時間已到;還沒到顯示「尚未開始」 */}
+                  {s.start_at && new Date(s.start_at).getTime() > now ? (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-brand-lavender/60 text-violet-600">
+                      ⏰ {t('LobbyPage.notStartedBadge')}
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-brand-mint/60 text-emerald-700">
+                      🏸 {t('LobbyPage.ongoingBadge')}
+                    </span>
+                  )}
+                  <span>
+                    {fmtRange(s) && <span>{fmtRange(s)} · </span>}
+                    {t('LobbyPage.numCourts', { n: s.num_courts })}
+                  </span>
                 </p>
-                {/* 開放報名的場次:已加入(/名額)· 報名中 */}
-                {s.signup_open && s.joined_count !== undefined && (
+                {/* 團內人數:已加入(/名額)· 打過人數 · 報名中 */}
+                {s.joined_count !== undefined && (
                   <p className="text-xs font-semibold text-amber-600 mt-0.5">
-                    🙋 {t('LobbyPage.joinedLabel')} {s.joined_count}{(s.signup_quota ?? 0) > 0 ? `/${s.signup_quota}` : ''} {t('LobbyPage.peopleUnit')}
+                    🙋 {t('LobbyPage.joinedLabel')} {s.joined_count}{s.signup_open && (s.signup_quota ?? 0) > 0 ? `/${s.signup_quota}` : ''} {t('LobbyPage.peopleUnit')}
+                    {' · '}{t('LobbyPage.playedCount', { n: s.played_count ?? 0 })}
                     {(s.pending_signups ?? 0) > 0 && <>{t('LobbyPage.pendingInline', { n: s.pending_signups })}</>}
                   </p>
                 )}

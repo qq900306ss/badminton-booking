@@ -1,5 +1,10 @@
 {
   "changelog": {
+    "2026/09/03": [
+      "Lobby cards now show a \"🏸 Ongoing / ⏰ Not started\" badge, so you can tell at a glance when a session hasn't begun yet",
+      "Cards also show member counts: how many joined, and how many have actually played a game",
+      "The court elapsed time now reads \"X min played\" with a proper unit"
+    ],
     "2026/07/06": [
       "Session cards now have “↗ Invite buddies”: share a game to LINE/IG in one tap, and friends can sign up straight from the link",
       "Added “📣 Recommend to friends” in Settings — if you like the app, help us spread the word 🙏"

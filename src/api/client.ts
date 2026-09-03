@@ -107,11 +107,12 @@ export interface SessionSummary {
   contact_url?: string // 團主提供的外部聯繫連結(選填)
   avatar_url?: string // 團主頭像(emoji 或照片網址),空=預設 🐰
   opened_at: string
-  // 前台報名(只有開放報名的場次會帶 counts)
+  // 前台報名(進行中場次會帶 counts)
   description?: string
   signup_open?: boolean
   signup_quota?: number
   joined_count?: number
+  played_count?: number // 實際上場打過至少一場的人數
   pending_signups?: number
   my_status?: 'member' | 'pending' // 已加入 / 報名中(帶登入態打大廳才有)
 }
