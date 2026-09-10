@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useMatch } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
@@ -87,8 +88,9 @@ export function HostCta() {
   const { t } = useTranslation()
   const [showBubble, setShowBubble] = useState(true)
   const [sheet, setSheet] = useState(false)
-  // 安裝頁自己有「你是團主?」區塊,漂浮鈕在那裡只會蓋住卡片(此元件在 Router 外,讀不到 useLocation)
-  const onInstallPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/install')
+  // 安裝頁自己有「你是團主?」區塊,漂浮鈕在那裡只會蓋住卡片。
+  // 用 Router 的 useMatch 跟路由同一套規則(大小寫不敏感、SPA 導頁會同步),別自己看 location
+  const onInstallPage = useMatch('/install') !== null
 
   // Show the bubble briefly on mount, then re-tease it every ~30s. Gentle enough
   // not to nag, present enough to keep the invite discoverable.

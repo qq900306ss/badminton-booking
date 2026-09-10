@@ -48,8 +48,9 @@ export default function App() {
       <LanguageSwitcher />
       <ConnectionBanner />
       <UpdateBanner />
-      <HostCta />
       <BrowserRouter>
+        {/* HostCta 要在 Router 內:它用 useMatch 判斷安裝頁要不要隱藏 */}
+        <HostCta />
         <Suspense fallback={<div className="min-h-screen bg-brand-bg" />}>
           <Routes>
             <Route path="/" element={<Home />} />
