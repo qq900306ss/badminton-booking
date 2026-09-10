@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { QRCodeSVG } from 'qrcode.react'
 import { isInAppBrowser, isLineInApp, lineExternalBrowserUrl, androidChromeIntentUrl } from '../lib/inAppBrowser'
-import { useInstallPrompt, promptInstall } from '../lib/installPrompt'
+import { useInstallPrompt, promptInstall, isStandalone } from '../lib/installPrompt'
 
 // 公開的「安裝頁」:宣傳時貼這一頁的網址,不用登入就能看。
 // 每個平台能做的事不一樣,這頁的工作就是把人導到「那個平台上真的能裝」的路:
@@ -17,12 +17,16 @@ const HOST_URL =
 
 type Platform = 'installed' | 'oldapp' | 'line' | 'inapp' | 'ios' | 'android' | 'desktop'
 
-// 被「舊網址的 PWA」開著:網址帶 ?moved=1(MovedNotice 帶的)或 referrer 是舊 cloudfront。
+// 被「舊網址的 PWA」開著:網址帶 ?moved=1(MovedNotice 帶的),或 referrer 是已知舊 host **且**還是 standalone。
 // 這種視窗還是舊 App 的(display-mode 也報 standalone),裝不了新的,也不能當「已裝好」。
+// 一般瀏覽器開舊網址會被 MovedNotice 用 location.replace 導過來,referrer 同樣是舊 origin,
+// 但那是正常瀏覽器、能裝 —— 所以 referrer 單獨不算,要配 standalone。
+const LEGACY_HOSTS = ['d2mg2bpjvlg672.cloudfront.net']
 function isOpenedFromOldApp(): boolean {
   if (new URLSearchParams(window.location.search).get('moved') === '1') return true
+  if (!isStandalone()) return false
   try {
-    return /\.cloudfront\.net$/i.test(new URL(document.referrer).hostname)
+    return LEGACY_HOSTS.includes(new URL(document.referrer).hostname.toLowerCase())
   } catch {
     return false
   }
