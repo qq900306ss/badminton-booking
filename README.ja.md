@@ -4,13 +4,13 @@
 
 バドミントンのコート管理システム。当日参加者が QR コードをスキャンして入場 → 本人を選択 → レベルを選択 → 順番待ち／出場 → コートのリアルタイム状況を確認、という流れです。
 
-🔗 **本番**: https://d2mg2bpjvlg672.cloudfront.net
+🔗 **本番**: https://badminton-tw.fyi
 
 ## 関連
 
 | | URL |
 |--|------|
-| 主催者管理画面 (admin) | https://d1r9u0ja59y4rv.cloudfront.net |
+| 主催者管理画面 (admin) | https://host.badminton-tw.fyi |
 | バックエンド API | https://pp2p4ln2cogxt4mi5f2wl3rqi40vskvs.lambda-url.ap-northeast-1.on.aws |
 
 ## ローカル開発

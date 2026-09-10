@@ -13,7 +13,7 @@ import { useInstallPrompt, promptInstall } from '../lib/installPrompt'
 //   桌機            → QR code 給手機掃
 const HOST_URL =
   (import.meta.env.VITE_HOST_APP_URL as string | undefined) ||
-  'https://d1r9u0ja59y4rv.cloudfront.net'
+  'https://host.badminton-tw.fyi'
 
 type Platform = 'installed' | 'line' | 'inapp' | 'ios' | 'android' | 'desktop'
 

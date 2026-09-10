@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 // proper rounded speech bubble that pops in periodically, so no bare text floats.
 const HOST_URL =
   (import.meta.env.VITE_HOST_APP_URL as string | undefined) ||
-  'https://d1r9u0ja59y4rv.cloudfront.net'
+  'https://host.badminton-tw.fyi'
 
 function HostSheet({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation()

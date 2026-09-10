@@ -4,13 +4,13 @@
 
 Badminton court management system: a drop-in player scans a QR code to enter → picks their identity → picks their skill level → queues / goes on court → watches the live court status.
 
-🔗 **Live**: https://d2mg2bpjvlg672.cloudfront.net
+🔗 **Live**: https://badminton-tw.fyi
 
 ## Related
 
 | | URL |
 |--|------|
-| Host admin (admin) | https://d1r9u0ja59y4rv.cloudfront.net |
+| Host admin (admin) | https://host.badminton-tw.fyi |
 | Backend API | https://pp2p4ln2cogxt4mi5f2wl3rqi40vskvs.lambda-url.ap-northeast-1.on.aws |
 
 ## Local development

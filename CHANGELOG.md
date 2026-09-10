@@ -12,6 +12,8 @@
 - PNG 圖示:192/512 + maskable + `apple-touch-icon` 180 滿版(iOS 不吃 SVG、透明角會變黑);manifest 改列 PNG
 - `index.html` 補 description + `og:*` 預覽卡(`og-image.png` 1200×630),LINE/FB 貼連結有圖有標題;網址指新網域
 - 網域 `badminton-tw.fyi`(Cloudflare Registrar,DNS 也在 Cloudflare;玩家端=apex、後台=`host.`、API=`api.` 走 Fly)
+- `MovedNotice`:舊 `*.cloudfront.net` / `www.` 網址開到 → 瀏覽器直接跳新網域同路徑;已安裝的 PWA(standalone)不能偷跳(會出 scope 降級),改全螢幕「網址搬家請到新網址重裝」提醒,可稍後(session 內不再吵)
+- 安裝頁隱藏 HostCta 漂浮鈕(用 `useMatch` 跟路由同規則);`HostCta` / 安裝頁的後台 fallback 網址改 `host.badminton-tw.fyi`
 
 ## 2026-09-03 — 大廳「進行中/尚未開始」標籤、分鐘單位
 

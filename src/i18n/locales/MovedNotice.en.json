@@ -1,0 +1,11 @@
+{
+  "MovedNotice": {
+    "title": "We've moved!",
+    "body": "Badminton Meetup has a new address. The icon on your home screen points to the old one and will stop updating. Please reinstall from the new address (30 seconds) — everything is tied to your account, nothing is lost.",
+    "install": "📲 Install from the new address",
+    "copy": "Copy new address",
+    "copied": "Copied",
+    "iosHint": "iPhone: if you can't add to Home Screen from here, paste the address into Safari and add it there.",
+    "later": "Later"
+  }
+}
