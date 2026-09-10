@@ -46,7 +46,7 @@ export default function App() {
     <QueryClientProvider client={qc}>
       <ErrorBoundary>
       <ToastProvider>
-      {/* 舊 cloudfront 網址:瀏覽器直接跳新網域、已安裝 PWA 顯示重新安裝提醒(z-90 蓋過所有常駐件) */}
+      {/* 舊 cloudfront 網址:瀏覽器直接跳新網域、已安裝 PWA 顯示重新安裝提醒(z-55,低於語言鈕讓人還能切語言) */}
       <MovedNotice />
       <LanguageSwitcher />
       <ConnectionBanner />
