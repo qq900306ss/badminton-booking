@@ -10,6 +10,7 @@ const EntryPage = lazy(() => import('./pages/EntryPage').then((m) => ({ default:
 const CourtPage = lazy(() => import('./pages/CourtPage').then((m) => ({ default: m.CourtPage })))
 const LobbyPage = lazy(() => import('./pages/LobbyPage').then((m) => ({ default: m.LobbyPage })))
 const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })))
+const InstallPage = lazy(() => import('./pages/InstallPage').then((m) => ({ default: m.InstallPage })))
 import { isLoggedIn } from './lib/playerAuth'
 import { ToastProvider } from './components/Toast'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -55,6 +56,8 @@ export default function App() {
             <Route path="/auth/callback" element={<AuthCallback provider="google" />} />
             <Route path="/auth/line/callback" element={<AuthCallback provider="line" />} />
             <Route path="/court/:sessionId" element={<CourtPage />} />
+            {/* 公開安裝頁:宣傳貼這個網址,不用登入 */}
+            <Route path="/install" element={<InstallPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

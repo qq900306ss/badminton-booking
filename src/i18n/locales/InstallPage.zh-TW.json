@@ -1,0 +1,56 @@
+{
+  "InstallPage": {
+    "title": "羽球揪團",
+    "tagline": "找場、報名、排隊、上場,一指搞定",
+    "chips": {
+      "free": "完全免費",
+      "noStore": "免商店下載",
+      "login": "LINE / Google 登入"
+    },
+    "installedTitle": "已經裝好了 🎉",
+    "installedBody": "你現在就是從桌面圖示開的,直接開始找團吧。",
+    "openApp": "🏸 開始找團",
+    "android": {
+      "title": "裝到手機桌面",
+      "body": "不用去商店,按一下就裝好:有圖示、全螢幕、會收通知,跟一般 App 一樣。",
+      "button": "📲 立即安裝",
+      "installing": "安裝中…",
+      "fallbackTitle": "沒跳出安裝視窗?",
+      "fallbackBody": "點瀏覽器右上角 ⋮ 選單 → 「安裝應用程式」或「加到主畫面」就可以了。"
+    },
+    "ios": {
+      "title": "在 iPhone / iPad 安裝",
+      "body": "iPhone 沒有安裝鈕,要用 Safari 手動加到主畫面,30 秒搞定:",
+      "step1": "用 Safari 開這一頁",
+      "step2": "點底部中間的「分享」鈕",
+      "step3": "往下滑點「加入主畫面」→ 右上角「新增」",
+      "notSafari": "你現在不是用 Safari,先複製網址貼到 Safari 開:"
+    },
+    "line": {
+      "title": "先跳出 LINE 再安裝",
+      "body": "LINE 內建的瀏覽器沒辦法安裝 App。按下面這顆,會自動改用手機的瀏覽器開這一頁。",
+      "button": "🌐 用瀏覽器開啟"
+    },
+    "inapp": {
+      "title": "先用瀏覽器打開",
+      "body": "你現在是用 FB / IG / Threads 的內建瀏覽器,沒辦法安裝。點右上角「⋯」→「在瀏覽器開啟」,或複製網址貼到 Chrome / Safari。",
+      "chromeButton": "在 Chrome 開啟"
+    },
+    "desktop": {
+      "title": "用手機掃描安裝",
+      "body": "這是手機用的 App,用手機相機掃這個 QR code 就會開到安裝頁。",
+      "installHere": "💻 也可以裝在這台電腦",
+      "orOpen": "或把網址傳到手機:"
+    },
+    "copyLink": "複製網址",
+    "copied": "已複製",
+    "useInBrowser": "不想安裝?直接用瀏覽器開 →",
+    "whyTitle": "裝到桌面有什麼差?",
+    "why1": "桌面一個圖示點開就是球場,不用翻聊天記錄找連結",
+    "why2": "「輪到你了」會推播通知,不會漏場",
+    "why3": "全螢幕、開得快,跟商店下載的 App 一樣",
+    "hostTitle": "你是團主?",
+    "hostBody": "開團後台是另一個 App:開團、排場、收費一個畫面搞定。",
+    "hostButton": "👑 前往開團後台"
+  }
+}

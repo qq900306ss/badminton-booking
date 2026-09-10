@@ -1,27 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
-
-type BIPEvent = Event & {
-  prompt: () => Promise<void>
-  userChoice: Promise<{ outcome: string }>
-}
-
-function isStandalone() {
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (navigator as unknown as { standalone?: boolean }).standalone === true
-  )
-}
+import { getInstallPrompt, subscribeInstallPrompt, isStandalone, promptInstall } from '../lib/installPrompt'
 
 type Help = null | 'ios' | 'inapp' | 'generic'
 
 export function InstallButton({ label }: { label?: string }) {
   const { t } = useTranslation()
   const displayLabel = label ?? t('InstallButton.installLabel')
-  const [deferred, setDeferred] = useState<BIPEvent | null>(null)
+  // beforeinstallprompt 由 lib/installPrompt 在 app 啟動時接住(常比元件 mount 早)
+  const [hasPrompt, setHasPrompt] = useState(() => getInstallPrompt() !== null)
   const [help, setHelp] = useState<Help>(null)
-  const [installed, setInstalled] = useState(false)
+  const [installed, setInstalled] = useState(() => isStandalone())
   const [copied, setCopied] = useState(false)
 
   const ua = navigator.userAgent || ''
@@ -30,26 +20,18 @@ export function InstallButton({ label }: { label?: string }) {
   const isInApp = /FBAN|FBAV|FB_IAB|Instagram|Line\/|Messenger|MicroMessenger|Twitter|musical_ly|Snapchat/i.test(ua)
 
   useEffect(() => {
-    if (isStandalone()) setInstalled(true)
-    const onPrompt = (e: Event) => {
-      e.preventDefault()
-      setDeferred(e as BIPEvent)
-    }
-    const onInstalled = () => setInstalled(true)
-    window.addEventListener('beforeinstallprompt', onPrompt)
-    window.addEventListener('appinstalled', onInstalled)
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onPrompt)
-      window.removeEventListener('appinstalled', onInstalled)
-    }
+    return subscribeInstallPrompt(() => {
+      setHasPrompt(getInstallPrompt() !== null)
+      if (isStandalone()) setInstalled(true)
+    })
   }, [])
 
   if (installed) return null
 
   async function onClick() {
-    if (deferred) {
-      await deferred.prompt()
-      setDeferred(null)
+    if (hasPrompt) {
+      const r = await promptInstall()
+      if (r === 'accepted') setInstalled(true)
       return
     }
     setHelp(isInApp ? 'inapp' : isIos ? 'ios' : 'generic')

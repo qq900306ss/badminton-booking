@@ -1,0 +1,56 @@
+{
+  "InstallPage": {
+    "title": "Badminton Meetup",
+    "tagline": "Find a group, sign up, queue, play — one tap each",
+    "chips": {
+      "free": "100% free",
+      "noStore": "No app store needed",
+      "login": "LINE / Google login"
+    },
+    "installedTitle": "You're all set 🎉",
+    "installedBody": "You opened this from the home-screen icon. Go find a group.",
+    "openApp": "🏸 Find a group",
+    "android": {
+      "title": "Add to your home screen",
+      "body": "No app store. One tap installs it: an icon, full screen, notifications — just like a regular app.",
+      "button": "📲 Install now",
+      "installing": "Installing…",
+      "fallbackTitle": "No install dialog?",
+      "fallbackBody": "Tap the ⋮ menu in the top-right corner → \"Install app\" or \"Add to Home screen\"."
+    },
+    "ios": {
+      "title": "Install on iPhone / iPad",
+      "body": "iPhone has no install button — add it from Safari by hand. Takes 30 seconds:",
+      "step1": "Open this page in Safari",
+      "step2": "Tap the Share button at the bottom",
+      "step3": "Scroll down, tap \"Add to Home Screen\" → \"Add\"",
+      "notSafari": "You're not in Safari. Copy the link and open it in Safari first:"
+    },
+    "line": {
+      "title": "Leave LINE first",
+      "body": "LINE's built-in browser can't install apps. Tap below and this page reopens in your phone's browser.",
+      "button": "🌐 Open in browser"
+    },
+    "inapp": {
+      "title": "Open in a real browser first",
+      "body": "You're inside the FB / IG / Threads in-app browser, which can't install. Tap \"⋯\" → \"Open in browser\", or copy the link into Chrome / Safari.",
+      "chromeButton": "Open in Chrome"
+    },
+    "desktop": {
+      "title": "Scan with your phone",
+      "body": "This is a mobile app. Point your phone camera at the QR code to open the install page.",
+      "installHere": "💻 Install on this computer too",
+      "orOpen": "Or send the link to your phone:"
+    },
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "useInBrowser": "Don't want to install? Just open it in the browser →",
+    "whyTitle": "Why add it to the home screen?",
+    "why1": "One icon on your home screen — no digging through chats for the link",
+    "why2": "\"You're up\" push notifications so you never miss a court",
+    "why3": "Full screen and fast, same as a store-installed app",
+    "hostTitle": "Hosting a group?",
+    "hostBody": "The host console is a separate app: open groups, assign courts and collect fees on one screen.",
+    "hostButton": "👑 Go to host console"
+  }
+}

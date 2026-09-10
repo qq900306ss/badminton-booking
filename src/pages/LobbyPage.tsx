@@ -17,6 +17,7 @@ import { ListSkeleton } from '../components/Skeleton'
 import { isPhotoUrl, AVATAR_EMOJIS, DEFAULT_ORG_AVATAR } from '../lib/avatar'
 import { OnboardingCards, ONBOARD_KEY } from '../components/OnboardingCards'
 import { shareContent } from '../lib/share'
+import { installShareUrl } from './InstallPage'
 
 // 分享某一場給球友(揪人來打 = 最自然的推薦):原生分享面板,退回剪貼簿
 async function shareSession(s: SessionSummary) {
@@ -30,12 +31,12 @@ async function shareSession(s: SessionSummary) {
   if (r === 'copied') alert(i18n.t('LobbyPage.sessionLinkCopied'))
 }
 
-// 推薦整個 App(設定裡的「推薦給朋友」)
+// 推薦整個 App(設定裡的「推薦給朋友」)— 連到安裝頁,朋友點開就能裝
 async function shareApp() {
   const r = await shareContent({
     title: i18n.t('LobbyPage.appName'),
     text: i18n.t('LobbyPage.shareAppText'),
-    url: window.location.origin,
+    url: installShareUrl(),
   })
   if (r === 'copied') alert(i18n.t('LobbyPage.appLinkCopied'))
 }
