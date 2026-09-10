@@ -1,37 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getInstallPrompt, subscribeInstallPrompt, isStandalone, promptInstall } from '../lib/installPrompt'
+import { useInstallPrompt, promptInstall } from '../lib/installPrompt'
+import { isInAppBrowser } from '../lib/inAppBrowser'
 
 type Help = null | 'ios' | 'inapp' | 'generic'
 
 export function InstallButton({ label }: { label?: string }) {
   const { t } = useTranslation()
   const displayLabel = label ?? t('InstallButton.installLabel')
-  // beforeinstallprompt 由 lib/installPrompt 在 app 啟動時接住(常比元件 mount 早)
-  const [hasPrompt, setHasPrompt] = useState(() => getInstallPrompt() !== null)
+  // beforeinstallprompt / appinstalled 由 lib/installPrompt 在 app 啟動時接住(常比元件 mount 早)
+  const { hasPrompt, installed } = useInstallPrompt()
   const [help, setHelp] = useState<Help>(null)
-  const [installed, setInstalled] = useState(() => isStandalone())
   const [copied, setCopied] = useState(false)
 
   const ua = navigator.userAgent || ''
   const isIos = /iphone|ipad|ipod/i.test(ua)
-  // in-app browsers (FB / Messenger / IG / LINE / WeChat …) can't install PWAs
-  const isInApp = /FBAN|FBAV|FB_IAB|Instagram|Line\/|Messenger|MicroMessenger|Twitter|musical_ly|Snapchat/i.test(ua)
-
-  useEffect(() => {
-    return subscribeInstallPrompt(() => {
-      setHasPrompt(getInstallPrompt() !== null)
-      if (isStandalone()) setInstalled(true)
-    })
-  }, [])
+  // in-app browsers (FB / Messenger / IG / LINE / WeChat / 一般 WebView …) can't install PWAs
+  const isInApp = isInAppBrowser() || /Twitter|musical_ly|Snapchat/i.test(ua)
 
   if (installed) return null
 
   async function onClick() {
     if (hasPrompt) {
-      const r = await promptInstall()
-      if (r === 'accepted') setInstalled(true)
+      await promptInstall() // 裝好會透過 appinstalled → installed,按鈕自己消失
       return
     }
     setHelp(isInApp ? 'inapp' : isIos ? 'ios' : 'generic')

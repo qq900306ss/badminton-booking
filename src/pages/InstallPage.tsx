@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { QRCodeSVG } from 'qrcode.react'
 import { isInAppBrowser, isLineInApp, lineExternalBrowserUrl, androidChromeIntentUrl } from '../lib/inAppBrowser'
-import { getInstallPrompt, subscribeInstallPrompt, isStandalone, promptInstall } from '../lib/installPrompt'
+import { useInstallPrompt, promptInstall } from '../lib/installPrompt'
 
 // 公開的「安裝頁」:宣傳時貼這一頁的網址,不用登入就能看。
 // 每個平台能做的事不一樣,這頁的工作就是把人導到「那個平台上真的能裝」的路:
@@ -17,8 +17,8 @@ const HOST_URL =
 
 type Platform = 'installed' | 'line' | 'inapp' | 'ios' | 'android' | 'desktop'
 
-function detectPlatform(): Platform {
-  if (isStandalone()) return 'installed'
+// 只看 UA;「已安裝」由 useInstallPrompt 決定(standalone 或本分頁剛裝完)
+function detectPlatform(): Exclude<Platform, 'installed'> {
   const ua = navigator.userAgent || ''
   if (isLineInApp()) return 'line'
   if (isInAppBrowser()) return 'inapp'
@@ -57,8 +57,9 @@ export function installShareUrl(): string {
 
 export function InstallPage() {
   const { t } = useTranslation()
-  const [platform, setPlatform] = useState<Platform>(() => detectPlatform())
-  const [hasPrompt, setHasPrompt] = useState(() => getInstallPrompt() !== null)
+  const [detected] = useState(() => detectPlatform())
+  const { hasPrompt, installed } = useInstallPrompt()
+  const platform: Platform = installed ? 'installed' : detected
   const [promptWaited, setPromptWaited] = useState(false)
   const [installing, setInstalling] = useState(false)
   const [dismissed, setDismissed] = useState(false)
@@ -66,29 +67,22 @@ export function InstallPage() {
   const { copied, copy } = useCopy(shareUrl)
 
   useEffect(() => {
-    const unsub = subscribeInstallPrompt(() => {
-      setHasPrompt(getInstallPrompt() !== null)
-      if (isStandalone()) setPlatform('installed')
-    })
     // Chrome 會晚一點才發 beforeinstallprompt;等 2 秒還沒來就先顯示手動說明
     const timer = setTimeout(() => setPromptWaited(true), 2000)
-    return () => {
-      unsub()
-      clearTimeout(timer)
-    }
+    return () => clearTimeout(timer)
   }, [])
 
   async function onInstall() {
     setInstalling(true)
-    const r = await promptInstall()
+    const r = await promptInstall() // accepted → store 標 installed → 畫面切「已裝好」
     setInstalling(false)
-    if (r === 'accepted') setPlatform('installed')
-    else setDismissed(true)
+    if (r !== 'accepted') setDismissed(true)
   }
 
   return (
     <div className="min-h-screen bg-brand-bg">
-      <div className="max-w-md mx-auto px-5 pt-10 pb-16 space-y-6">
+      {/* 底部多留空,最後一張卡才不會被 fixed 的語言鈕蓋住 */}
+      <div className="max-w-md mx-auto px-5 pt-10 pb-28 space-y-6">
         {/* 頭:圖示 + 名字 + 一句話 */}
         <div className="text-center space-y-3">
           <img
@@ -121,6 +115,7 @@ export function InstallPage() {
             <>
               <p className="font-extrabold text-gray-800 text-lg">{t('InstallPage.line.title')}</p>
               <p className="text-sm text-gray-500">{t('InstallPage.line.body')}</p>
+              <img src="/install/line-1.jpg" alt="" width={640} height={640} className="w-44 mx-auto rounded-2xl" />
               <a href={lineExternalBrowserUrl()} className="btn-primary block text-center">
                 {t('InstallPage.line.button')}
               </a>
@@ -150,6 +145,24 @@ export function InstallPage() {
                   <CopyRow url={shareUrl} copied={copied} onCopy={copy} />
                 </div>
               )}
+              {/* 三格漫畫(astra 畫的吉祥物教學),文字步驟在下面補細節 */}
+              <div className="grid grid-cols-3 gap-2">
+                {[1, 2, 3].map((n) => (
+                  <div key={n} className="relative">
+                    <img
+                      src={`/install/ios-${n}.jpg`}
+                      alt=""
+                      width={640}
+                      height={640}
+                      loading="lazy"
+                      className="w-full rounded-2xl bg-brand-bg"
+                    />
+                    <span className="absolute -top-1.5 -left-1.5 w-6 h-6 rounded-full bg-brand-pink text-white text-xs font-extrabold flex items-center justify-center shadow">
+                      {n}
+                    </span>
+                  </div>
+                ))}
+              </div>
               <ol className="space-y-3">
                 <Step n={1} icon={<span className="text-xl">🧭</span>} text={t('InstallPage.ios.step1')} />
                 <Step n={2} icon={<ShareIcon />} text={t('InstallPage.ios.step2')} />
@@ -162,6 +175,7 @@ export function InstallPage() {
             <>
               <p className="font-extrabold text-gray-800 text-lg">{t('InstallPage.android.title')}</p>
               <p className="text-sm text-gray-500">{t('InstallPage.android.body')}</p>
+              <img src="/install/android-1.jpg" alt="" width={640} height={640} className="w-44 mx-auto rounded-2xl" />
               {hasPrompt ? (
                 <button onClick={onInstall} disabled={installing} className="btn-primary w-full text-lg disabled:opacity-60">
                   {installing ? t('InstallPage.android.installing') : t('InstallPage.android.button')}

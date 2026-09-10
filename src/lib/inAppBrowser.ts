@@ -4,7 +4,9 @@
 export function isInAppBrowser(): boolean {
   if (typeof navigator === 'undefined') return false
   const ua = navigator.userAgent || ''
-  return /FBAN|FBAV|FB_IAB|Instagram|Threads|Barcelona|Line\/|Messenger|MicroMessenger/i.test(ua)
+  // `; wv)` 是 Android 標準 WebView 的 UA 標記(沒掛自家 token 的 App 都長這樣),
+  // 一樣擋 Google 登入、也裝不了 PWA
+  return /FBAN|FBAV|FB_IAB|Instagram|Threads|Barcelona|Line\/|Messenger|MicroMessenger|; wv\)/i.test(ua)
 }
 
 // LINE 內建瀏覽器獨立認:它是唯一支援「帶參數就自動改用外部瀏覽器」的。

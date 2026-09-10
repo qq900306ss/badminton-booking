@@ -87,6 +87,8 @@ export function HostCta() {
   const { t } = useTranslation()
   const [showBubble, setShowBubble] = useState(true)
   const [sheet, setSheet] = useState(false)
+  // 安裝頁自己有「你是團主?」區塊,漂浮鈕在那裡只會蓋住卡片(此元件在 Router 外,讀不到 useLocation)
+  const onInstallPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/install')
 
   // Show the bubble briefly on mount, then re-tease it every ~30s. Gentle enough
   // not to nag, present enough to keep the invite discoverable.
@@ -101,6 +103,8 @@ export function HostCta() {
       clearInterval(cycle)
     }
   }, [])
+
+  if (onInstallPage) return null
 
   return (
     <>

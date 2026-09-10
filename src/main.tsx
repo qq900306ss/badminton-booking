@@ -4,6 +4,9 @@ import './index.css'
 import './i18n'
 import App from './App.tsx'
 import { CURRENT_BUILD } from './lib/appUpdate'
+// 靜態匯入:一啟動就接住 beforeinstallprompt(它比任何 lazy 頁面都早發,
+// 停在登入頁時就會來;只靠頁面間接匯入會漏接)
+import './lib/installPrompt'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
