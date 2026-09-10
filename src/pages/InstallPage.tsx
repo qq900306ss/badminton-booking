@@ -74,12 +74,21 @@ export function InstallPage() {
   const { t } = useTranslation()
   const [detected] = useState(() => detectPlatform())
   const [fromOldApp] = useState(() => isOpenedFromOldApp())
-  const { hasPrompt, installed } = useInstallPrompt()
+  const { hasPrompt, installed, installedHere } = useInstallPrompt()
   // 優先序:
   //   1. 有原生安裝框(hasPrompt)→ 這一定是真正的瀏覽器分頁(App 內視窗 / Custom Tab 不會發),直接走平台分支給安裝鈕
-  //   2. 被舊 App 開著(?moved=1 / referrer)→ oldapp:那個 standalone 是舊 App 的,不是「已裝好」
-  //   3. installed → 已裝好
-  const platform: Platform = hasPrompt ? detected : fromOldApp ? 'oldapp' : installed ? 'installed' : detected
+  //   2. 本頁剛裝好(installedHere)→ 已裝好(就算網址還帶著 ?moved=1)
+  //   3. 被舊 App 開著(?moved=1 / referrer)→ oldapp:那個 standalone 是舊 App 的,不是「已裝好」
+  //   4. installed(standalone)→ 已裝好
+  const platform: Platform = hasPrompt
+    ? detected
+    : installedHere
+      ? 'installed'
+      : fromOldApp
+        ? 'oldapp'
+        : installed
+          ? 'installed'
+          : detected
   const isAndroid = /android/i.test(navigator.userAgent || '')
   const cleanInstallUrl = `${window.location.origin}/install`
   // 再開一次也帶 ?moved=1:開在 App 視窗裡 referrer 會是空的,沒這個參數就會誤判成已裝好
@@ -268,7 +277,7 @@ export function InstallPage() {
           {debug && (
             <pre className="text-[10px] leading-snug text-gray-400 whitespace-pre-wrap break-all bg-gray-50 rounded-xl p-2">
               {JSON.stringify(
-                { platform, detected, fromOldApp, standalone: isStandalone(), hasPrompt, installed, promptWaited, referrer: document.referrer, ua: navigator.userAgent },
+                { platform, detected, fromOldApp, standalone: isStandalone(), hasPrompt, installed, installedHere, promptWaited, referrer: document.referrer, ua: navigator.userAgent },
                 null,
                 1,
               )}

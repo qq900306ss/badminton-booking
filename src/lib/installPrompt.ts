@@ -11,6 +11,7 @@ export type BIPEvent = Event & {
 export type InstallState = {
   hasPrompt: boolean // 原生安裝框可用(可以呼叫 promptInstall)
   installed: boolean // 已裝好:從桌面開的(standalone)或本分頁剛裝完(appinstalled)
+  installedHere: boolean // 本分頁剛裝完(appinstalled / prompt accepted)— 比 standalone 可信,standalone 可能是別的 PWA 視窗繼承來的
 }
 
 let deferred: BIPEvent | null = null
@@ -54,10 +55,15 @@ export function isStandalone(): boolean {
 }
 
 // useSyncExternalStore 要求快照物件穩定(內容沒變就回同一個 reference)
-let snapshot: InstallState = { hasPrompt: false, installed: false }
+let snapshot: InstallState = { hasPrompt: false, installed: false, installedHere: false }
 function getSnapshot(): InstallState {
-  const next = { hasPrompt: deferred !== null, installed: installedHere || isStandalone() }
-  if (next.hasPrompt !== snapshot.hasPrompt || next.installed !== snapshot.installed) snapshot = next
+  const next = { hasPrompt: deferred !== null, installed: installedHere || isStandalone(), installedHere }
+  if (
+    next.hasPrompt !== snapshot.hasPrompt ||
+    next.installed !== snapshot.installed ||
+    next.installedHere !== snapshot.installedHere
+  )
+    snapshot = next
   return snapshot
 }
 
