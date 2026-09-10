@@ -75,7 +75,9 @@ export function MovedNotice() {
         <p className="text-sm text-gray-600">{t('MovedNotice.body')}</p>
         <div className="bg-gray-50 rounded-xl px-3 py-2 text-xs text-gray-500 break-all select-all">{installUrl}</div>
         {isAndroid ? (
-          <a href={androidChromeIntentUrl(installUrl)} className="btn-primary block text-center">
+          // intent 也帶 ?moved=1:Chrome 對自己發 intent 常常還是開在 App 視窗裡(referrer 空),
+          // 安裝頁要靠這個參數知道自己被舊 App 開著;真到了 Chrome 會有原生安裝框,安裝頁會自己切回安裝鈕
+          <a href={androidChromeIntentUrl(movedUrl)} className="btn-primary block text-center">
             {t('MovedNotice.androidButton')}
           </a>
         ) : isIos ? (

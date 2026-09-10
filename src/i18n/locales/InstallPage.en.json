@@ -10,7 +10,8 @@
     "oldapp": {
       "title": "You're still inside the old app",
       "body": "This window was opened by the old-address app, and it can't install the new one. Open this address in your phone's browser to install:",
-      "chromeButton": "📲 Open in Chrome",
+      "androidMenu": "👉 Tap ⋮ in the top-right of this window → \"Open in Chrome\". In real Chrome you'll get the install button.",
+      "chromeButton": "Or try opening in Chrome directly",
       "iosHint": "iPhone: copy the address → open Safari and paste → Share → Add to Home Screen. You can delete the old icon afterwards."
     },
     "installedTitle": "You're all set 🎉",
@@ -21,8 +22,11 @@
       "body": "No app store. One tap installs it: an icon, full screen, notifications — just like a regular app.",
       "button": "📲 Install now",
       "installing": "Installing…",
-      "fallbackTitle": "No install dialog?",
-      "fallbackBody": "Tap the ⋮ menu in the top-right corner → \"Install app\" or \"Add to Home screen\"."
+      "waiting": "Waiting for the install dialog… if it doesn't show, use one of these:",
+      "fallbackTitle": "No install dialog? Two ways:",
+      "method1": "① Tap the ⋮ menu (top right) → \"Install app\" or \"Add to Home screen\"",
+      "method2": "② If the menu only offers \"Open in Chrome\", you're inside an app window — tap that to jump to real Chrome, then do ①",
+      "openChrome": "🌐 Open this page in Chrome"
     },
     "ios": {
       "title": "Install on iPhone / iPad",

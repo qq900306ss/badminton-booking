@@ -75,10 +75,16 @@ export function InstallPage() {
   const [detected] = useState(() => detectPlatform())
   const [fromOldApp] = useState(() => isOpenedFromOldApp())
   const { hasPrompt, installed } = useInstallPrompt()
-  // 舊 App 開的優先:那個 standalone 是舊 App 的,不是「已裝好」
-  const platform: Platform = fromOldApp ? 'oldapp' : installed ? 'installed' : detected
+  // 優先序:
+  //   1. 有原生安裝框(hasPrompt)→ 這一定是真正的瀏覽器分頁(App 內視窗 / Custom Tab 不會發),直接走平台分支給安裝鈕
+  //   2. 被舊 App 開著(?moved=1 / referrer)→ oldapp:那個 standalone 是舊 App 的,不是「已裝好」
+  //   3. installed → 已裝好
+  const platform: Platform = hasPrompt ? detected : fromOldApp ? 'oldapp' : installed ? 'installed' : detected
   const isAndroid = /android/i.test(navigator.userAgent || '')
   const cleanInstallUrl = `${window.location.origin}/install`
+  // 再開一次也帶 ?moved=1:開在 App 視窗裡 referrer 會是空的,沒這個參數就會誤判成已裝好
+  const movedInstallUrl = `${cleanInstallUrl}?moved=1`
+  const [debug] = useState(() => new URLSearchParams(window.location.search).get('debug') === '1')
   const [promptWaited, setPromptWaited] = useState(false)
   const [installing, setInstalling] = useState(false)
   const [dismissed, setDismissed] = useState(false)
@@ -127,11 +133,17 @@ export function InstallPage() {
               <p className="font-extrabold text-gray-800 text-lg">{t('InstallPage.oldapp.title')}</p>
               <p className="text-sm text-gray-500">{t('InstallPage.oldapp.body')}</p>
               {isAndroid && (
-                <a href={androidChromeIntentUrl(cleanInstallUrl)} className="btn-primary block text-center">
+                // 實測 intent 常常還是開在 App 視窗,所以「⋮ → 在 Chrome 中開啟」才是主要出口,intent 鈕當備援
+                <div className="bg-brand-yellow/40 rounded-2xl p-3 text-sm text-gray-700 font-bold">
+                  {t('InstallPage.oldapp.androidMenu')}
+                </div>
+              )}
+              <CopyRow url={shareUrl} copied={copied} onCopy={copy} />
+              {isAndroid && (
+                <a href={androidChromeIntentUrl(movedInstallUrl)} className="btn-secondary block text-center text-sm">
                   {t('InstallPage.oldapp.chromeButton')}
                 </a>
               )}
-              <CopyRow url={shareUrl} copied={copied} onCopy={copy} />
               {detected === 'ios' && <p className="text-xs text-gray-500">{t('InstallPage.oldapp.iosHint')}</p>}
             </>
           )}
@@ -213,15 +225,19 @@ export function InstallPage() {
                 <button onClick={onInstall} disabled={installing} className="btn-primary w-full text-lg disabled:opacity-60">
                   {installing ? t('InstallPage.android.installing') : t('InstallPage.android.button')}
                 </button>
-              ) : promptWaited || dismissed ? (
-                <div className="bg-gray-50 rounded-2xl p-3 space-y-1">
-                  <p className="text-sm font-bold text-gray-700">{t('InstallPage.android.fallbackTitle')}</p>
-                  <p className="text-sm text-gray-500">{t('InstallPage.android.fallbackBody')}</p>
-                </div>
               ) : (
-                <button disabled className="btn-primary w-full text-lg opacity-60">
-                  {t('InstallPage.android.button')}
-                </button>
+                // 沒有原生安裝框(還沒發、被關掉、或這是 App 裡/Custom Tab 的視窗 —— 那種視窗 Chrome 不給裝):
+                // 手動路直接給,不等;兩條:瀏覽器選單裝、或先「在 Chrome 中開啟」再裝
+                <div className="bg-gray-50 rounded-2xl p-3 space-y-2">
+                  <p className="text-sm font-bold text-gray-700">
+                    {promptWaited || dismissed ? t('InstallPage.android.fallbackTitle') : t('InstallPage.android.waiting')}
+                  </p>
+                  <p className="text-sm text-gray-600">{t('InstallPage.android.method1')}</p>
+                  <p className="text-sm text-gray-600">{t('InstallPage.android.method2')}</p>
+                  <a href={androidChromeIntentUrl(movedInstallUrl)} className="btn-secondary block text-center text-sm">
+                    {t('InstallPage.android.openChrome')}
+                  </a>
+                </div>
               )}
             </>
           )}
@@ -247,6 +263,16 @@ export function InstallPage() {
             <a href="/" className="block text-center text-sm font-bold text-brand-pink underline underline-offset-2">
               {t('InstallPage.useInBrowser')}
             </a>
+          )}
+          {/* ?debug=1:遠端除錯用,把偵測結果印出來(使用者截圖回報就知道走到哪條分支) */}
+          {debug && (
+            <pre className="text-[10px] leading-snug text-gray-400 whitespace-pre-wrap break-all bg-gray-50 rounded-xl p-2">
+              {JSON.stringify(
+                { platform, detected, fromOldApp, standalone: isStandalone(), hasPrompt, installed, promptWaited, referrer: document.referrer, ua: navigator.userAgent },
+                null,
+                1,
+              )}
+            </pre>
           )}
         </div>
 
