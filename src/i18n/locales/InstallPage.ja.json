@@ -7,6 +7,12 @@
       "noStore": "ストア不要",
       "login": "LINE / Google ログイン"
     },
+    "oldapp": {
+      "title": "まだ旧アプリの中にいます",
+      "body": "この画面は旧 URL のアプリが開いたもので、ここからは新しいアプリをインストールできません。スマホのブラウザでこの URL を開いてください:",
+      "chromeButton": "📲 Chrome で開く",
+      "iosHint": "iPhone:URL をコピー → Safari で開いて貼り付け → 共有 → ホーム画面に追加。追加後、古いアイコンは削除して構いません。"
+    },
     "installedTitle": "インストール済みです 🎉",
     "installedBody": "ホーム画面のアイコンから開いています。さっそくコートを探しましょう。",
     "openApp": "🏸 コートを探す",

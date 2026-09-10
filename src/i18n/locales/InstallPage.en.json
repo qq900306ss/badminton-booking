@@ -7,6 +7,12 @@
       "noStore": "No app store needed",
       "login": "LINE / Google login"
     },
+    "oldapp": {
+      "title": "You're still inside the old app",
+      "body": "This window was opened by the old-address app, and it can't install the new one. Open this address in your phone's browser to install:",
+      "chromeButton": "📲 Open in Chrome",
+      "iosHint": "iPhone: copy the address → open Safari and paste → Share → Add to Home Screen. You can delete the old icon afterwards."
+    },
     "installedTitle": "You're all set 🎉",
     "installedBody": "You opened this from the home-screen icon. Go find a group.",
     "openApp": "🏸 Find a group",

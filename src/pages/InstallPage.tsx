@@ -15,10 +15,21 @@ const HOST_URL =
   (import.meta.env.VITE_HOST_APP_URL as string | undefined) ||
   'https://host.badminton-tw.fyi'
 
-type Platform = 'installed' | 'line' | 'inapp' | 'ios' | 'android' | 'desktop'
+type Platform = 'installed' | 'oldapp' | 'line' | 'inapp' | 'ios' | 'android' | 'desktop'
+
+// 被「舊網址的 PWA」開著:網址帶 ?moved=1(MovedNotice 帶的)或 referrer 是舊 cloudfront。
+// 這種視窗還是舊 App 的(display-mode 也報 standalone),裝不了新的,也不能當「已裝好」。
+function isOpenedFromOldApp(): boolean {
+  if (new URLSearchParams(window.location.search).get('moved') === '1') return true
+  try {
+    return /\.cloudfront\.net$/i.test(new URL(document.referrer).hostname)
+  } catch {
+    return false
+  }
+}
 
 // 只看 UA;「已安裝」由 useInstallPrompt 決定(standalone 或本分頁剛裝完)
-function detectPlatform(): Exclude<Platform, 'installed'> {
+function detectPlatform(): Exclude<Platform, 'installed' | 'oldapp'> {
   const ua = navigator.userAgent || ''
   if (isLineInApp()) return 'line'
   if (isInAppBrowser()) return 'inapp'
@@ -58,8 +69,12 @@ export function installShareUrl(): string {
 export function InstallPage() {
   const { t } = useTranslation()
   const [detected] = useState(() => detectPlatform())
+  const [fromOldApp] = useState(() => isOpenedFromOldApp())
   const { hasPrompt, installed } = useInstallPrompt()
-  const platform: Platform = installed ? 'installed' : detected
+  // 舊 App 開的優先:那個 standalone 是舊 App 的,不是「已裝好」
+  const platform: Platform = fromOldApp ? 'oldapp' : installed ? 'installed' : detected
+  const isAndroid = /android/i.test(navigator.userAgent || '')
+  const cleanInstallUrl = `${window.location.origin}/install`
   const [promptWaited, setPromptWaited] = useState(false)
   const [installing, setInstalling] = useState(false)
   const [dismissed, setDismissed] = useState(false)
@@ -103,6 +118,20 @@ export function InstallPage() {
 
         {/* 主 CTA:依平台換內容 */}
         <div className="card space-y-4">
+          {platform === 'oldapp' && (
+            <>
+              <p className="font-extrabold text-gray-800 text-lg">{t('InstallPage.oldapp.title')}</p>
+              <p className="text-sm text-gray-500">{t('InstallPage.oldapp.body')}</p>
+              {isAndroid && (
+                <a href={androidChromeIntentUrl(cleanInstallUrl)} className="btn-primary block text-center">
+                  {t('InstallPage.oldapp.chromeButton')}
+                </a>
+              )}
+              <CopyRow url={shareUrl} copied={copied} onCopy={copy} />
+              {detected === 'ios' && <p className="text-xs text-gray-500">{t('InstallPage.oldapp.iosHint')}</p>}
+            </>
+          )}
+
           {platform === 'installed' && (
             <>
               <p className="font-extrabold text-gray-800 text-lg">{t('InstallPage.installedTitle')}</p>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isStandalone } from '../lib/installPrompt'
+import { androidChromeIntentUrl } from '../lib/inAppBrowser'
 
 // 網址搬家(cloudfront.net → 自訂網域)的收尾:舊 origin 開到這裡時 —
 //   一般瀏覽器 → 直接跳到新網域同一路徑(等同 301,舊連結 / 舊 QR 都還能用)
@@ -41,6 +42,13 @@ export function MovedNotice() {
   const [copied, setCopied] = useState(false)
   const target = `https://${CANONICAL_HOST}${window.location.pathname}${window.location.search}${window.location.hash}`
   const installUrl = `https://${CANONICAL_HOST}/install`
+  // 從舊 PWA 直接 <a> 開新網址,會開在舊 App 的視窗裡(還是 standalone、裝不了,安裝頁還會誤判「已裝好」)。
+  // Android 用 Chrome intent 把真正的 Chrome 叫出來;iPhone 沒這種東西,主打「複製貼到 Safari」;
+  // 保底連結帶 ?moved=1 讓安裝頁知道自己被舊 App 開著、改顯示對應說明。
+  const ua = navigator.userAgent || ''
+  const isAndroid = /android/i.test(ua)
+  const isIos = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  const movedUrl = `${installUrl}?moved=1`
 
   useEffect(() => {
     if (legacy && !standalone) window.location.replace(target)
@@ -66,18 +74,31 @@ export function MovedNotice() {
         <p className="font-extrabold text-gray-800 text-lg">{t('MovedNotice.title')}</p>
         <p className="text-sm text-gray-600">{t('MovedNotice.body')}</p>
         <div className="bg-gray-50 rounded-xl px-3 py-2 text-xs text-gray-500 break-all select-all">{installUrl}</div>
-        <a
-          href={installUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-primary block text-center"
-        >
-          {t('MovedNotice.install')}
-        </a>
-        <button onClick={copy} className="btn-secondary w-full text-sm">
-          {copied ? `✓ ${t('MovedNotice.copied')}` : t('MovedNotice.copy')}
-        </button>
-        <p className="text-[11px] text-gray-400">{t('MovedNotice.iosHint')}</p>
+        {isAndroid ? (
+          <a href={androidChromeIntentUrl(installUrl)} className="btn-primary block text-center">
+            {t('MovedNotice.androidButton')}
+          </a>
+        ) : isIos ? (
+          <button onClick={copy} className="btn-primary w-full">
+            {copied ? `✓ ${t('MovedNotice.copied')}` : t('MovedNotice.copy')}
+          </button>
+        ) : (
+          <a href={movedUrl} target="_blank" rel="noopener noreferrer" className="btn-primary block text-center">
+            {t('MovedNotice.install')}
+          </a>
+        )}
+        {isIos ? (
+          <p className="text-xs text-gray-500">{t('MovedNotice.iosCopyHint')}</p>
+        ) : (
+          <button onClick={copy} className="btn-secondary w-full text-sm">
+            {copied ? `✓ ${t('MovedNotice.copied')}` : t('MovedNotice.copy')}
+          </button>
+        )}
+        {isIos && (
+          <a href={movedUrl} target="_blank" rel="noopener noreferrer" className="block text-center text-xs font-bold text-brand-pink underline underline-offset-2">
+            {t('MovedNotice.openLink')}
+          </a>
+        )}
         <button
           onClick={() => {
             writeLater()

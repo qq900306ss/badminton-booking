@@ -7,6 +7,12 @@
       "noStore": "免商店下載",
       "login": "LINE / Google 登入"
     },
+    "oldapp": {
+      "title": "你還在舊的 App 裡面",
+      "body": "這個視窗是舊網址的 App 開的,在這裡裝不了新的。請用手機的瀏覽器開這個網址再安裝:",
+      "chromeButton": "📲 用 Chrome 開啟",
+      "iosHint": "iPhone:複製網址 → 開 Safari 貼上 → 分享 → 加入主畫面。裝好後舊的那顆可以刪掉。"
+    },
     "installedTitle": "已經裝好了 🎉",
     "installedBody": "你現在就是從桌面圖示開的,直接開始找團吧。",
     "openApp": "🏸 開始找團",
