@@ -1,5 +1,11 @@
 # 更新日誌(玩家端 booking)
 
+## 2026-09-20 — 「安裝到手機桌面」改導去安裝頁
+
+- 大廳 / 場內的安裝鈕:有原生安裝框(Android Chrome)維持一鍵直接裝;其他情況(iPhone、LINE/FB 內建瀏覽器、安裝框沒出現)改成導去 `/install`,由那頁依平台分流
+- 移除按鈕自帶的說明彈窗與三語說明文案(`InstallButton.*.json` 只留 `installLabel`),說明只留 `/install` 一份,避免兩邊文案漂移
+- 評估過上架 Google Play / App Store(Android TWA 已能 build),因成本先擱置;`/.well-known/assetlinks.json` 為該次評估留下的檔案
+
 ## 2026-09-10 — 公開安裝頁 `/install` + 自訂網域 badminton-tw.fyi
 
 - 新增 `/install`(不用登入,宣傳貼這個):依平台導到「那個平台真的能裝」的路 —

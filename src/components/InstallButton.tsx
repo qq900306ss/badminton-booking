@@ -1,114 +1,31 @@
-import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useInstallPrompt, promptInstall } from '../lib/installPrompt'
-import { isInAppBrowser } from '../lib/inAppBrowser'
 
-type Help = null | 'ios' | 'inapp' | 'generic'
+const CLS = `block w-full text-center bg-white border-2 border-brand-pink text-brand-pink font-bold
+  py-2.5 rounded-2xl shadow-sm active:scale-95 transition-transform`
 
+// 大廳 / 場內的「安裝到桌面」入口。
+//   有原生安裝框(Android 真 Chrome 才會發)→ 一鍵直接裝,這是最短路徑
+//   其他(iPhone、LINE/FB 內建瀏覽器、安裝框沒出現)→ 導去 /install,那頁會依平台分流
+//     (漫畫教學、LINE 跳外部瀏覽器、Chrome intent…),以前這裡自帶的說明彈窗已移除,避免兩份文案漂移
 export function InstallButton({ label }: { label?: string }) {
   const { t } = useTranslation()
-  const displayLabel = label ?? t('InstallButton.installLabel')
-  // beforeinstallprompt / appinstalled 由 lib/installPrompt 在 app 啟動時接住(常比元件 mount 早)
   const { hasPrompt, installed } = useInstallPrompt()
-  const [help, setHelp] = useState<Help>(null)
-  const [copied, setCopied] = useState(false)
-
-  const ua = navigator.userAgent || ''
-  const isIos = /iphone|ipad|ipod/i.test(ua)
-  // in-app browsers (FB / Messenger / IG / LINE / WeChat / 一般 WebView …) can't install PWAs
-  const isInApp = isInAppBrowser() || /Twitter|musical_ly|Snapchat/i.test(ua)
+  const text = label ?? t('InstallButton.installLabel')
 
   if (installed) return null
 
-  async function onClick() {
-    if (hasPrompt) {
-      await promptInstall() // 裝好會透過 appinstalled → installed,按鈕自己消失
-      return
-    }
-    setHelp(isInApp ? 'inapp' : isIos ? 'ios' : 'generic')
-  }
-
-  async function copyLink() {
-    try {
-      await navigator.clipboard.writeText(location.href)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    } catch {
-      /* ignore */
-    }
-  }
-
-  return (
-    <>
-      <button
-        onClick={onClick}
-        className="w-full bg-white border-2 border-brand-pink text-brand-pink font-bold
-          py-2.5 rounded-2xl shadow-sm active:scale-95 transition-transform"
-      >
-        {displayLabel}
+  if (hasPrompt) {
+    return (
+      <button onClick={() => promptInstall()} className={CLS}>
+        {text}
       </button>
-
-      <AnimatePresence>
-        {help && (
-          <motion.div
-            className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setHelp(null)}
-          >
-            <motion.div
-              className="bg-white w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl p-6 space-y-3"
-              initial={{ y: 40 }}
-              animate={{ y: 0 }}
-              exit={{ y: 40 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {help === 'inapp' && (
-                <>
-                  <p className="font-extrabold text-gray-800 text-lg">{t('InstallButton.inapp.title')} 🏸</p>
-                  <p className="text-gray-600 text-sm">
-                    {t('InstallButton.inapp.body')}{' '}
-                    {t('InstallButton.inapp.useInstead')}<b>Chrome</b>{t('InstallButton.inapp.or')}<b>Safari</b>{t('InstallButton.inapp.openSuffix')}
-                  </p>
-                  <ol className="text-gray-600 text-sm space-y-1.5 list-decimal list-inside">
-                    <li>{t('InstallButton.inapp.step1Prefix')}<b>⋯</b>{t('InstallButton.inapp.step1Suffix')}</li>
-                    <li>{t('InstallButton.inapp.step2Prefix')}<b>{t('InstallButton.inapp.step2Bold')}</b>{t('InstallButton.inapp.step2Suffix')}</li>
-                    <li>{t('InstallButton.inapp.step3')}</li>
-                  </ol>
-                  <button onClick={copyLink} className="btn-secondary w-full text-sm">
-                    {copied ? `✓ ${t('InstallButton.copied')}` : t('InstallButton.copyLink')}
-                  </button>
-                </>
-              )}
-
-              {help === 'ios' && (
-                <>
-                  <p className="font-extrabold text-gray-800 text-lg">{t('InstallButton.ios.title')} 🏸</p>
-                  <ol className="text-gray-600 text-sm space-y-2 list-decimal list-inside">
-                    <li>{t('InstallButton.ios.step1Prefix')}<b>Safari</b>{t('InstallButton.ios.step1Suffix')}</li>
-                    <li>{t('InstallButton.ios.step2Prefix')}<b>{t('InstallButton.ios.step2Bold')}</b>{t('InstallButton.ios.step2Suffix')}</li>
-                    <li>{t('InstallButton.ios.step3Prefix')}<b>{t('InstallButton.ios.step3Bold')}</b>{t('InstallButton.ios.step3Suffix')}</li>
-                    <li>{t('InstallButton.ios.step4Prefix')}<b>{t('InstallButton.ios.step4Bold')}</b>{t('InstallButton.ios.step4Suffix')}</li>
-                  </ol>
-                </>
-              )}
-
-              {help === 'generic' && (
-                <>
-                  <p className="font-extrabold text-gray-800 text-lg">{t('InstallButton.generic.title')} 🏸</p>
-                  <p className="text-gray-600 text-sm">
-                    {t('InstallButton.generic.part1')}<b>⋮</b>{t('InstallButton.generic.part2')}<b>{t('InstallButton.generic.bold1')}</b>{t('InstallButton.generic.mid')}<b>{t('InstallButton.generic.bold2')}</b>{t('InstallButton.generic.part3')}
-                  </p>
-                </>
-              )}
-
-              <button onClick={() => setHelp(null)} className="btn-primary w-full">{t('InstallButton.gotIt')}</button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+    )
+  }
+  return (
+    <Link to="/install" className={CLS}>
+      {text}
+    </Link>
   )
 }
