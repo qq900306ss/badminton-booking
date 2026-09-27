@@ -20,8 +20,11 @@ const NO_REDIRECT_PATHS = ['/privacy', '/account-deletion', '/install', '/auth/'
 api.interceptors.response.use(undefined, (err) => {
   const status = err?.response?.status
   const msg = err?.response?.data?.error
-  const sentToken = !!err?.config?.headers?.['Authorization']
-  if (status === 401 && sentToken && DEAD_TOKEN_ERRORS.includes(msg)) {
+  const sentAuth: string | undefined = err?.config?.headers?.['Authorization']
+  // 只在「失敗的就是目前這顆 token」時才清:別的分頁可能已換成新登入,舊請求晚回來不能把它登出
+  const current = localStorage.getItem('player_token')
+  const isCurrentToken = !!sentAuth && !!current && sentAuth === `Bearer ${current}`
+  if (status === 401 && isCurrentToken && DEAD_TOKEN_ERRORS.includes(msg)) {
     // 帳號被刪 → 連裝置上綁這個人的資料一起清;單純過期 → 跟登出一樣就好(重登同帳號還接得上)
     if (msg === '帳號已刪除,請重新登入') clearAccountData()
     else logout()
@@ -62,7 +65,9 @@ export const playerApi = {
     ),
   sendFeedback: (message: string) => api.post('/api/feedback', { message }),
   // 刪除自己的帳號(Google Play 要求 App 內可刪帳號);成功回 204
-  deleteMe: () => api.delete('/api/players/me'),
+  // 明確帶「按下確認時」的 token,不吃 request interceptor 讀到的最新 token:
+  // 確認後別的分頁換了帳號,也不會誤刪到另一個人
+  deleteMe: (token: string) => api.delete('/api/players/me', { headers: { Authorization: `Bearer ${token}` } }),
 }
 
 export interface PlayerSlot {

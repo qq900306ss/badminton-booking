@@ -16,6 +16,7 @@
     "failed": "刪除失敗,請稍後再試",
     "sessionExpired": "登入已過期,請重新登入後再刪除",
     "loginFirst": "請先登入要刪除的帳號",
-    "loginHint": "用你當初登入的方式(Google 或 LINE)登入,登入後會回到這一頁。"
+    "loginHint": "用你當初登入的方式(Google 或 LINE)登入,登入後會回到這一頁。",
+    "accountChanged": "登入的帳號已變更,請重新確認要刪除的帳號。"
   }
 }

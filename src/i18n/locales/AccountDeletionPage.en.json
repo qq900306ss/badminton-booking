@@ -16,6 +16,7 @@
     "failed": "Couldn't delete the account. Please try again later",
     "sessionExpired": "Your login has expired. Please log in again to delete your account",
     "loginFirst": "Please log in to the account you want to delete",
-    "loginHint": "Use the same method you signed up with (Google or LINE). You'll come back to this page after logging in."
+    "loginHint": "Use the same method you signed up with (Google or LINE). You'll come back to this page after logging in.",
+    "accountChanged": "The signed-in account changed. Please confirm which account to delete again."
   }
 }

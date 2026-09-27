@@ -6,6 +6,7 @@ import { playerApi } from '../api/client'
 import {
   isLoggedIn,
   getAccount,
+  getToken,
   logout,
   clearAccountData,
   googleLoginUrl,
@@ -25,7 +26,10 @@ export function AccountDeletionPage() {
   const qc = useQueryClient()
   const toast = useToast()
   const [loggedIn, setLoggedIn] = useState(() => isLoggedIn())
-  const [confirming, setConfirming] = useState(false)
+  // 開啟確認時記下當下的 token:確認綁定這個帳號,期間換了帳號就作廢
+  const [confirmToken, setConfirmToken] = useState<string | null>(null)
+  const confirming = confirmToken !== null
+  const setConfirming = (on: boolean) => setConfirmToken(on ? getToken() : null)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
   const account = loggedIn ? getAccount() : null
@@ -35,7 +39,14 @@ export function AccountDeletionPage() {
     setDeleting(true)
     setError('')
     try {
-      await playerApi.deleteMe()
+      if (!confirmToken || getToken() !== confirmToken) {
+        // 確認之後帳號變了(別的分頁登出/換帳號)→ 不刪,重新整理顯示目前帳號
+        setConfirming(false)
+        setLoggedIn(isLoggedIn())
+        setError(t('AccountDeletionPage.accountChanged'))
+        return
+      }
+      await playerApi.deleteMe(confirmToken)
       // 跟登出同一套清法,再多清掉綁這個人的裝置資料;react-query 快取也丟掉免得殘留舊畫面
       clearAccountData()
       qc.clear()
