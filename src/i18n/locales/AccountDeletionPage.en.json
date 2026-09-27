@@ -1,0 +1,21 @@
+{
+  "AccountDeletionPage": {
+    "backHome": "Home",
+    "title": "Delete account",
+    "intro": "Delete your Badminton Meetup player account. This can't be undone — logging in again with the same Google / LINE account will create a brand-new account.",
+    "privacyLink": "Read the full privacy policy",
+    "loggedInAs": "Logged in as: {{name}}",
+    "thisAccount": "this account",
+    "deleteButton": "Delete my account",
+    "confirmTitle": "Permanently delete your account?",
+    "confirmBody": "The data listed above will be deleted right away. This can't be undone.",
+    "cancel": "Cancel",
+    "confirmButton": "Yes, delete permanently",
+    "deleting": "Deleting…",
+    "deleted": "Your account has been deleted. Thanks for playing with us 🏸",
+    "failed": "Couldn't delete the account. Please try again later",
+    "sessionExpired": "Your login has expired. Please log in again to delete your account",
+    "loginFirst": "Please log in to the account you want to delete",
+    "loginHint": "Use the same method you signed up with (Google or LINE). You'll come back to this page after logging in."
+  }
+}

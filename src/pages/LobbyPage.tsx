@@ -347,6 +347,19 @@ export function LobbyPage() {
               >
                 🔄 {t('LobbyPage.updateLatest')}
               </button>
+              {/* Google Play 要求:App 內找得到隱私權政策與刪除帳號 */}
+              <button
+                onClick={() => nav('/privacy')}
+                className="btn-secondary text-sm"
+              >
+                🔒 {t('LobbyPage.privacy')}
+              </button>
+              <button
+                onClick={() => nav('/account-deletion')}
+                className="btn-secondary text-sm text-red-500"
+              >
+                🗑️ {t('LobbyPage.deleteAccount')}
+              </button>
             </div>
           </div>
         </div>

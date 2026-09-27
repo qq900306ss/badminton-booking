@@ -1,5 +1,13 @@
 # 更新日誌(玩家端 booking)
 
+## 2026-09-28 — 隱私權政策 `/privacy` + 刪除帳號 `/account-deletion`(Google Play 上架要求)
+
+- 新增公開頁 `/privacy`、`/account-deletion`(不用登入):登入閘只在 `Home`(`/`),其他 Route 本來就不經過它,直接掛上即公開;`HostCta` 在這兩頁隱藏
+- 隱私權政策照程式碼實際行為寫(Google 拿 email、LINE 不拿;頭像上傳 S3 東京;無第三方分析/追蹤;操作紀錄 90 天 TTL);「刪什麼 / 留什麼」抽成 `DeletionScope` 兩頁共用
+- 刪除帳號:`DELETE /api/players/me`(204),確認走第二顆明確按鈕(不用 `window.confirm`);成功後 `clearAccountData()`(logout + 清 `badminton_*`、`announce_closed_*`、`oauth_state`,瀏覽器推播退訂)→ 清 react-query 快取 → 回 `/` + toast。沒登入時顯示 LINE/Google 登入,OAuth 回來會回到這頁
+- `api` 加 401 response interceptor:有帶 token 且訊息是「請先登入 / 帳號已刪除,請重新登入」→ 清登入態、回首頁(`wrong password` 的 401 不動;公開頁與 OAuth callback 不跳轉)
+- 設定彈窗加「🔒 隱私權政策」「🗑️ 刪除帳號」;更新資訊加 2026/09/28 一筆
+
 ## 2026-09-20 — 「安裝到手機桌面」改導去安裝頁
 
 - 大廳 / 場內的安裝鈕:有原生安裝框(Android Chrome)維持一鍵直接裝;其他情況(iPhone、LINE/FB 內建瀏覽器、安裝框沒出現)改成導去 `/install`,由那頁依平台分流

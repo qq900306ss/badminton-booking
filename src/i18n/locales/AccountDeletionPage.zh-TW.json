@@ -1,0 +1,21 @@
+{
+  "AccountDeletionPage": {
+    "backHome": "回首頁",
+    "title": "刪除帳號",
+    "intro": "刪除「羽球揪團」的球友帳號。刪除後無法復原,下次用同一個 Google / LINE 登入會是全新的帳號。",
+    "privacyLink": "查看完整隱私權政策",
+    "loggedInAs": "目前登入:{{name}}",
+    "thisAccount": "這個帳號",
+    "deleteButton": "刪除我的帳號",
+    "confirmTitle": "確定要永久刪除帳號嗎?",
+    "confirmBody": "上面列出的資料會立即刪除,無法復原。",
+    "cancel": "取消",
+    "confirmButton": "確定,永久刪除",
+    "deleting": "刪除中…",
+    "deleted": "帳號已刪除,謝謝你用過羽球揪團 🏸",
+    "failed": "刪除失敗,請稍後再試",
+    "sessionExpired": "登入已過期,請重新登入後再刪除",
+    "loginFirst": "請先登入要刪除的帳號",
+    "loginHint": "用你當初登入的方式(Google 或 LINE)登入,登入後會回到這一頁。"
+  }
+}

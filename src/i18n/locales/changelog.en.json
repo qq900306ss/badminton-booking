@@ -1,5 +1,8 @@
 {
   "changelog": {
+    "2026/09/28": [
+      "You can now delete your account from Settings, and there's a new \"🔒 Privacy policy\" page (Settings → Privacy policy / Delete account)"
+    ],
     "2026/09/03": [
       "Lobby cards now show a \"🏸 Ongoing / ⏰ Not started\" badge, so you can tell at a glance when a session hasn't begun yet",
       "The court elapsed time now reads \"X min played\" with a proper unit"

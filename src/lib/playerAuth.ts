@@ -39,6 +39,28 @@ export function logout() {
   localStorage.removeItem('display_name')
 }
 
+// 刪帳號後用:比 logout 多清掉「跟這個人綁在一起」的裝置資料 ——
+// 每場的身分(badminton_<sid>)、通知紀錄(badminton_notifs_*)、公告收合狀態、OAuth nonce。
+// 語言、導覽看過沒這類「裝置偏好」留著(換人登入也適用)。
+// 推播訂閱也順手從瀏覽器退訂(伺服器端那份由後端刪),best-effort 不擋流程。
+export function clearAccountData() {
+  logout()
+  const drop: string[] = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i)
+    if (!k) continue
+    if (k.startsWith('badminton_') || k.startsWith('announce_closed_') || k === 'oauth_state') drop.push(k)
+  }
+  drop.forEach((k) => localStorage.removeItem(k))
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .getRegistration()
+      .then((reg) => reg?.pushManager.getSubscription())
+      .then((sub) => sub?.unsubscribe())
+      .catch(() => {})
+  }
+}
+
 // where to come back to after the OAuth round-trip (e.g. "/?s=<sessionId>")
 function redirectBack(): string {
   return window.location.pathname + window.location.search

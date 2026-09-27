@@ -91,6 +91,9 @@ export function HostCta() {
   // 安裝頁自己有「你是團主?」區塊,漂浮鈕在那裡只會蓋住卡片。
   // 用 Router 的 useMatch 跟路由同一套規則(大小寫不敏感、SPA 導頁會同步),別自己看 location
   const onInstallPage = useMatch('/install') !== null
+  // 隱私權 / 刪帳號頁是給人讀條文的,漂浮開團鈕會蓋住內文也不合時宜
+  const onPrivacy = useMatch('/privacy') !== null
+  const onDeletion = useMatch('/account-deletion') !== null
 
   // Show the bubble briefly on mount, then re-tease it every ~30s. Gentle enough
   // not to nag, present enough to keep the invite discoverable.
@@ -106,7 +109,7 @@ export function HostCta() {
     }
   }, [])
 
-  if (onInstallPage) return null
+  if (onInstallPage || onPrivacy || onDeletion) return null
 
   return (
     <>

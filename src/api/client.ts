@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { logout, clearAccountData } from '../lib/playerAuth'
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
@@ -9,6 +10,25 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('player_token')
   if (token) config.headers['Authorization'] = `Bearer ${token}`
   return config
+})
+
+// 帶著 player token 卻被擋 401 = token 失效(過期,或帳號已在別台裝置刪除)→ 清掉登入態、回首頁重新登入。
+// 只認「請先登入 / 帳號已刪除」這兩種訊息:join / verify-password 打錯密碼也回 401("wrong password"),那不能登出。
+// 公開頁(隱私權、刪帳號、安裝頁)與 OAuth callback 不強制跳轉,讓它們自己處理。
+const DEAD_TOKEN_ERRORS = ['請先登入', '帳號已刪除,請重新登入']
+const NO_REDIRECT_PATHS = ['/privacy', '/account-deletion', '/install', '/auth/']
+api.interceptors.response.use(undefined, (err) => {
+  const status = err?.response?.status
+  const msg = err?.response?.data?.error
+  const sentToken = !!err?.config?.headers?.['Authorization']
+  if (status === 401 && sentToken && DEAD_TOKEN_ERRORS.includes(msg)) {
+    // 帳號被刪 → 連裝置上綁這個人的資料一起清;單純過期 → 跟登出一樣就好(重登同帳號還接得上)
+    if (msg === '帳號已刪除,請重新登入') clearAccountData()
+    else logout()
+    const path = window.location.pathname
+    if (!NO_REDIRECT_PATHS.some((p) => path.startsWith(p))) window.location.href = '/'
+  }
+  return Promise.reject(err)
 })
 
 export interface Player {
@@ -41,6 +61,8 @@ export const playerApi = {
       { content_type: contentType }
     ),
   sendFeedback: (message: string) => api.post('/api/feedback', { message }),
+  // 刪除自己的帳號(Google Play 要求 App 內可刪帳號);成功回 204
+  deleteMe: () => api.delete('/api/players/me'),
 }
 
 export interface PlayerSlot {

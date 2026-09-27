@@ -1,0 +1,76 @@
+{
+  "PrivacyPage": {
+    "backHome": "Home",
+    "title": "Privacy Policy",
+    "effective": "Effective date: 2026-09-28",
+    "intro": "Badminton Meetup (\"羽球揪團\", the website badminton-tw.fyi and the Android app on Google Play) is a tool for organizing drop-in badminton: finding groups, signing up and queuing for courts. This policy explains what data we collect, what we use it for, and how you can delete it.",
+    "goDelete": "Go to account deletion",
+    "sections": {
+      "operator": {
+        "title": "Operator and contact",
+        "items": [
+          "Operator: 羽球揪團 (Badminton Meetup), an individual developer",
+          "Contact: in-app \"Settings → 💬 Feedback\", or the developer email shown on the Google Play store listing"
+        ]
+      },
+      "collected": {
+        "title": "Data we collect",
+        "items": [
+          "Google login: Google account ID, display name, profile photo URL, email",
+          "LINE login: LINE user ID, display name, profile photo URL (LINE login does not give us your email)",
+          "Data you set yourself: join name, default level, avatar (an emoji, your Google / LINE photo, or a photo you upload; uploaded photos are stored in AWS S3 in the Tokyo region and displayed via a public URL)",
+          "Session records (managed by each group leader): the name you used in that session, level, games played, total minutes, whether you've paid the court fee (marked by the leader), your signup message, family members you added with their names and levels, and each game's player list",
+          "Feedback: what you send, together with your account name and email (if any) at the time",
+          "Push subscription: if you turn on notifications, we store the Web Push subscription your browser provides (push endpoint and keys) to notify you, e.g. when it's your turn to play",
+          "localStorage on your device: login token, cached account, preferences such as language, per-session identities and notification history. These stay on your device",
+          "The app uses no third-party analytics, advertising or tracking tools"
+        ]
+      },
+      "visibility": {
+        "title": "Who can see your data",
+        "items": [
+          "Other players in the same session: your name, avatar, level and games played in that session",
+          "That session's group leader: the above, plus your signup message, paid flag, minutes played and family members you brought",
+          "Your email is never shown to other players or group leaders"
+        ]
+      },
+      "purpose": {
+        "title": "How we use it",
+        "items": [
+          "Only to run the pickup-group features: login, signing up, queuing, playing, notifications, and letting leaders manage their own sessions",
+          "No ads, no selling of data, no marketing use"
+        ]
+      },
+      "sharing": {
+        "title": "Sharing and infrastructure",
+        "items": [
+          "We don't give your data to any third party, except the infrastructure providers the service runs on:",
+          "Amazon Web Services (DynamoDB, S3, CloudFront; Tokyo region): database, avatar photos and website files",
+          "Fly.io (Tokyo): API server",
+          "Cloudflare: domain DNS",
+          "Google, LINE: login",
+          "The push service your browser uses (e.g. Google, Apple, Mozilla): only to deliver notifications to your device if you turn them on"
+        ]
+      },
+      "deletion": {
+        "title": "Retention and deletion",
+        "items": [
+          "Account data is kept until you delete your account",
+          "You can delete it yourself at any time in the app under \"Settings → Delete account\", or on the account deletion page below (login required)"
+        ]
+      },
+      "children": {
+        "title": "Children",
+        "items": [
+          "The service is not directed at children under 13, and we do not knowingly collect personal data from children under 13"
+        ]
+      },
+      "changes": {
+        "title": "Changes to this policy",
+        "items": [
+          "If this policy changes, we'll update this page and show the new effective date"
+        ]
+      }
+    }
+  }
+}

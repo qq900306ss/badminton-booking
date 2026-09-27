@@ -11,6 +11,10 @@ const CourtPage = lazy(() => import('./pages/CourtPage').then((m) => ({ default:
 const LobbyPage = lazy(() => import('./pages/LobbyPage').then((m) => ({ default: m.LobbyPage })))
 const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })))
 const InstallPage = lazy(() => import('./pages/InstallPage').then((m) => ({ default: m.InstallPage })))
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage').then((m) => ({ default: m.PrivacyPage })))
+const AccountDeletionPage = lazy(() =>
+  import('./pages/AccountDeletionPage').then((m) => ({ default: m.AccountDeletionPage }))
+)
 import { isLoggedIn } from './lib/playerAuth'
 import { ToastProvider } from './components/Toast'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -62,6 +66,10 @@ export default function App() {
             <Route path="/court/:sessionId" element={<CourtPage />} />
             {/* 公開安裝頁:宣傳貼這個網址,不用登入 */}
             <Route path="/install" element={<InstallPage />} />
+            {/* 公開的隱私權政策 / 刪除帳號頁:Google Play 要求不用登入就打得開。
+                登入閘只在 Home(path "/")裡,其他 Route 本來就不經過它,所以直接掛上就是公開的 */}
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/account-deletion" element={<AccountDeletionPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

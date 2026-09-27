@@ -1,0 +1,19 @@
+{
+  "DeletionScope": {
+    "deletedTitle": "Deleted immediately when you delete your account",
+    "deleted": [
+      "Your account: login identity (Google / LINE account ID), name, email, profile photo URL, and your settings such as join name, default level and avatar",
+      "Avatar photos you uploaded",
+      "Your push notification subscriptions",
+      "Signups not yet approved by a group leader, and family members not yet approved",
+      "The login state on this device, plus the per-session identities and notification history this app keeps on the device; any other device still logged in to this account is signed out too"
+    ],
+    "retainedTitle": "What is kept",
+    "retained": [
+      "In sessions where you were approved, your name (and those of family members you brought) stays in that group's roster and game logs (level, games played, minutes, paid flag) as the group leader's session records. After deletion they're no longer linked to your account, and the avatar and signup message are removed",
+      "Group leaders' action logs (which may mention the name you used in a session) are deleted automatically after 90 days",
+      "Feedback you sent is kept for the developer but anonymized: your name, email and account ID are removed"
+    ],
+    "leaderNote": "Group leader (host console) accounts aren't deleted here: request deletion through the in-app \"💬 Feedback\" or the developer email on the Google Play store listing."
+  }
+}
