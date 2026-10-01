@@ -2,15 +2,15 @@
   "PrivacyPage": {
     "backHome": "Home",
     "title": "Privacy Policy",
-    "effective": "Effective date: 2026-09-28",
-    "intro": "Badminton Meetup (\"羽球揪團\", the website badminton-tw.fyi and the Android app on Google Play) is a tool for organizing drop-in badminton: finding groups, signing up and queuing for courts. This policy explains what data we collect, what we use it for, and how you can delete it.",
+    "effective": "Effective date: 2026-10-01",
+    "intro": "Badminton Meetup (\"羽球揪團\", the website badminton-tw.fyi the Android app on Google Play, and the iOS app on the App Store) is a tool for organizing drop-in badminton: finding groups, signing up and queuing for courts. This policy explains what data we collect, what we use it for, and how you can delete it.",
     "goDelete": "Go to account deletion",
     "sections": {
       "operator": {
         "title": "Operator and contact",
         "items": [
           "Operator: 羽球揪團 (Badminton Meetup), an individual developer",
-          "Contact: in-app \"Settings → 💬 Feedback\", or the developer email shown on the Google Play store listing"
+          "Contact: in-app \"Settings → 💬 Feedback\", or the developer email shown on the Google Play / App Store listing"
         ]
       },
       "collected": {
@@ -18,10 +18,11 @@
         "items": [
           "Google login: Google account ID, display name, profile photo URL, email",
           "LINE login: LINE user ID, display name, profile photo URL (LINE login does not give us your email)",
+          "Sign in with Apple (iOS app): your Apple user ID, plus the name and email you choose to share the first time you sign in (if you hide your email we only get Apple's relay address). We also keep the authorization token Apple issues to this app, used only to ask Apple to revoke it when you delete your account",
           "Data you set yourself: join name, default level, avatar (an emoji, your Google / LINE photo, or a photo you upload; uploaded photos are stored in AWS S3 in the Tokyo region and displayed via a public URL)",
           "Session records (managed by each group leader): the name you used in that session, level, games played, total minutes, whether you've paid the court fee (marked by the leader), your signup message, family members you added with their names and levels, and each game's player list",
           "Feedback: what you send, together with your account name and email (if any) at the time",
-          "Push subscription: if you turn on notifications, we store the Web Push subscription your browser provides (push endpoint and keys) to notify you, e.g. when it's your turn to play",
+          "Push subscription: if you turn on notifications, we store the Web Push subscription your browser provides (push endpoint and keys), or in the iOS app the Apple Push Notification service (APNs) device token, to notify you, e.g. when it's your turn to play",
           "localStorage on your device: login token, cached account, preferences such as language, per-session identities and notification history. These stay on your device",
           "The app uses no third-party analytics, advertising or tracking tools"
         ]
@@ -48,15 +49,16 @@
           "Amazon Web Services (DynamoDB, S3, CloudFront; Tokyo region): database, avatar photos and website files",
           "Fly.io (Tokyo): API server",
           "Cloudflare: domain DNS",
-          "Google, LINE: login",
-          "The push service your browser uses (e.g. Google, Apple, Mozilla): only to deliver notifications to your device if you turn them on"
+          "Google, LINE, Apple: login",
+          "Push services: the push service your browser uses (e.g. Google, Apple, Mozilla), or Apple Push Notification service (APNs) in the iOS app — only to deliver notifications to your device if you turn them on"
         ]
       },
       "deletion": {
         "title": "Retention and deletion",
         "items": [
           "Account data is kept until you delete your account",
-          "You can delete it yourself at any time in the app under \"Settings → Delete account\", or on the account deletion page below (login required)"
+          "You can delete it yourself at any time in the app under \"Settings → Delete account\", or on the account deletion page below (login required)",
+          "If you signed in with Apple, deleting your account also asks Apple to revoke this app's sign-in authorization"
         ]
       },
       "children": {

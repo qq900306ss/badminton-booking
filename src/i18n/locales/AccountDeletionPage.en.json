@@ -2,7 +2,7 @@
   "AccountDeletionPage": {
     "backHome": "Home",
     "title": "Delete account",
-    "intro": "Delete your Badminton Meetup player account. This can't be undone — logging in again with the same Google / LINE account will create a brand-new account.",
+    "intro": "Delete your Badminton Meetup player account. This can't be undone — logging in again with the same Google / LINE / Apple account will create a brand-new account.",
     "privacyLink": "Read the full privacy policy",
     "loggedInAs": "Logged in as: {{name}}",
     "thisAccount": "this account",
@@ -16,7 +16,7 @@
     "failed": "Couldn't delete the account. Please try again later",
     "sessionExpired": "Your login has expired. Please log in again to delete your account",
     "loginFirst": "Please log in to the account you want to delete",
-    "loginHint": "Use the same method you signed up with (Google or LINE). You'll come back to this page after logging in.",
+    "loginHint": "Use the same method you signed up with (Google, LINE, or Apple in the iOS app). You'll come back to this page after logging in. Accounts created with Apple can be deleted in the iOS app under Settings → Delete account.",
     "accountChanged": "The signed-in account changed. Please confirm which account to delete again."
   }
 }

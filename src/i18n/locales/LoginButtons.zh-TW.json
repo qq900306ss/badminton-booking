@@ -1,0 +1,6 @@
+{
+  "LoginButtons": {
+    "apple": "使用 Apple 登入",
+    "failed": "登入失敗,請再試一次"
+  }
+}

@@ -1,5 +1,19 @@
 # 更新日誌(玩家端 booking)
 
+## 2026-10-01 — iOS App(原生外殼)支援:Apple 登入、APNs 推播、系統登入視窗
+
+iOS App 在 `../ios-app`:原生外殼載入正式站(跟 Android TWA 同一個思路),網頁照常部署。這次是網頁這邊的配合:
+
+- `lib/native.ts`:外殼在 documentStart 注入 `window.BadmintonNative` + message handler `badmintonNative`(postMessage 回 promise);`isIOSApp` 為 false 時(瀏覽器 / TWA)一切照舊
+- 登入按鈕抽成 `LoginButtons`(登入畫面、刪除帳號頁共用)。iOS App 裡多「使用 Apple 登入」(App Store 4.8:有第三方登入就要有 Apple 登入),打新的 `POST /api/auth/player/apple`
+- Google / LINE 在 App 裡改走系統登入視窗(Google 擋 WebView 內 OAuth):state 多帶 `a:1`;`/auth/*callback` 在系統視窗裡看到它就原封不動轉跳 `badmintontw://oauth/<路徑>?code&state`,App 在自己的 WebView 重開回跳頁,nonce 驗證、換 token 跟網頁版同一套(redirect_uri 不變,後端不用分)
+- 推播:WKWebView 沒有 Web Push → App 裡 `subscribePush` / `requestNotify` 改叫原生拿 APNs token,打新的 `POST /api/push/apns`(跟 Web Push 訂閱並存)
+- 分享走 UIKit 分享面板、`vibrate()` 改原生震動回饋;App 裡安裝鈕/安裝頁當成已安裝
+- `appleLogin` 動態載入 api client:登入畫面在首包,不為了只在 App 出現的按鈕把 axios 拖進首包
+- 隱私權政策(三語)補上 iOS App、Apple 登入(含刪帳號時撤銷 Apple 授權)、APNs;生效日改 2026-10-01
+- `public/.well-known/apple-app-site-association`:universal links(掃場館 QR 直接開 App,`/auth/*` 排除);deploy 另外把它設成 `application/json`
+- 玩家看的「更新資訊」(changelog.*.json)等 App 真的上架再加
+
 ## 2026-09-28 — 隱私權政策 `/privacy` + 刪除帳號 `/account-deletion`(Google Play 上架要求)
 
 - 新增公開頁 `/privacy`、`/account-deletion`(不用登入):登入閘只在 `Home`(`/`),其他 Route 本來就不經過它,直接掛上即公開;`HostCta` 在這兩頁隱藏

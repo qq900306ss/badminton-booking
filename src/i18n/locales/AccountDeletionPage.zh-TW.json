@@ -2,7 +2,7 @@
   "AccountDeletionPage": {
     "backHome": "回首頁",
     "title": "刪除帳號",
-    "intro": "刪除「羽球揪團」的球友帳號。刪除後無法復原,下次用同一個 Google / LINE 登入會是全新的帳號。",
+    "intro": "刪除「羽球揪團」的球友帳號。刪除後無法復原,下次用同一個 Google / LINE / Apple 登入會是全新的帳號。",
     "privacyLink": "查看完整隱私權政策",
     "loggedInAs": "目前登入:{{name}}",
     "thisAccount": "這個帳號",
@@ -16,7 +16,7 @@
     "failed": "刪除失敗,請稍後再試",
     "sessionExpired": "登入已過期,請重新登入後再刪除",
     "loginFirst": "請先登入要刪除的帳號",
-    "loginHint": "用你當初登入的方式(Google 或 LINE)登入,登入後會回到這一頁。",
+    "loginHint": "用你當初登入的方式登入(Google、LINE,或 iOS App 裡的 Apple),登入後會回到這一頁。用 Apple 登入的帳號請在 iOS App「設定 → 刪除帳號」操作。",
     "accountChanged": "登入的帳號已變更,請重新確認要刪除的帳號。"
   }
 }

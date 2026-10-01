@@ -9,17 +9,15 @@ import {
   getToken,
   logout,
   clearAccountData,
-  googleLoginUrl,
-  lineLoginUrl,
-  authProvidersConfigured,
 } from '../lib/playerAuth'
 import { DeletionScope } from '../components/DeletionScope'
+import { LoginButtons } from '../components/LoginButtons'
 import { useToast, errMsg } from '../components/Toast'
 
 // 公開的刪除帳號頁(/account-deletion):Google Play 要求「App 內」跟「公開網址」都能刪帳號,
 // 所以這頁不走登入閘 —— 沒登入也看得到會刪什麼、留什麼,再引導先登入。
 // 登入後才顯示刪除鈕;確認走「第二顆明確按鈕」(App 裡 window.confirm 不可靠,TWA/內建瀏覽器常直接吞掉)。
-// 登入流程沿用 googleLoginUrl / lineLoginUrl:OAuth state 會記住目前路徑,登入完回到這頁。
+// 登入按鈕共用 LoginButtons:OAuth state 會記住目前路徑,登入完回到這頁(iOS App 的 Apple 登入也是)。
 export function AccountDeletionPage() {
   const { t } = useTranslation()
   const nav = useNavigate()
@@ -129,27 +127,7 @@ export function AccountDeletionPage() {
           <section className="card space-y-3 text-center">
             <p className="text-sm font-bold text-gray-700">{t('AccountDeletionPage.loginFirst')}</p>
             <p className="text-xs text-gray-500">{t('AccountDeletionPage.loginHint')}</p>
-            {authProvidersConfigured.line && (
-              <button
-                onClick={() => {
-                  window.location.href = lineLoginUrl()
-                }}
-                className="w-full py-3 rounded-2xl font-bold text-white bg-[#06C755] shadow active:scale-95 transition-transform"
-              >
-                {t('LoginScreen.lineLogin')}
-              </button>
-            )}
-            {authProvidersConfigured.google && (
-              <button
-                onClick={() => {
-                  window.location.href = googleLoginUrl()
-                }}
-                className="w-full py-3 rounded-2xl font-bold bg-white border-2 border-gray-200 text-gray-700
-                  shadow-sm active:scale-95 transition-transform"
-              >
-                {t('LoginScreen.googleLogin')}
-              </button>
-            )}
+            <LoginButtons />
           </section>
         )}
       </div>

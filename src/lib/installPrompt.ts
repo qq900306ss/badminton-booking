@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { isIOSApp } from './native'
 
 // Chrome / Edge / Samsung 的 `beforeinstallprompt` 在頁面載入很早就發,常常比
 // React 元件 mount 還早;元件自己掛 listener 會錯過。這個模組由 main.tsx 靜態
@@ -45,10 +46,12 @@ export function subscribeInstallPrompt(fn: () => void): () => void {
   }
 }
 
-// 已經是從桌面圖示開的(PWA standalone)— iOS 用 navigator.standalone
+// 已經是從桌面圖示開的(PWA standalone)— iOS 用 navigator.standalone;
+// iOS App(原生外殼)本身就是裝好的 app,安裝鈕/安裝頁都當成已安裝
 export function isStandalone(): boolean {
   if (typeof window === 'undefined') return false
   return (
+    isIOSApp ||
     window.matchMedia('(display-mode: standalone)').matches ||
     (navigator as unknown as { standalone?: boolean }).standalone === true
   )

@@ -51,6 +51,15 @@ export const playerApi = {
     api.post<{ data: { token: string; player: Player } }>('/api/auth/player/google', { code }),
   line: (code: string) =>
     api.post<{ data: { token: string; player: Player } }>('/api/auth/player/line', { code }),
+  // iOS App 的「使用 Apple 登入」:name 只有第一次授權才有,後端只在建新帳號時用
+  apple: (idToken: string, code: string, name: string) =>
+    api.post<{ data: { token: string; player: Player } }>('/api/auth/player/apple', {
+      id_token: idToken,
+      code,
+      name,
+    }),
+  // iOS App 的 APNs device token(跟 Web Push 訂閱並存,後端兩邊都推)
+  registerApns: (token: string, sandbox: boolean) => api.post('/api/push/apns', { token, sandbox }),
   me: () => api.get<{ data: Player }>('/api/players/me'),
   updateProfile: (joinName: string, defaultLevel: number, avatarUrl: string) =>
     api.put<{ data: Player }>('/api/players/me', {

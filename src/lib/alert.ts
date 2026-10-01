@@ -1,6 +1,9 @@
 // "輪到你了" alert helpers — sound (Web Audio, no asset), vibration, notification.
 
 import i18n from '../i18n'
+import { playerApi } from '../api/client'
+import { isLoggedIn } from './playerAuth'
+import { isIOSApp, native } from './native'
 
 let ctx: AudioContext | null = null
 
@@ -30,6 +33,11 @@ export function playChime() {
 }
 
 export function vibrate() {
+  // iPhone 沒有 navigator.vibrate;在 iOS App 裡改用原生震動回饋
+  if (isIOSApp) {
+    native.haptic('success')
+    return
+  }
   try {
     navigator.vibrate?.([200, 100, 200])
   } catch {
@@ -49,6 +57,10 @@ export function notifyTurn(body: string) {
 
 // best-effort: ask for notification permission (call from a user gesture)
 export function requestNotify() {
+  if (isIOSApp) {
+    registerNativePush()
+    return
+  }
   try {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission()
@@ -73,6 +85,11 @@ export async function subscribePush(
   getVapid: () => Promise<string>,
   send: (sub: PushSubscriptionJSON) => Promise<unknown>
 ) {
+  // WKWebView 沒有 Web Push → iOS App 走 APNs
+  if (isIOSApp) {
+    registerNativePush()
+    return
+  }
   try {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return
     if (Notification.permission !== 'granted') return
@@ -90,4 +107,16 @@ export async function subscribePush(
   } catch {
     // ignore — push just won't be available
   }
+}
+
+// iOS App:要通知權限 + 拿 APNs device token 交給後端(跟 Web Push 一樣掛在帳號上)。
+// 第一次會跳系統的通知權限詢問;已經拒絕過就安靜失敗(使用者要到 iOS 設定裡自己打開)。
+export function registerNativePush() {
+  if (!isIOSApp || !isLoggedIn()) return
+  native
+    .registerPush()
+    .then(({ token, sandbox }) => playerApi.registerApns(token, sandbox))
+    .catch(() => {
+      // ignore — push just won't be available
+    })
 }

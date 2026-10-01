@@ -4,6 +4,8 @@
     "loginFailedBadState": "登入失敗:安全驗證不符,請重新登入",
     "loginFailedRetry": "登入失敗,請再試一次",
     "backHome": "回首頁",
-    "loggingIn": "登入中…"
+    "loggingIn": "登入中…",
+    "returningToApp": "正在回到羽球揪團 App…",
+    "openApp": "回到 App"
   }
 }

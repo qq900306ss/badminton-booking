@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["__APPLE_TEAM_ID__.fyi.badmintontw.app"],
+        "components": [
+          { "/": "/auth/*", "exclude": true, "comment": "OAuth 回跳要留在登入視窗 / Safari 裡,由網頁轉回 app" },
+          { "/": "/.well-known/*", "exclude": true },
+          { "/": "/*", "comment": "掃場館 QR(/?s=…)、分享出去的連結都直接開 app" }
+        ]
+      }
+    ]
+  }
+}

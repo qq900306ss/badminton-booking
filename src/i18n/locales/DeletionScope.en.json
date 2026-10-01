@@ -2,9 +2,9 @@
   "DeletionScope": {
     "deletedTitle": "Deleted immediately when you delete your account",
     "deleted": [
-      "Your account: login identity (Google / LINE account ID), name, email, profile photo URL, and your settings such as join name, default level and avatar",
+      "Your account: login identity (Google / LINE / Apple account ID), name, email, profile photo URL, and your settings such as join name, default level and avatar",
       "Avatar photos you uploaded",
-      "Your push notification subscriptions",
+      "Your push notification subscriptions (Web Push and the iOS app's push token)",
       "Signups not yet approved by a group leader, and family members not yet approved",
       "The login state on this device, plus the per-session identities and notification history this app keeps on the device; any other device still logged in to this account is signed out too"
     ],
@@ -14,6 +14,6 @@
       "Group leaders' action logs (which may mention the name you used in a session) are deleted automatically after 90 days",
       "Feedback you sent is kept for the developer but anonymized: your name, email and account ID are removed"
     ],
-    "leaderNote": "Group leader (host console) accounts aren't deleted here: request deletion through the in-app \"💬 Feedback\" or the developer email on the Google Play store listing."
+    "leaderNote": "Group leader (host console) accounts aren't deleted here: request deletion through the in-app \"💬 Feedback\" or the developer email on the Google Play / App Store listing."
   }
 }

@@ -1,4 +1,5 @@
 import type { Player } from '../api/client'
+import { isIOSApp } from './native'
 
 // drop-in player auth: token + account stored in localStorage.
 const TOKEN_KEY = 'player_token'
@@ -69,6 +70,8 @@ function redirectBack(): string {
 // OAuth `state` = base64({ return-path, random nonce }). The nonce is stashed in
 // sessionStorage and re-checked on the callback to block CSRF (a forged callback
 // from another page can't know/set this browser's nonce).
+// iOS App 多帶 a:1:授權是在系統登入視窗(Safari)裡跑的,回跳頁在那邊看到這個旗標
+// 就把 code/state 原封不動丟回 app(見 AuthCallback),nonce 驗證留在 app 的 WebView 做。
 function makeOAuthState(): string {
   const nonce =
     typeof crypto !== 'undefined' && crypto.randomUUID
@@ -78,7 +81,16 @@ function makeOAuthState(): string {
   // returns the callback in a different tab/context and drops sessionStorage,
   // which would falsely fail the check. localStorage survives same-browser tabs.
   localStorage.setItem('oauth_state', nonce)
-  return btoa(JSON.stringify({ r: redirectBack(), n: nonce }))
+  return btoa(JSON.stringify(isIOSApp ? { r: redirectBack(), n: nonce, a: 1 } : { r: redirectBack(), n: nonce }))
+}
+
+// 回跳頁用:這次登入是不是 iOS App 發起的(不消耗 nonce)
+export function isAppOAuthState(raw: string): boolean {
+  try {
+    return (JSON.parse(atob(raw)) as { a?: number }).a === 1
+  } catch {
+    return false
+  }
 }
 
 // Verify the callback's state and return the safe return path. Only REJECT on a

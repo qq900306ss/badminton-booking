@@ -1,0 +1,6 @@
+{
+  "LoginButtons": {
+    "apple": "Sign in with Apple",
+    "failed": "Login failed — please try again"
+  }
+}

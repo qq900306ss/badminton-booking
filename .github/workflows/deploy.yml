@@ -36,4 +36,6 @@ jobs:
           CF_DISTRIBUTION_ID: ${{ secrets.CF_DISTRIBUTION_ID }}
         run: |
           aws s3 sync dist/ "s3://$S3_BUCKET/" --delete
+          # iOS universal links:沒副檔名,sync 會標成 binary/octet-stream → 另外以 JSON 重傳
+          aws s3 cp dist/.well-known/apple-app-site-association "s3://$S3_BUCKET/.well-known/apple-app-site-association" --content-type application/json
           aws cloudfront create-invalidation --distribution-id "$CF_DISTRIBUTION_ID" --paths "/*"

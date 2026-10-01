@@ -4,6 +4,8 @@
     "loginFailedBadState": "Login failed: security check didn't match, please log in again",
     "loginFailedRetry": "Login failed, please try again",
     "backHome": "Back home",
-    "loggingIn": "Logging in…"
+    "loggingIn": "Logging in…",
+    "returningToApp": "Returning to the Badminton Meetup app…",
+    "openApp": "Back to the app"
   }
 }
