@@ -11,7 +11,7 @@ iOS App 在 `../ios-app`:原生外殼載入正式站(跟 Android TWA 同一個�
 - 分享走 UIKit 分享面板、`vibrate()` 改原生震動回饋;App 裡安裝鈕/安裝頁當成已安裝
 - `appleLogin` 動態載入 api client:登入畫面在首包,不為了只在 App 出現的按鈕把 axios 拖進首包
 - 隱私權政策(三語)補上 iOS App、Apple 登入(含刪帳號時撤銷 Apple 授權)、APNs;生效日改 2026-10-01
-- `public/.well-known/apple-app-site-association`:universal links(掃場館 QR 直接開 App,`/auth/*` 排除);deploy 另外把它設成 `application/json`
+- `public/.well-known/apple-app-site-association`:universal links(Team `U2235K4N7Y`;掃場館 QR 直接開 App,`/auth/*` 排除);deploy 另外把它設成 `application/json`
 - 玩家看的「更新資訊」(changelog.*.json)等 App 真的上架再加
 
 ## 2026-09-28 — 隱私權政策 `/privacy` + 刪除帳號 `/account-deletion`(Google Play 上架要求)

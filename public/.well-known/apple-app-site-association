@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["__APPLE_TEAM_ID__.fyi.badmintontw.app"],
+        "appIDs": ["U2235K4N7Y.fyi.badmintontw.app"],
         "components": [
           { "/": "/auth/*", "exclude": true, "comment": "OAuth 回跳要留在登入視窗 / Safari 裡,由網頁轉回 app" },
           { "/": "/.well-known/*", "exclude": true },
