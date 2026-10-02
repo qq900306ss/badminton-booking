@@ -1,0 +1,15 @@
+{
+  "BlockListButton": {
+    "button": "封鎖名單",
+    "title": "封鎖名單",
+    "close": "關閉",
+    "hint": "封鎖的球友在場上會顯示成「已封鎖的球友」,封鎖的團主開的團不會出現在大廳。名稱與頭像是封鎖當下的紀錄。",
+    "loading": "載入中…",
+    "empty": "還沒有封鎖任何人",
+    "noName": "(沒有名稱)",
+    "typePlayer": "球友",
+    "typeOrg": "團主",
+    "sessionOnly": "只在當時那一場",
+    "unblock": "解除封鎖"
+  }
+}

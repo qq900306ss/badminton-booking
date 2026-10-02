@@ -2,6 +2,7 @@
   "AnnouncementBanner": {
     "title": "Announcement",
     "expand": "Show ▾",
-    "collapse": "Hide ▴"
+    "collapse": "Hide ▴",
+    "more": "Report or block this group"
   }
 }

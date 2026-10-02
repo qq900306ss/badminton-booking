@@ -1,0 +1,38 @@
+{
+  "ModerationSheet": {
+    "close": "閉じる",
+    "cancel": "キャンセル",
+    "back": "戻る",
+    "unblock": "ブロックを解除",
+    "player": {
+      "subtitle": "プレイヤー",
+      "report": "通報",
+      "block": "ブロック",
+      "reportTitle": "このプレイヤーを通報",
+      "blockTitle": "このプレイヤーをブロックしますか?",
+      "blockBody": "ブロックすると相手の名前とアイコンが表示されなくなります(コート上の位置はそのまま表示されます)。運営にも通知が届きます。"
+    },
+    "org": {
+      "subtitle": "主催者の募集",
+      "report": "このグループを通報",
+      "block": "この主催者をブロック",
+      "reportTitle": "このグループを通報(グループ名・紹介文・お知らせ)",
+      "blockTitle": "この主催者をブロックしますか?",
+      "blockBody": "この主催者の募集はロビーに表示されなくなり、リンクから開いても紹介文やお知らせは表示されません。運営にも通知が届きます。"
+    },
+    "reasons": {
+      "inappropriate": "不適切な名前やアイコン",
+      "harassment": "嫌がらせ・いじめ",
+      "spam": "詐欺・広告",
+      "other": "その他"
+    },
+    "detailPlaceholder": "詳細(任意、500 文字まで)",
+    "reportNote": "24 時間以内に対応します。誰が通報したかは相手に伝わりません。",
+    "submitReport": "通報する",
+    "sending": "送信中…",
+    "reportSent": "送信しました。24 時間以内に対応します",
+    "reportFailed": "送信に失敗しました。もう一度お試しください",
+    "blockUndoHint": "「設定 → 🚫 ブロックリスト」からいつでも解除できます。",
+    "confirmBlock": "ブロックする"
+  }
+}

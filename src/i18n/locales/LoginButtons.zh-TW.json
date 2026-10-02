@@ -1,6 +1,7 @@
 {
   "LoginButtons": {
     "apple": "使用 Apple 登入",
-    "failed": "登入失敗,請再試一次"
+    "failed": "登入失敗,請再試一次",
+    "banned": "你的帳號因違反使用條款已被停權。如有疑問請寫信到 rr900306@gmail.com"
   }
 }

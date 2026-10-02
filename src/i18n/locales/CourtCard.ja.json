@@ -21,6 +21,7 @@
     "lockedByHost": "このコートは主催者がロックしました",
     "tapToPlay": "👆 空き位置をタップしてそのまま出場",
     "waitInQueue": "順番待ちに入る",
-    "queueOnly": "とりあえず順番待ちだけ(出場しない)"
+    "queueOnly": "とりあえず順番待ちだけ(出場しない)",
+    "playerActions": "{{name}}:通報・ブロック"
   }
 }

@@ -30,6 +30,10 @@
       "profile": {
         "title": "Edit your profile",
         "body": "Use \"Settings\" at the top right to change your name, default level, or avatar (pick a cute icon)."
+      },
+      "safety": {
+        "title": "Report / block",
+        "body": "See an inappropriate name, avatar or content? Tap that player's avatar on the court, or a group's \"⋯\", and choose \"🚩 Report\" or \"🚫 Block\". You can unblock from your block list in \"Settings\"."
       }
     }
   }

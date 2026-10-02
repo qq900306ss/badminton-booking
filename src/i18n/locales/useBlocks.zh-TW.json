@@ -1,0 +1,9 @@
+{
+  "useBlocks": {
+    "blocked": "已封鎖,你不會再看到對方的名字與頭像",
+    "unblocked": "已解除封鎖",
+    "blockedPlayer": "已封鎖的球友",
+    "blockedOrg": "已封鎖的團主",
+    "blockedOrgToast": "已封鎖,你不會再看到這個團主開的團"
+  }
+}

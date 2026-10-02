@@ -24,6 +24,7 @@ export function getAccount(): Player | null {
 export function setAuth(token: string, player: Player) {
   localStorage.setItem(TOKEN_KEY, token)
   localStorage.setItem(PLAYER_KEY, JSON.stringify(player))
+  clearBannedNotice()
 }
 
 // update the cached account (e.g. after editing the preferred join name), keep token
@@ -38,6 +39,31 @@ export function logout() {
   // carry a stale player_id into a court page
   localStorage.removeItem('player_id')
   localStorage.removeItem('display_name')
+}
+
+// 被停權登出:401 攔截器整頁跳回登入畫面前記一筆,登入畫面據此說明為什麼被登出;下次登入成功(setAuth)才清。
+// sessionStorage 在隱私模式 / 被封鎖時會丟例外,失敗就算了,不擋登出流程
+const BANNED_NOTICE_KEY = 'banned_notice'
+export function markBannedNotice() {
+  try {
+    sessionStorage.setItem(BANNED_NOTICE_KEY, '1')
+  } catch {
+    /* storage blocked */
+  }
+}
+export function hasBannedNotice(): boolean {
+  try {
+    return sessionStorage.getItem(BANNED_NOTICE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+function clearBannedNotice() {
+  try {
+    sessionStorage.removeItem(BANNED_NOTICE_KEY)
+  } catch {
+    /* storage blocked */
+  }
 }
 
 // 刪帳號後用:比 logout 多清掉「跟這個人綁在一起」的裝置資料 ——

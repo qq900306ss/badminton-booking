@@ -26,6 +26,9 @@ export function PrivacyPage() {
           <p className="text-xs text-gray-400">{t('PrivacyPage.effective')}</p>
         </header>
         <p className="text-sm text-gray-600">{t('PrivacyPage.intro')}</p>
+        <Link to="/terms" className="block text-sm font-bold text-brand-pink">
+          📜 {t('PrivacyPage.termsLink')} →
+        </Link>
 
         {SECTIONS.map((id, idx) => (
           <section key={id} className="card space-y-2">

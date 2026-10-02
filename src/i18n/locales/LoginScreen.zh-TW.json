@@ -9,6 +9,8 @@
     "lineLogin": "用 LINE 登入",
     "googleLogin": "使用 Google 登入",
     "notConfigured": "登入尚未設定,請聯絡管理員",
-    "privacyNote": "登入只用來辨識你的身份,你的 email 不會公開給團主"
+    "privacyNote": "登入只用來辨識你的身份,你的 email 不會公開給團主",
+    "agreeTerms": "登入即表示你同意<terms>《使用條款》</terms>與<privacy>《隱私權政策》</privacy>",
+    "banned": "你的帳號因違反使用條款已被停權。如有疑問請寫信到 rr900306@gmail.com"
   }
 }

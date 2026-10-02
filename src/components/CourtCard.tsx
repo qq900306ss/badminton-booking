@@ -23,7 +23,7 @@ function elapsedMins(startedAt?: string): number | null {
   return Math.floor(ms / 60000)
 }
 
-function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
+function Avatar({ slot, me = false, blocked = false, onTap }: { slot: PlayerSlot; me?: boolean; blocked?: boolean; onTap?: () => void }) {
   const { t } = useTranslation()
   // [...str][0] is emoji/surrogate-pair safe — str[0] splits a 🔥-style name into
   // a broken half (the "亂碼" in the circle).
@@ -31,15 +31,27 @@ function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
   const tier = tierOf(slot.level)
   const bg = tier ? tier.avatarBg : fallbackColor(slot.player_id)
   const ring = me ? 'ring-4 ring-amber-400' : 'ring-2 ring-white'
+  // 已封鎖的球友:頭像換成中性 🚫 灰底、名字換掉;人還在場上,位置與程度照常
+  const name = blocked ? t('useBlocks.blockedPlayer') : slot.display_name
+  // 點別人的頭像 → 檢舉 / 封鎖 sheet(自己與自己的家人不給點)。
+  // 頭像本來沒有點擊行為(上場/排隊是點空位與下方按鈕),所以直接用點的,不會跟既有操作打架
+  const Wrap = onTap ? 'button' : 'div'
   return (
     <motion.div
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-      className="flex flex-col items-center gap-1"
     >
+      <Wrap
+        {...(onTap ? { type: 'button' as const, onClick: onTap, 'aria-label': t('CourtCard.playerActions', { name }) } : {})}
+        className={`flex flex-col items-center gap-1 ${onTap ? 'active:opacity-60 transition-opacity' : ''}`}
+      >
       <div className="relative">
-        {isPhotoUrl(slot.avatar_url) ? (
+        {blocked ? (
+          <div className={`w-11 h-11 rounded-full bg-gray-200 flex items-center justify-center shadow-md ${ring}`}>
+            <span className="text-xl grayscale">🚫</span>
+          </div>
+        ) : isPhotoUrl(slot.avatar_url) ? (
           <img
             src={slot.avatar_url}
             alt={slot.display_name}
@@ -68,9 +80,10 @@ function Avatar({ slot, me = false }: { slot: PlayerSlot; me?: boolean }) {
           </span>
         )}
       </div>
-      <span className={`text-xs font-semibold max-w-[4rem] truncate ${me ? 'text-amber-600' : 'text-gray-700'}`}>
-        {slot.display_name}
+      <span className={`text-xs font-semibold ${blocked ? 'max-w-[5rem]' : 'max-w-[4rem]'} truncate ${me ? 'text-amber-600' : blocked ? 'text-gray-400' : 'text-gray-700'}`}>
+        {name}
       </span>
+      </Wrap>
     </motion.div>
   )
 }
@@ -119,9 +132,13 @@ interface Props {
   onLeavePlaying: () => void
   onVoteEnd: () => void
   votePending?: boolean
+  // 檢舉 / 封鎖:isBlocked 判斷要不要遮掉;playerAction 回傳點擊處理(回 undefined = 不可點,
+  // 由球場頁決定:自己、自己的家人、未登入都不給點)
+  isBlocked?: (slot: PlayerSlot) => boolean
+  playerAction?: (slot: PlayerSlot) => (() => void) | undefined
 }
 
-export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying, onVoteEnd, votePending = false }: Props) {
+export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying, onVoteEnd, votePending = false, isBlocked, playerAction }: Props) {
   const { t } = useTranslation()
   const toast = useToast()
   // playing is a fixed 4-slot array; empty slots have player_id === ''
@@ -178,7 +195,12 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
           {slots.map((slot, i) => (
             <div key={i} className="h-16 flex items-center justify-center">
               {slot.player_id ? (
-                <Avatar slot={slot} me={slot.player_id === myPlayerId} />
+                <Avatar
+                  slot={slot}
+                  me={slot.player_id === myPlayerId}
+                  blocked={isBlocked?.(slot)}
+                  onTap={playerAction?.(slot)}
+                />
               ) : (
                 <EmptySlot canJoin={canPlace} onJoin={() => onJoinPlaying(i)} locked={showLockedAffordance} onLockedTap={notifyLocked} />
               )}
@@ -194,7 +216,12 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
           {court.queue.map((p) => (
             <motion.div key={p.player_id} animate={{ y: [0, -3, 0] }}
               transition={{ repeat: Infinity, duration: 2 }}>
-              <Avatar slot={p} me={p.player_id === myPlayerId} />
+              <Avatar
+                slot={p}
+                me={p.player_id === myPlayerId}
+                blocked={isBlocked?.(p)}
+                onTap={playerAction?.(p)}
+              />
             </motion.div>
           ))}
         </div>

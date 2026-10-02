@@ -2,6 +2,7 @@
   "AnnouncementBanner": {
     "title": "場內公告",
     "expand": "展開 ▾",
-    "collapse": "收起 ▴"
+    "collapse": "收起 ▴",
+    "more": "檢舉或封鎖這個團"
   }
 }

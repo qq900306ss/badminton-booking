@@ -45,6 +45,7 @@
     "yourNamePlaceholder": "Enter your name",
     "level": "Level",
     "joining": "Joining…",
-    "enterCourt": "Enter the court →"
+    "enterCourt": "Enter the court →",
+    "reportOrBlock": "Report this group / block the leader"
   }
 }

@@ -1,0 +1,15 @@
+{
+  "BlockListButton": {
+    "button": "Block list",
+    "title": "Block list",
+    "close": "Close",
+    "hint": "Blocked players show as \"Blocked player\" on the court, and sessions from blocked group leaders are hidden from your lobby. Names and avatars are as they were when you blocked them.",
+    "loading": "Loading…",
+    "empty": "You haven't blocked anyone",
+    "noName": "(no name)",
+    "typePlayer": "Player",
+    "typeOrg": "Group leader",
+    "sessionOnly": "That session only",
+    "unblock": "Unblock"
+  }
+}

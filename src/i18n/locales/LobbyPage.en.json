@@ -62,6 +62,9 @@
     "join": "Join →",
     "externalLinkConfirm": "This is an external link provided by the host, unrelated to this service. Are you sure you want to go?",
     "contactHost": "Contact host",
-    "inviteBuddies": "Invite buddies"
+    "inviteBuddies": "Invite buddies",
+    "terms": "Terms of use",
+    "reportOrBlock": "Report or block this group",
+    "saveFailed": "Couldn't save. Please try again"
   }
 }

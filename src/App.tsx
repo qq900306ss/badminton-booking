@@ -12,6 +12,7 @@ const LobbyPage = lazy(() => import('./pages/LobbyPage').then((m) => ({ default:
 const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })))
 const InstallPage = lazy(() => import('./pages/InstallPage').then((m) => ({ default: m.InstallPage })))
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage').then((m) => ({ default: m.PrivacyPage })))
+const TermsPage = lazy(() => import('./pages/TermsPage').then((m) => ({ default: m.TermsPage })))
 const AccountDeletionPage = lazy(() =>
   import('./pages/AccountDeletionPage').then((m) => ({ default: m.AccountDeletionPage }))
 )
@@ -69,6 +70,8 @@ export default function App() {
             {/* 公開的隱私權政策 / 刪除帳號頁:Google Play 要求不用登入就打得開。
                 登入閘只在 Home(path "/")裡,其他 Route 本來就不經過它,所以直接掛上就是公開的 */}
             <Route path="/privacy" element={<PrivacyPage />} />
+            {/* 公開的使用條款(App Store 1.2:UGC 零容忍、檢舉與封鎖);掛法同 /privacy */}
+            <Route path="/terms" element={<TermsPage />} />
             <Route path="/account-deletion" element={<AccountDeletionPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

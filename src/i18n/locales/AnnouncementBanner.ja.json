@@ -2,6 +2,7 @@
   "AnnouncementBanner": {
     "title": "場内お知らせ",
     "expand": "開く ▾",
-    "collapse": "閉じる ▴"
+    "collapse": "閉じる ▴",
+    "more": "このグループを通報・ブロック"
   }
 }

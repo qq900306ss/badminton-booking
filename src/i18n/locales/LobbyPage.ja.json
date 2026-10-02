@@ -62,6 +62,9 @@
     "join": "参加 →",
     "externalLinkConfirm": "これは主催者が提供する外部リンクで、本サービスとは関係ありません。移動してもよろしいですか?",
     "contactHost": "主催者に連絡",
-    "inviteBuddies": "仲間を誘う"
+    "inviteBuddies": "仲間を誘う",
+    "terms": "利用規約",
+    "reportOrBlock": "このグループを通報・ブロック",
+    "saveFailed": "保存に失敗しました。もう一度お試しください"
   }
 }

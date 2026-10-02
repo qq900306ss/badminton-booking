@@ -45,6 +45,7 @@
     "yourNamePlaceholder": "輸入你的名字",
     "level": "程度",
     "joining": "加入中...",
-    "enterCourt": "進入球場 →"
+    "enterCourt": "進入球場 →",
+    "reportOrBlock": "檢舉這個團 / 封鎖團主"
   }
 }

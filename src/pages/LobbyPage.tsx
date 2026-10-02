@@ -18,6 +18,10 @@ import { isPhotoUrl, AVATAR_EMOJIS, DEFAULT_ORG_AVATAR } from '../lib/avatar'
 import { OnboardingCards, ONBOARD_KEY } from '../components/OnboardingCards'
 import { shareContent } from '../lib/share'
 import { installShareUrl } from './InstallPage'
+import { useBlocked, type BlockTarget } from '../hooks/useBlocks'
+import { ModerationSheet } from '../components/ModerationSheet'
+import { BlockListButton } from '../components/BlockListButton'
+import { errMsg } from '../components/Toast'
 
 // 分享某一場給球友(揪人來打 = 最自然的推薦):原生分享面板,退回剪貼簿
 async function shareSession(s: SessionSummary) {
@@ -139,9 +143,12 @@ export function LobbyPage() {
     refetchInterval: 30000, // discovery list — no live room, just a slow refresh
   })
 
-  const list = (sessions ?? []).slice().sort((a, b) =>
-    (a.start_at || a.opened_at).localeCompare(b.start_at || b.opened_at)
-  )
+  // 已封鎖的團主開的團不列出(封鎖當下就消失,不等重抓)
+  const { isOrgBlocked } = useBlocked()
+  const [modTarget, setModTarget] = useState<BlockTarget | null>(null)
+  const list = (sessions ?? [])
+    .filter((s) => !isOrgBlocked(s.org_id))
+    .sort((a, b) => (a.start_at || a.opened_at).localeCompare(b.start_at || b.opened_at))
 
   // 現在時刻放 state(render 保持純),每分鐘更新 → 「尚未開始」時間到自動變「進行中」
   const [now, setNow] = useState(() => Date.now())
@@ -182,6 +189,7 @@ export function LobbyPage() {
   const [avatarInput, setAvatarInput] = useState('')
   const [uploading, setUploading] = useState(false)
   const [savingName, setSavingName] = useState(false)
+  const [nameError, setNameError] = useState('') // 後端擋下的原因(例如名稱含不當字詞)
 
   async function uploadPhoto(file: File) {
     if (file.size > 3 * 1024 * 1024) {
@@ -207,12 +215,14 @@ export function LobbyPage() {
     const n = nameInput.trim()
     if (!n) return
     setSavingName(true)
+    setNameError('')
     try {
       const r = await playerApi.updateProfile(n, levelInput, avatarInput)
       updateAccount(r.data.data)
       setEditName(false)
-    } catch {
-      /* keep dialog open on error */
+    } catch (e: unknown) {
+      // keep dialog open on error,並把後端的原因秀出來(不然按了儲存沒反應)
+      setNameError(errMsg(e, t('LobbyPage.saveFailed')))
     } finally {
       setSavingName(false)
     }
@@ -242,6 +252,7 @@ export function LobbyPage() {
               setNameInput(myName)
               setLevelInput(account?.default_level || 0)
               setAvatarInput(account?.avatar_url || '')
+              setNameError('')
               setEditName(true)
             }}
             className="text-brand-pink font-semibold"
@@ -320,6 +331,7 @@ export function LobbyPage() {
               </div>
             </div>
             <p className="text-xs text-gray-400 text-center">{t('LobbyPage.profileHint')}</p>
+            {nameError && <p className="text-red-400 text-sm text-center">{nameError}</p>}
             <div className="flex gap-2">
               <button onClick={() => setEditName(false)} className="btn-secondary flex-1">{t('LobbyPage.cancel')}</button>
               <button onClick={saveName} disabled={savingName} className="btn-primary flex-1">
@@ -360,10 +372,17 @@ export function LobbyPage() {
               >
                 🗑️ {t('LobbyPage.deleteAccount')}
               </button>
+              {/* App Store 1.2:使用條款(零容忍)+ 封鎖名單(可解除) */}
+              <button onClick={() => nav('/terms')} className="btn-secondary text-sm">
+                📜 {t('LobbyPage.terms')}
+              </button>
+              <BlockListButton className="btn-secondary text-sm" />
             </div>
           </div>
         </div>
       )}
+
+      {modTarget && <ModerationSheet target={modTarget} onClose={() => setModTarget(null)} />}
 
       <AnimatePresence>{showIntro && <Intro onDone={dismissIntro} />}</AnimatePresence>
       {!showIntro && showOnboard && <OnboardingCards onClose={() => setShowOnboard(false)} />}
@@ -577,6 +596,22 @@ export function LobbyPage() {
                   ${s.contact_url ? 'border-l border-gray-100' : ''}`}
               >
                 ↗ {t('LobbyPage.inviteBuddies')}
+              </button>
+              {/* ⋯ → 檢舉這個團 / 封鎖團主 */}
+              <button
+                onClick={() =>
+                  setModTarget({
+                    type: 'org',
+                    sessionId: s.session_id,
+                    orgId: s.org_id,
+                    name: s.title || t('LobbyPage.defaultGroupName'),
+                    avatarUrl: s.avatar_url,
+                  })
+                }
+                className="shrink-0 px-3 border-l border-gray-100 text-gray-300 font-extrabold active:opacity-60"
+                aria-label={t('LobbyPage.reportOrBlock')}
+              >
+                ⋯
               </button>
             </div>
           </motion.div>

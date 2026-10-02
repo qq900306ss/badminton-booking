@@ -7,6 +7,9 @@ import { LevelPicker } from '../components/LevelPicker'
 import { requestNotify } from '../lib/alert'
 import { isLoggedIn, getAccount } from '../lib/playerAuth'
 import { LoginScreen } from '../components/LoginScreen'
+import { useBlocked, useSessionOrgId, type BlockTarget } from '../hooks/useBlocks'
+import { ModerationSheet } from '../components/ModerationSheet'
+import { BlockedOrgNotice } from '../components/BlockedOrgNotice'
 
 // per-session identity, so back-button can't re-pick / orphan a claimed name
 const idKey = (sid: string) => `badminton_${sid}`
@@ -51,11 +54,17 @@ export function EntryPage() {
     refetchInterval: 10000, // 等核准中 → 核准瞬間自動進場
   })
 
+  // 檢舉這個團 / 封鎖團主;已封鎖的團主 → 整頁換成「你已封鎖這個團主」(不顯示團名、簡介,也不自動進場)
+  const { isOrgBlocked } = useBlocked()
+  const orgId = useSessionOrgId(sessionId, view)
+  const orgBlocked = isOrgBlocked(orgId)
+  const [modTarget, setModTarget] = useState<BlockTarget | null>(null)
+
   // already joined this session? verify the identity still exists, THEN go to the
   // court. if the leader removed it, clear it and let them re-pick.
   // 也涵蓋「報名被核准」:roster 裡有我的帳號 id 就直接採用進場。
   useEffect(() => {
-    if (!sessionId) return
+    if (!sessionId || orgBlocked) return
     const saved = localStorage.getItem(idKey(sessionId))
     const accountID = getAccount()?.player_id
     const adopt = (player_id: string, display_name: string) => {
@@ -89,7 +98,7 @@ export function EntryPage() {
         localStorage.setItem('display_name', display_name)
         nav(`/court/${sessionId}`, { replace: true })
       })
-  }, [sessionId, nav, mySignup?.status])
+  }, [sessionId, nav, mySignup?.status, orgBlocked])
 
   async function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -179,6 +188,8 @@ export function EntryPage() {
   if (!loggedIn) {
     return <LoginScreen title={t('EntryPage.loginToJoin')} />
   }
+
+  if (orgId && orgBlocked) return <BlockedOrgNotice orgId={orgId} />
 
   const quota = view?.signup_quota ?? 0
   const joined = view?.joined_count
@@ -392,7 +403,26 @@ export function EntryPage() {
             </button>
           </div>
         )}
+
+        {/* 🚩 檢舉這個團 / 🚫 封鎖團主(團名、簡介是團主寫的 UGC) */}
+        {view && (
+          <button
+            onClick={() =>
+              setModTarget({
+                type: 'org',
+                sessionId,
+                orgId,
+                name: view.title || t('EntryPage.defaultTitle'),
+                avatarUrl: view.avatar_url,
+              })
+            }
+            className="w-full mt-6 text-xs font-semibold text-gray-300 hover:text-gray-500"
+          >
+            ⋯ {t('EntryPage.reportOrBlock')}
+          </button>
+        )}
       </div>
+      {modTarget && <ModerationSheet target={modTarget} onClose={() => setModTarget(null)} />}
     </div>
   )
 }

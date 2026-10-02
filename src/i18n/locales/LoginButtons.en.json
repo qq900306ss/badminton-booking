@@ -1,6 +1,7 @@
 {
   "LoginButtons": {
     "apple": "Sign in with Apple",
-    "failed": "Login failed — please try again"
+    "failed": "Login failed — please try again",
+    "banned": "Your account has been suspended for violating the Terms of Use. If you have questions, email rr900306@gmail.com"
   }
 }

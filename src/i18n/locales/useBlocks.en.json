@@ -1,0 +1,9 @@
+{
+  "useBlocks": {
+    "blocked": "Blocked. You won't see their name or avatar anymore",
+    "unblocked": "Unblocked",
+    "blockedPlayer": "Blocked player",
+    "blockedOrg": "Blocked group leader",
+    "blockedOrgToast": "Blocked. You won't see this group leader's sessions anymore"
+  }
+}

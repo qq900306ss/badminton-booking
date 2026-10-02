@@ -16,6 +16,10 @@ import { connectSessionWS } from '../lib/realtime'
 import { pushNotif } from '../lib/notifications'
 import { isPhotoUrl, DEFAULT_ORG_AVATAR } from '../lib/avatar'
 import { sessionApi } from '../api/client'
+import { isLoggedIn } from '../lib/playerAuth'
+import { useBlocked, useMyAccountRef, useSessionOrgId, type BlockTarget } from '../hooks/useBlocks'
+import { ModerationSheet } from '../components/ModerationSheet'
+import { BlockedOrgNotice } from '../components/BlockedOrgNotice'
 
 export function CourtPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -193,6 +197,36 @@ export function CourtPage() {
     prevState.current = myState
   }, [myState, myCourt, toast])
 
+  // 檢舉 / 封鎖(App Store 1.2):點場上別人的頭像 → sheet;已封鎖的人遮掉名字頭像(人照樣在位置上)
+  const { isPlayerBlocked, isOrgBlocked } = useBlocked()
+  const myAccountRef = useMyAccountRef()
+  const orgId = useSessionOrgId(sid, session)
+  const [modTarget, setModTarget] = useState<BlockTarget | null>(null)
+  const loggedIn = isLoggedIn()
+  // 這支手機控制的人(我 + 我帶的家人)不給檢舉/封鎖;同帳號(account_ref 相同)也算自己
+  const mineIds = new Set([myPlayerId, ...myFamily.map((p) => p.player_id)])
+  const playerAction = (p: { player_id: string; display_name: string; avatar_url?: string; account_ref?: string }) => {
+    if (!loggedIn || !p.player_id || mineIds.has(p.player_id)) return undefined
+    if (myAccountRef && p.account_ref === myAccountRef) return undefined
+    return () =>
+      setModTarget({
+        type: 'player',
+        sessionId: sid,
+        playerId: p.player_id,
+        accountRef: p.account_ref,
+        name: p.display_name,
+        avatarUrl: p.avatar_url,
+      })
+  }
+  const openOrgSheet = () =>
+    setModTarget({
+      type: 'org',
+      sessionId: sid,
+      orgId,
+      name: session?.title || t('LobbyPage.defaultGroupName'),
+      avatarUrl: session?.avatar_url,
+    })
+
   // queue-open gate: before this time players can look but not join/queue
   const queueOpenAt = session?.queue_open_at ? new Date(session.queue_open_at) : null
   const locked = queueOpenAt ? new Date() < queueOpenAt : false
@@ -230,8 +264,13 @@ export function CourtPage() {
     )
   }
 
+  // 已封鎖這個團主(用連結進來,或剛在場內封鎖):不顯示團名、公告與場地,只給解除封鎖 / 回大廳
+  if (orgId && isOrgBlocked(orgId)) return <BlockedOrgNotice orgId={orgId} />
+
   return (
     <div className="min-h-screen bg-brand-bg">
+      {modTarget && <ModerationSheet target={modTarget} onClose={() => setModTarget(null)} />}
+
       {/* header */}
       <div className="bg-white shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
@@ -266,11 +305,21 @@ export function CourtPage() {
             )}
           </div>
           <p className="font-extrabold text-gray-700">{session.title}</p>
+          {/* ⋯ → 檢舉這個團 / 封鎖團主(沒公告的團也找得到入口) */}
+          {loggedIn && (
+            <button
+              onClick={openOrgSheet}
+              className="text-gray-400 hover:text-gray-600 font-extrabold px-1.5 leading-none"
+              aria-label={t('CourtPage.reportOrBlockOrg')}
+            >
+              ⋯
+            </button>
+          )}
         </div>
       )}
 
-      {/* 📢 場內公告(團主寫的,可收起;內容一改會自動重新展開) */}
-      <AnnouncementBanner sessionId={sid} text={session.announcement} />
+      {/* 📢 場內公告(團主寫的,可收起;內容一改會自動重新展開)— 右側 ⋯ 可檢舉 / 封鎖 */}
+      <AnnouncementBanner sessionId={sid} text={session.announcement} onMore={loggedIn ? openOrgSheet : undefined} />
 
       {/* 家人共用手機:身份切換 + 帶家人 */}
       <FamilyBar
@@ -300,6 +349,8 @@ export function CourtPage() {
         view={session}
         players={sessionPlayers ?? []}
         myIds={[myPlayerId, ...myFamily.map((p) => p.player_id)].filter((x): x is string => !!x)}
+        isBlocked={isPlayerBlocked}
+        playerAction={playerAction}
       />
 
       {/* courts grid */}
@@ -317,6 +368,8 @@ export function CourtPage() {
             onLeavePlaying={() => leavePlaying.mutate({ courtId: court.court_id, asPlayer: asPlayerArg })}
             onVoteEnd={() => voteEnd.mutate({ courtId: court.court_id, asPlayer: asPlayerArg })}
             votePending={voteEnd.isPending}
+            isBlocked={isPlayerBlocked}
+            playerAction={playerAction}
           />
         ))}
       </div>

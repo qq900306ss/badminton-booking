@@ -1,5 +1,9 @@
 {
   "changelog": {
+    "2026/10/02": [
+      "🚩 Report / 🚫 Block: tap another player's avatar on the court to report or block them; use \"⋯\" on lobby session cards, a group's entry page or the announcement to report the group or block its leader. Blocked users' names and avatars disappear right away, and reports are handled within 24 hours",
+      "New in Settings: \"🚫 Block list\" (unblock anytime) and \"📜 Terms of use\""
+    ],
     "2026/09/28": [
       "You can now delete your account from Settings, and there's a new \"🔒 Privacy policy\" page (Settings → Privacy policy / Delete account)"
     ],

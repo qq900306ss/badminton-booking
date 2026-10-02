@@ -11,10 +11,15 @@ export function FairPlayInfo({
   view,
   players,
   myIds,
+  isBlocked,
+  playerAction,
 }: {
   view: SessionView
   players: SessionPlayer[]
   myIds: string[]
+  // 檢舉 / 封鎖(同 CourtCard):已封鎖的人遮名字頭像;playerAction 回 undefined = 不可點
+  isBlocked?: (p: SessionPlayer) => boolean
+  playerAction?: (p: SessionPlayer) => (() => void) | undefined
 }) {
   const { t } = useTranslation()
   const [openList, setOpenList] = useState(false)
@@ -66,25 +71,40 @@ export function FairPlayInfo({
           {ranked.map((p, i) => {
             const mine = myIds.includes(p.player_id)
             const over = view.fair_enforced && (p.games || 0) > limit
+            const blocked = !mine && !!isBlocked?.(p)
+            const onTap = mine ? undefined : playerAction?.(p)
+            const Row = onTap ? 'button' : 'div'
             return (
-              <div
+              <Row
                 key={p.player_id}
-                className={`flex items-center gap-2 px-2 py-1.5 rounded-xl ${mine ? 'bg-brand-pink/10' : ''}`}
+                {...(onTap ? { type: 'button' as const, onClick: onTap } : {})}
+                className={`w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-xl ${mine ? 'bg-brand-pink/10' : ''} ${
+                  onTap ? 'active:bg-gray-50' : ''
+                }`}
               >
                 <span className="text-xs text-gray-300 w-4 text-right">{i + 1}</span>
-                <div className="w-6 h-6 rounded-full bg-brand-pink/15 flex items-center justify-center shrink-0 overflow-hidden">
-                  {isPhotoUrl(p.avatar_url) ? (
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${
+                    blocked ? 'bg-gray-200' : 'bg-brand-pink/15'
+                  }`}
+                >
+                  {blocked ? (
+                    <span className="text-xs grayscale">🚫</span>
+                  ) : isPhotoUrl(p.avatar_url) ? (
                     <img src={p.avatar_url} alt="" className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-sm">{p.avatar_url || '🏸'}</span>
                   )}
                 </div>
-                <span className={`flex-1 text-sm truncate ${mine ? 'font-bold text-gray-700' : 'text-gray-600'}`}>
-                  {p.display_name}{mine && t('FairPlayInfo.youSuffix')}
+                <span
+                  className={`flex-1 text-sm truncate ${mine ? 'font-bold text-gray-700' : blocked ? 'text-gray-400' : 'text-gray-600'}`}
+                >
+                  {blocked ? t('useBlocks.blockedPlayer') : p.display_name}
+                  {mine && t('FairPlayInfo.youSuffix')}
                 </span>
                 {over && <span className="text-[10px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">{t('FairPlayInfo.yielding')}</span>}
                 <span className="text-sm font-bold text-gray-700 tabular-nums">{p.games || 0}</span>
-              </div>
+              </Row>
             )
           })}
         </div>

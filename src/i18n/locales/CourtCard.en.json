@@ -21,6 +21,7 @@
     "lockedByHost": "This court has been locked by the host",
     "tapToPlay": "👆 Tap an open slot to go on court",
     "waitInQueue": "Join queue",
-    "queueOnly": "Just queue for now (don't go on court)"
+    "queueOnly": "Just queue for now (don't go on court)",
+    "playerActions": "{{name}}: report or block"
   }
 }

@@ -52,7 +52,8 @@ export function AuthCallback({ provider }: { provider: 'google' | 'line' }) {
       })
       .catch((e) => {
         const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error
-        setError(msg ?? t('AuthCallback.loginFailedRetry'))
+        // 停權帳號:後端回 403「帳號已停權」→ 照語言顯示完整說明(含聯絡方式)
+        setError(msg === '帳號已停權' ? t('AuthCallback.banned') : msg ?? t('AuthCallback.loginFailedRetry'))
       })
   }, [params, provider, nav, t])
 

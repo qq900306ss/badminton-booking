@@ -18,7 +18,11 @@ export function LoginButtons() {
     setBusy(true)
     setError('')
     fn()
-      .catch(() => setError(t('LoginButtons.failed')))
+      // 停權帳號登入會被後端擋 403「帳號已停權」(Apple 登入走這裡;Google / LINE 在 AuthCallback 顯示)
+      .catch((e) => {
+        const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error
+        setError(msg === '帳號已停權' ? t('LoginButtons.banned') : t('LoginButtons.failed'))
+      })
       // 網頁版成功時整頁跳走,不會走到這;app 版取消或失敗才需要把按鈕放回來
       .finally(() => setBusy(false))
   }

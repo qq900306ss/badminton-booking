@@ -2,7 +2,7 @@
   "PrivacyPage": {
     "backHome": "Home",
     "title": "Privacy Policy",
-    "effective": "Effective date: 2026-10-01",
+    "effective": "Effective date: 2026-10-02",
     "intro": "Badminton Meetup (\"羽球揪團\", the website badminton-tw.fyi the Android app on Google Play, and the iOS app on the App Store) is a tool for organizing drop-in badminton: finding groups, signing up and queuing for courts. This policy explains what data we collect, what we use it for, and how you can delete it.",
     "goDelete": "Go to account deletion",
     "sections": {
@@ -22,6 +22,7 @@
           "Data you set yourself: join name, default level, avatar (an emoji, your Google / LINE photo, or a photo you upload; uploaded photos are stored in AWS S3 in the Tokyo region and displayed via a public URL)",
           "Session records (managed by each group leader): the name you used in that session, level, games played, total minutes, whether you've paid the court fee (marked by the leader), your signup message, family members you added with their names and levels, and each game's player list",
           "Feedback: what you send, together with your account name and email (if any) at the time",
+          "Reports and blocks: reports you send (the target, reason and details, plus a snapshot of the reported content at that moment, such as names, avatars, group names, descriptions and announcements) and your block list (a snapshot of each blocked name and avatar), used only to handle violations and to hide them from your screen",
           "Push subscription: if you turn on notifications, we store the Web Push subscription your browser provides (push endpoint and keys), or in the iOS app the Apple Push Notification service (APNs) device token, to notify you, e.g. when it's your turn to play",
           "localStorage on your device: login token, cached account, preferences such as language, per-session identities and notification history. These stay on your device",
           "The app uses no third-party analytics, advertising or tracking tools"
@@ -32,7 +33,8 @@
         "items": [
           "Other players in the same session: your name, avatar, level and games played in that session",
           "That session's group leader: the above, plus your signup message, paid flag, minutes played and family members you brought",
-          "Your email is never shown to other players or group leaders"
+          "Your email is never shown to other players or group leaders",
+          "Who you report or block is never shown to them or to group leaders; reports are visible only to the service's administrators"
         ]
       },
       "purpose": {
@@ -50,7 +52,8 @@
           "Fly.io (Tokyo): API server",
           "Cloudflare: domain DNS",
           "Google, LINE, Apple: login",
-          "Push services: the push service your browser uses (e.g. Google, Apple, Mozilla), or Apple Push Notification service (APNs) in the iOS app — only to deliver notifications to your device if you turn them on"
+          "Push services: the push service your browser uses (e.g. Google, Apple, Mozilla), or Apple Push Notification service (APNs) in the iOS app — only to deliver notifications to your device if you turn them on",
+          "Report notifications: when someone sends a report or blocks a user, a summary (the reason and the reported content) is sent to the developer's own messaging tool (e.g. Discord or Slack), used only to handle reports promptly"
         ]
       },
       "deletion": {
@@ -73,6 +76,7 @@
           "If this policy changes, we'll update this page and show the new effective date"
         ]
       }
-    }
+    },
+    "termsLink": "Terms of Use"
   }
 }

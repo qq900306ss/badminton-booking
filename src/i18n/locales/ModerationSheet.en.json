@@ -1,0 +1,38 @@
+{
+  "ModerationSheet": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "back": "Back",
+    "unblock": "Unblock",
+    "player": {
+      "subtitle": "Player",
+      "report": "Report",
+      "block": "Block",
+      "reportTitle": "Report this player",
+      "blockTitle": "Block this player?",
+      "blockBody": "You won't see their name or avatar anymore (their spot on the court still shows), and we'll be notified."
+    },
+    "org": {
+      "subtitle": "Group session",
+      "report": "Report this group",
+      "block": "Block this group leader",
+      "reportTitle": "Report this group (name, description or announcement)",
+      "blockTitle": "Block this group leader?",
+      "blockBody": "Their sessions will no longer appear in your lobby, and if you open one by link you won't see its description or announcement. We'll be notified too."
+    },
+    "reasons": {
+      "inappropriate": "Inappropriate name or avatar",
+      "harassment": "Harassment or bullying",
+      "spam": "Scam or advertising",
+      "other": "Other"
+    },
+    "detailPlaceholder": "Details (optional, up to 500 characters)",
+    "reportNote": "We'll act on it within 24 hours. They won't know who reported them.",
+    "submitReport": "Send report",
+    "sending": "Sending…",
+    "reportSent": "Report sent. We'll act on it within 24 hours",
+    "reportFailed": "Failed to send. Please try again",
+    "blockUndoHint": "You can unblock anytime in \"Settings → 🚫 Block list\".",
+    "confirmBlock": "Block"
+  }
+}

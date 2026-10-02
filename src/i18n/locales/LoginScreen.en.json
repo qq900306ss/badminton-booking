@@ -9,6 +9,8 @@
     "lineLogin": "Log in with LINE",
     "googleLogin": "Log in with Google",
     "notConfigured": "Login isn't set up yet — please contact the admin",
-    "privacyNote": "Login is only used to identify you; your email is never shared with the host"
+    "privacyNote": "Login is only used to identify you; your email is never shared with the host",
+    "agreeTerms": "By signing in, you agree to the <terms>Terms of Use</terms> and <privacy>Privacy Policy</privacy>",
+    "banned": "Your account has been suspended for violating the Terms of Use. If you have questions, email rr900306@gmail.com"
   }
 }

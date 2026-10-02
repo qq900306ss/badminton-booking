@@ -45,6 +45,7 @@
     "yourNamePlaceholder": "名前を入力",
     "level": "レベル",
     "joining": "参加中…",
-    "enterCourt": "コートに入場 →"
+    "enterCourt": "コートに入場 →",
+    "reportOrBlock": "このグループを通報 / 主催者をブロック"
   }
 }

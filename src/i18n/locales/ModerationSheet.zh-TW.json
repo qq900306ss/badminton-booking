@@ -1,0 +1,38 @@
+{
+  "ModerationSheet": {
+    "close": "關閉",
+    "cancel": "取消",
+    "back": "返回",
+    "unblock": "解除封鎖",
+    "player": {
+      "subtitle": "球友",
+      "report": "檢舉",
+      "block": "封鎖",
+      "reportTitle": "檢舉這位球友",
+      "blockTitle": "確定要封鎖這位球友?",
+      "blockBody": "封鎖後你會看不到對方的名字與頭像(對方在場上的位置照常顯示),我們也會收到通知。"
+    },
+    "org": {
+      "subtitle": "團主開的團",
+      "report": "檢舉這個團",
+      "block": "封鎖這個團主",
+      "reportTitle": "檢舉這個團(團名、簡介或公告)",
+      "blockTitle": "確定要封鎖這個團主?",
+      "blockBody": "封鎖後大廳不會再列出這個團主開的團,用連結進來也看不到團簡介與公告;我們也會收到通知。"
+    },
+    "reasons": {
+      "inappropriate": "不當名稱或頭像",
+      "harassment": "騷擾或霸凌",
+      "spam": "詐騙或廣告",
+      "other": "其他"
+    },
+    "detailPlaceholder": "補充說明(選填,最多 500 字)",
+    "reportNote": "我們會在 24 小時內處理,對方不會知道是誰檢舉的。",
+    "submitReport": "送出檢舉",
+    "sending": "送出中…",
+    "reportSent": "已送出,我們會在 24 小時內處理",
+    "reportFailed": "送出失敗,請再試一次",
+    "blockUndoHint": "可以隨時在「設定 → 🚫 封鎖名單」解除。",
+    "confirmBlock": "確定封鎖"
+  }
+}

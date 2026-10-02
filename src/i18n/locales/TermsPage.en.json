@@ -1,0 +1,78 @@
+{
+  "TermsPage": {
+    "backHome": "Home",
+    "title": "Terms of Use",
+    "effective": "Effective date: 2026-10-02",
+    "intro": "Welcome to Badminton Meetup (\"羽球揪團\": the website badminton-tw.fyi, the Android app on Google Play and the iOS app on the App Store; the \"Service\"). By signing in to or using the Service, you agree to these Terms of Use and our Privacy Policy. If you don't agree, please don't use the Service.",
+    "goPrivacy": "Privacy policy",
+    "sections": {
+      "service": {
+        "title": "About the Service",
+        "items": [
+          "The Service is a tool for drop-in badminton: group leaders open sessions, and players sign up, queue and get on court, with in-session announcements and notifications.",
+          "The Service is free and provided \"as is\". We do our best to keep it running, but we don't guarantee it will be uninterrupted or error-free, and we may change or discontinue features."
+        ]
+      },
+      "account": {
+        "title": "Your account",
+        "items": [
+          "You can sign in with Google, LINE or Apple (iOS app). Don't impersonate anyone, and don't let others use your account.",
+          "You are responsible for everything done under your account, including actions you take on behalf of family members.",
+          "The Service is not intended for children under 13; minors should use it with the consent of a parent or guardian.",
+          "You can delete your account anytime in \"Settings → Delete account\"."
+        ]
+      },
+      "conduct": {
+        "title": "Community rules: zero tolerance",
+        "items": [
+          "We have zero tolerance for objectionable content and abusive behavior. Nothing you post on the Service (names, avatars, photos, signup messages, family member names, group names, group descriptions, announcements, team names, etc.) and nothing you do may include or involve:",
+          "Sexual content, nudity, violence or gore",
+          "Harassment, bullying, threats, or hate and discrimination based on race, ethnicity, nationality, religion, gender, sexual orientation, disability or similar",
+          "Scams, spam, unsolicited advertising or suspicious links",
+          "Impersonating others (players, group leaders, public figures or organizations), or sharing someone's personal information without consent",
+          "Illegal content, or content that infringes copyrights, trademarks, portrait rights or other rights",
+          "Content that breaks these rules will be removed and the offending account suspended; serious or repeated violations lead to a permanent ban without notice.",
+          "Obvious objectionable words are blocked automatically, but some may slip through. If you see objectionable content, please report it."
+        ]
+      },
+      "reporting": {
+        "title": "Reporting and blocking",
+        "items": [
+          "Report a player: on the court, tap their avatar, choose \"🚩 Report\" and pick a reason.",
+          "Report a group: tap \"⋯\" on a lobby session card, the group's entry page or the in-session announcement, then choose \"🚩 Report this group\".",
+          "Block: choose \"🚫 Block\" in the same menu. Their name and avatar disappear from your screen immediately; if you block a group leader, their sessions no longer appear in your lobby. We are notified of every block.",
+          "Your block list is in \"Settings → 🚫 Block list\", where you can unblock anytime.",
+          "We act on every report within 24 hours: confirmed violations are removed and the offending account is suspended (a leader's whole group may be disabled).",
+          "Reported or blocked users are never told who reported or blocked them."
+        ]
+      },
+      "hosts": {
+        "title": "Group leaders and payments",
+        "items": [
+          "Group leaders are responsible for their own sessions, including the group name, description and announcements, and on-site management (approving signups, assigning courts, etc.).",
+          "Court fees, shuttlecock fees and any other payments are settled offline between the group leader and players. The Service does not handle, collect or hold any money, and is not involved in related disputes.",
+          "External links provided by group leaders (e.g. LINE groups) are not part of the Service; use your own judgment before opening them."
+        ]
+      },
+      "safety": {
+        "title": "Sports safety",
+        "items": [
+          "Badminton carries a risk of injury. Play within your limits, warm up and protect yourself; you are responsible for your own safety during activities.",
+          "The Service only provides organizing and queuing tools and is not the organizer of any activity. It is not liable for injuries, property loss or disputes between users arising from activities."
+        ]
+      },
+      "changes": {
+        "title": "Changes to these terms",
+        "items": [
+          "If these terms change, we'll update this page with a new effective date. Continuing to use the Service after a change means you accept the updated terms."
+        ]
+      },
+      "contact": {
+        "title": "Contact",
+        "items": [
+          "For questions or complaints, use in-app \"Settings → 💬 Feedback\", or email rr900306@gmail.com"
+        ]
+      }
+    }
+  }
+}

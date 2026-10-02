@@ -1,0 +1,8 @@
+{
+  "BlockedOrgNotice": {
+    "title": "You've blocked this group leader",
+    "body": "This leader's group name, description and announcements are hidden. Unblock to view and join as usual.",
+    "unblock": "Unblock",
+    "backToLobby": "Back to lobby"
+  }
+}

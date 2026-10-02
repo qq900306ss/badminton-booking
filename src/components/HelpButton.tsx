@@ -11,6 +11,7 @@ const STEPS: { icon: string; id: string }[] = [
   { icon: '👪', id: 'family' },
   { icon: '🗳️', id: 'vote' },
   { icon: '⚙️', id: 'profile' },
+  { icon: '🚩', id: 'safety' },
 ]
 
 export function HelpButton({ className = '' }: { className?: string }) {

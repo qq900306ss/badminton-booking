@@ -62,6 +62,9 @@
     "join": "加入 →",
     "externalLinkConfirm": "這是團主提供的外部連結,內容與本服務無關,確定要前往嗎?",
     "contactHost": "聯繫團主",
-    "inviteBuddies": "揪球友"
+    "inviteBuddies": "揪球友",
+    "terms": "使用條款",
+    "reportOrBlock": "檢舉或封鎖這個團",
+    "saveFailed": "儲存失敗,請再試一次"
   }
 }

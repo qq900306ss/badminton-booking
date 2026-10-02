@@ -13,6 +13,7 @@
     "queueOpensAt": "順番待ちは{{time}}に開放",
     "queueLockedHint": "まずはコートの様子をチェック。時間になったら自分で順番待ちできます",
     "installLabel": "📲 ホーム画面に追加・「あなたの番」通知を受け取る",
-    "liveUpdateFooter": "⚡ リアルタイム更新(WebSocket)"
+    "liveUpdateFooter": "⚡ リアルタイム更新(WebSocket)",
+    "reportOrBlockOrg": "このグループを通報・ブロック"
   }
 }

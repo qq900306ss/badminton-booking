@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { logout, clearAccountData } from '../lib/playerAuth'
+import { logout, clearAccountData, markBannedNotice } from '../lib/playerAuth'
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
@@ -12,11 +12,12 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// 帶著 player token 卻被擋 401 = token 失效(過期,或帳號已在別台裝置刪除)→ 清掉登入態、回首頁重新登入。
-// 只認「請先登入 / 帳號已刪除」這兩種訊息:join / verify-password 打錯密碼也回 401("wrong password"),那不能登出。
-// 公開頁(隱私權、刪帳號、安裝頁)與 OAuth callback 不強制跳轉,讓它們自己處理。
-const DEAD_TOKEN_ERRORS = ['請先登入', '帳號已刪除,請重新登入']
-const NO_REDIRECT_PATHS = ['/privacy', '/account-deletion', '/install', '/auth/']
+// 帶著 player token 卻被擋 401 = token 失效(過期、帳號已在別台裝置刪除,或被停權)→ 清掉登入態、回首頁重新登入。
+// 只認「請先登入 / 帳號已刪除 / 帳號已停權」這幾種訊息:join / verify-password 打錯密碼也回 401("wrong password"),那不能登出。
+// 公開頁(隱私權、使用條款、刪帳號、安裝頁)與 OAuth callback 不強制跳轉,讓它們自己處理。
+const BANNED_ERROR = '帳號已停權'
+const DEAD_TOKEN_ERRORS = ['請先登入', '帳號已刪除,請重新登入', BANNED_ERROR]
+const NO_REDIRECT_PATHS = ['/privacy', '/terms', '/account-deletion', '/install', '/auth/']
 api.interceptors.response.use(undefined, (err) => {
   const status = err?.response?.status
   const msg = err?.response?.data?.error
@@ -28,6 +29,8 @@ api.interceptors.response.use(undefined, (err) => {
     // 帳號被刪 → 連裝置上綁這個人的資料一起清;單純過期 → 跟登出一樣就好(重登同帳號還接得上)
     if (msg === '帳號已刪除,請重新登入') clearAccountData()
     else logout()
+    // 停權:回到登入畫面時要說清楚為什麼被登出(LoginScreen 讀這個旗標顯示一次)
+    if (msg === BANNED_ERROR) markBannedNotice()
     const path = window.location.pathname
     if (!NO_REDIRECT_PATHS.some((p) => path.startsWith(p))) window.location.href = '/'
   }
@@ -43,6 +46,7 @@ export interface Player {
   avatar_url?: string
   photo_url?: string
   email?: string
+  account_ref?: string // 自己的匿名識別碼(跟場上 slot 的 account_ref 同一套;登入回應與 /players/me 都帶),用來不對自己顯示檢舉/封鎖
   created_at: string
 }
 
@@ -85,6 +89,7 @@ export interface PlayerSlot {
   level: number
   games: number
   avatar_url?: string
+  account_ref?: string // 帳號的匿名識別碼(跨場次封鎖用);團主手動加的名字/臨時加的人沒有
 }
 
 export interface CourtView {
@@ -103,6 +108,7 @@ export interface CourtView {
 
 export interface SessionView {
   session_id: string
+  org_id?: string // 開這場的團主(REST 與 WS 的 view 都帶),判斷「已封鎖這個團主」用
   title: string
   num_courts: number
   status: string
@@ -132,6 +138,7 @@ export interface SessionView {
 
 export interface SessionSummary {
   session_id: string
+  org_id?: string // 開這場的團主,大廳用來濾掉已封鎖的團主
   title: string
   city?: string
   district?: string
@@ -163,6 +170,7 @@ export interface SessionPlayer {
   avatar_url?: string
   owner_id?: string // 家人子身份:帶它來的手機帳號
   pending?: boolean // 家人待團主核准
+  account_ref?: string // 同 PlayerSlot.account_ref
 }
 
 export const sessionApi = {
@@ -237,4 +245,43 @@ export const sessionApi = {
 
   removeFamily: (sessionId: string, playerId: string) =>
     api.delete(`/api/sessions/${sessionId}/family/${playerId}`),
+}
+
+// ── 檢舉 / 封鎖(App Store 1.2:UGC 要能檢舉不當內容、封鎖濫用者)──
+
+export type ReportReason = 'inappropriate' | 'harassment' | 'spam' | 'other'
+
+// 封鎖名單一筆。player 型 ref = 對方的 account_ref(沒帳號的人 = "s:" + 那場的 player_id,只在那場有效);
+// org 型 ref = org_id。name / avatar_url 是封鎖當下的快照,給封鎖名單顯示
+export interface Block {
+  type: 'player' | 'org'
+  ref: string
+  name: string
+  avatar_url?: string
+  created_at: string
+}
+
+export const moderationApi = {
+  // target_type=player 要帶 player_id(那場的 session player_id);session = 檢舉這個團(團名/簡介/公告)
+  report: (v: { targetType: 'player' | 'session'; sessionId: string; playerId?: string; reason: ReportReason; detail?: string }) =>
+    api.post<{ data: { reported: boolean } }>('/api/reports', {
+      target_type: v.targetType,
+      session_id: v.sessionId,
+      player_id: v.playerId,
+      reason: v.reason,
+      detail: v.detail || undefined,
+    }),
+  blocks: () => api.get<{ data: Block[] }>('/api/players/me/blocks'),
+  // 封鎖玩家帶那場的 player_id;封鎖團主只帶 session_id(後端從場次找 org_id)。已封鎖過 = 冪等回原本那筆
+  block: (v: { type: 'player'; sessionId: string; playerId: string } | { type: 'org'; sessionId: string }) =>
+    api.post<{ data: Block }>('/api/players/me/blocks', {
+      type: v.type,
+      session_id: v.sessionId,
+      player_id: v.type === 'player' ? v.playerId : undefined,
+    }),
+  // ref 可能是 "s:<player_id>",一定要 encode
+  unblock: (type: Block['type'], ref: string) =>
+    api.delete<{ data: { removed: boolean } }>(
+      `/api/players/me/blocks/${type}/${encodeURIComponent(ref)}`
+    ),
 }

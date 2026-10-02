@@ -13,6 +13,7 @@
     "queueOpensAt": "Queue opens at {{time}}",
     "queueLockedHint": "Take a look at the courts for now — once it opens you can queue up yourself",
     "installLabel": "📲 Add to home screen · get \"your turn\" alerts",
-    "liveUpdateFooter": "⚡ Real-time updates (WebSocket)"
+    "liveUpdateFooter": "⚡ Real-time updates (WebSocket)",
+    "reportOrBlockOrg": "Report or block this group"
   }
 }

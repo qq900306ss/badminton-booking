@@ -13,6 +13,7 @@
     "queueOpensAt": "排隊 {{time}} 開放",
     "queueLockedHint": "先看看球場狀況,時間到就能自己排上場囉",
     "installLabel": "📲 裝到桌面 · 收「輪到你了」通知",
-    "liveUpdateFooter": "⚡ 即時更新(WebSocket)"
+    "liveUpdateFooter": "⚡ 即時更新(WebSocket)",
+    "reportOrBlockOrg": "檢舉或封鎖這個團"
   }
 }
