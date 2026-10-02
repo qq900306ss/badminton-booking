@@ -53,9 +53,18 @@ const UNBLOCK_MUTATION_KEY = ['unblock']
 export function useBlockPending(): boolean {
   return useIsMutating({ mutationKey: BLOCK_MUTATION_KEY }) > 0
 }
-// 封鎖/解除進行中時不重抓名單:較早送出的 GET 晚回來會蓋掉剛成功的那筆
-function pendingWrites(qc: QueryClient): number {
-  return qc.isMutating({ mutationKey: BLOCK_MUTATION_KEY }) + qc.isMutating({ mutationKey: UNBLOCK_MUTATION_KEY })
+// 封鎖/解除進行中時不重抓名單:較早送出的 GET 晚回來會蓋掉剛成功的那筆。
+// 只算同一個帳號的(還沒跑完 onMutate、不知道 key 的也算進去,寧可晚點對帳)
+function pendingWrites(qc: QueryClient, key: readonly unknown[]): number {
+  const want = JSON.stringify(key)
+  return qc.isMutating({
+    predicate: (m) => {
+      const mk = m.options.mutationKey?.[0]
+      if (mk !== BLOCK_MUTATION_KEY[0] && mk !== UNBLOCK_MUTATION_KEY[0]) return false
+      const ck = (m.state.context as Ctx | undefined)?.key
+      return !ck || JSON.stringify(ck) === want
+    },
+  })
 }
 
 // 對帳規則只有一條:每次封鎖/解除結束,等它的狀態落定(下一個 macrotask)後,
@@ -63,7 +72,7 @@ function pendingWrites(qc: QueryClient): number {
 // 之後才開始的封鎖會在 onMutate cancel 掉這次 GET,不會被它蓋掉。
 function reconcileWhenIdle(qc: QueryClient, key: readonly unknown[]) {
   setTimeout(() => {
-    if (pendingWrites(qc) === 0) qc.invalidateQueries({ queryKey: key })
+    if (pendingWrites(qc, key) === 0) qc.invalidateQueries({ queryKey: key })
   }, 0)
 }
 
@@ -72,14 +81,22 @@ export function useBlockList() {
   const accountId = currentAccountId()
   const q = useQuery({
     queryKey: blocksKey(accountId ?? ''),
-    queryFn: () => moderationApi.blocks().then((r) => r.data.data ?? []),
+    // token 是全站共用的那一個:另一個分頁換了帳號,這個 key 的抓取就會拿到別人的名單 → 前後都對一下帳號,不符就丟掉
+    queryFn: async () => {
+      const own = () => currentAccountId() === accountId
+      if (!own()) throw new Error('account switched')
+      const list = (await moderationApi.blocks()).data.data ?? []
+      if (!own()) throw new Error('account switched')
+      return list
+    },
     enabled: !!accountId,
     initialData: () => (accountId ? readStoredBlocks(accountId) : undefined),
     initialDataUpdatedAt: 0, // 裝置備份一律當過期 → 掛上就去抓最新
     staleTime: 5 * 60_000, // 只有自己會改(改的時候直接寫快取),不用常常重抓
     retry: 3,
     // 抓不到就一直重試,別停在舊名單;有封鎖/解除進行中先不抓
-    refetchInterval: (query) => (query.state.status === 'error' && pendingWrites(qc) === 0 ? 30_000 : false),
+    refetchInterval: (query) =>
+      query.state.status === 'error' && pendingWrites(qc, query.queryKey) === 0 ? 30_000 : false,
   })
   useEffect(() => {
     if (accountId && q.data) writeStoredBlocks(accountId, q.data)
