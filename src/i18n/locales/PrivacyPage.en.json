@@ -52,8 +52,7 @@
           "Fly.io (Tokyo): API server",
           "Cloudflare: domain DNS",
           "Google, LINE, Apple: login",
-          "Push services: the push service your browser uses (e.g. Google, Apple, Mozilla), or Apple Push Notification service (APNs) in the iOS app — only to deliver notifications to your device if you turn them on",
-          "Report notifications: when someone sends a report or blocks a user, a summary (the reason and the reported content) is sent to the developer's own messaging tool (e.g. Discord or Slack), used only to handle reports promptly"
+          "Push services: the push service your browser uses (e.g. Google, Apple, Mozilla), or Apple Push Notification service (APNs) in the iOS app — only to deliver notifications to your device if you turn them on"
         ]
       },
       "deletion": {

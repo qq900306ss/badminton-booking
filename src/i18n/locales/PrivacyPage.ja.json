@@ -52,8 +52,7 @@
           "Fly.io(東京):API サーバー",
           "Cloudflare:ドメインの DNS",
           "Google、LINE、Apple:ログイン認証",
-          "プッシュサービス:ご利用のブラウザのプッシュサービス(Google、Apple、Mozilla など)、iOS アプリでは Apple Push Notification service(APNs)。通知をオンにした場合に、通知を端末へ届けるためだけに使われます",
-          "通報の通知:通報やブロックがあった場合、その概要(理由と通報された内容)を開発者が使うメッセージツール(Discord や Slack など)に送信します。通報に迅速に対応するためだけに使います"
+          "プッシュサービス:ご利用のブラウザのプッシュサービス(Google、Apple、Mozilla など)、iOS アプリでは Apple Push Notification service(APNs)。通知をオンにした場合に、通知を端末へ届けるためだけに使われます"
         ]
       },
       "deletion": {

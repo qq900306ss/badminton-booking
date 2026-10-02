@@ -52,8 +52,7 @@
           "Fly.io(東京):API 伺服器",
           "Cloudflare:網域 DNS",
           "Google、LINE、Apple:登入驗證",
-          "推播服務:瀏覽器所使用的推播服務(例如 Google、Apple、Mozilla),iOS App 則是 Apple 推播服務(APNs)。只在你開啟通知時用來把通知送到你的裝置",
-          "檢舉通知:有人送出檢舉或封鎖時,系統會把摘要(理由與被檢舉的內容)傳到開發者自己使用的通訊工具(例如 Discord 或 Slack),只用來及時處理檢舉"
+          "推播服務:瀏覽器所使用的推播服務(例如 Google、Apple、Mozilla),iOS App 則是 Apple 推播服務(APNs)。只在你開啟通知時用來把通知送到你的裝置"
         ]
       },
       "deletion": {
