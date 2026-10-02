@@ -46,9 +46,6 @@ function writeStoredBlocks(accountId: string, list: Block[]) {
   }
 }
 
-// 名單有沒有真的從伺服器抓成功過(快取裡可能只有裝置備份或樂觀更新)
-const fetchedFromServer = new Set<string>()
-
 // 封鎖送出中(還沒回來)就按解除,DELETE 會先到、POST 後到 → 伺服器又變回封鎖。
 // 解除鈕在有封鎖送出中時先 disable(各處的 useBlockActions 是不同實例,用 mutationKey 跨元件看)
 const BLOCK_MUTATION_KEY = ['block']
@@ -61,16 +58,21 @@ function pendingWrites(qc: QueryClient): number {
   return qc.isMutating({ mutationKey: BLOCK_MUTATION_KEY }) + qc.isMutating({ mutationKey: UNBLOCK_MUTATION_KEY })
 }
 
+// 對帳規則只有一條:每次封鎖/解除結束,等它的狀態落定(下一個 macrotask)後,
+// 若已經沒有任何封鎖/解除在路上,就重抓一次名單 —— 這時伺服器已套用所有寫入,GET 的結果一定是新的;
+// 之後才開始的封鎖會在 onMutate cancel 掉這次 GET,不會被它蓋掉。
+function reconcileWhenIdle(qc: QueryClient, key: readonly unknown[]) {
+  setTimeout(() => {
+    if (pendingWrites(qc) === 0) qc.invalidateQueries({ queryKey: key })
+  }, 0)
+}
+
 export function useBlockList() {
   const qc = useQueryClient()
   const accountId = currentAccountId()
   const q = useQuery({
     queryKey: blocksKey(accountId ?? ''),
-    queryFn: () =>
-      moderationApi.blocks().then((r) => {
-        if (accountId) fetchedFromServer.add(accountId)
-        return r.data.data ?? []
-      }),
+    queryFn: () => moderationApi.blocks().then((r) => r.data.data ?? []),
     enabled: !!accountId,
     initialData: () => (accountId ? readStoredBlocks(accountId) : undefined),
     initialDataUpdatedAt: 0, // 裝置備份一律當過期 → 掛上就去抓最新
@@ -140,13 +142,13 @@ export type BlockTarget =
     }
   | { type: 'org'; sessionId: string; orgId?: string; name: string; avatarUrl?: string }
 
-type Ctx = { prev?: Block[]; optimisticRef?: string }
+// key 在送出那一刻就綁定(別用 render 時的 key:等回應期間另一個分頁換了帳號,
+// react-query 會換成新 render 的 callback,回滾就會寫進別人的名單)
+type Ctx = { key: readonly unknown[]; prev?: Block[]; optimisticRef?: string }
 
 export function useBlockActions() {
   const qc = useQueryClient()
   const toast = useToast()
-  const accountId = currentAccountId() ?? ''
-  const key = blocksKey(accountId)
 
   const block = useMutation({
     mutationKey: BLOCK_MUTATION_KEY,
@@ -161,11 +163,12 @@ export function useBlockActions() {
     // 樂觀更新:按下去那一刻就把對方從畫面上換掉(App Store 要求「立即」);
     // 團主那種要等後端回 org_id 才知道 ref(大廳/進場頁通常已知 orgId,一樣能先套)
     onMutate: async (v: BlockTarget): Promise<Ctx> => {
+      const key = blocksKey(currentAccountId() ?? '')
       await qc.cancelQueries({ queryKey: key })
       const prev = qc.getQueryData<Block[]>(key)
       const ref =
         v.type === 'player' ? playerBlockRef({ player_id: v.playerId, account_ref: v.accountRef }) : v.orgId
-      if (!ref) return { prev }
+      if (!ref) return { key, prev }
       const optimistic: Block = {
         type: v.type,
         ref,
@@ -177,31 +180,31 @@ export function useBlockActions() {
         optimistic,
         ...list.filter((b) => !(b.type === v.type && b.ref === ref)),
       ])
-      return { prev, optimisticRef: ref }
+      return { key, prev, optimisticRef: ref }
     },
     onSuccess: (b, v, ctx) => {
+      if (!ctx) return
       // 換成伺服器那筆(冪等:已封鎖過回原本那筆)
-      qc.setQueryData<Block[]>(key, (list = []) => [
+      qc.setQueryData<Block[]>(ctx.key, (list = []) => [
         b,
-        ...list.filter((x) => !(x.type === v.type && (x.ref === b.ref || x.ref === ctx?.optimisticRef))),
+        ...list.filter((x) => !(x.type === v.type && (x.ref === b.ref || x.ref === ctx.optimisticRef))),
       ])
-      // 名單還沒從伺服器抓成功過(上面 cancel 掉了那次抓取,快取只有裝置備份)→ 補抓一次完整名單;
-      // 還有別的封鎖/解除在路上就先不抓(它晚回來的結果會被這次 GET 蓋掉),交給最後一個完成的去抓
-      if (!fetchedFromServer.has(accountId) && pendingWrites(qc) <= 1) qc.invalidateQueries({ queryKey: key })
       toast(i18n.t(v.type === 'org' ? 'useBlocks.blockedOrgToast' : 'useBlocks.blocked'), 'success')
     },
     onError: (e: unknown, v, ctx) => {
-      // 只回滾這一筆(不整份換回 prev:同時送出的另一筆封鎖可能已經成功,不能被一起抹掉)。
-      // 不在這裡重抓:較早的 GET 可能蓋掉同時成功的另一筆;快取本來就是完整名單(含裝置備份),精準回滾就夠
+      // 只回滾這一筆(不整份換回 prev:同時送出的另一筆封鎖可能已經成功,不能被一起抹掉)
       const ref = ctx?.optimisticRef
-      if (ref) {
-        const before = ctx?.prev?.find((x) => x.type === v.type && x.ref === ref) // 本來就封鎖過 → 放回原本那筆
-        qc.setQueryData<Block[]>(key, (list = []) => {
+      if (ctx && ref) {
+        const before = ctx.prev?.find((x) => x.type === v.type && x.ref === ref) // 本來就封鎖過 → 放回原本那筆
+        qc.setQueryData<Block[]>(ctx.key, (list = []) => {
           const rest = list.filter((x) => !(x.type === v.type && x.ref === ref))
           return before ? [before, ...rest] : rest
         })
       }
       toast(errMsg(e))
+    },
+    onSettled: (_d, _e, _v, ctx) => {
+      if (ctx) reconcileWhenIdle(qc, ctx.key)
     },
   })
 
@@ -209,23 +212,27 @@ export function useBlockActions() {
     mutationKey: UNBLOCK_MUTATION_KEY,
     mutationFn: (b: Pick<Block, 'type' | 'ref'>) => moderationApi.unblock(b.type, b.ref),
     onMutate: async (b): Promise<Ctx> => {
+      const key = blocksKey(currentAccountId() ?? '')
       await qc.cancelQueries({ queryKey: key })
       const prev = qc.getQueryData<Block[]>(key)
       qc.setQueryData<Block[]>(key, (list = []) =>
         list.filter((x) => !(x.type === b.type && x.ref === b.ref))
       )
-      return { prev }
+      return { key, prev }
     },
     onSuccess: () => toast(i18n.t('useBlocks.unblocked'), 'info'),
     onError: (e: unknown, b, ctx) => {
-      // 只放回這一筆(理由同封鎖的回滾,也不重抓)
+      // 只放回這一筆(理由同封鎖的回滾)
       const removed = ctx?.prev?.find((x) => x.type === b.type && x.ref === b.ref)
-      if (removed)
-        qc.setQueryData<Block[]>(key, (list = []) => [
+      if (ctx && removed)
+        qc.setQueryData<Block[]>(ctx.key, (list = []) => [
           removed,
           ...list.filter((x) => !(x.type === b.type && x.ref === b.ref)),
         ])
       toast(errMsg(e))
+    },
+    onSettled: (_d, _e, _b, ctx) => {
+      if (ctx) reconcileWhenIdle(qc, ctx.key)
     },
   })
 
