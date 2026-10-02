@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient, useIsMutating } from '@tanstack/react-query'
 import { moderationApi, playerApi, sessionApi, type Block } from '../api/client'
 import { isLoggedIn, getAccount } from '../lib/playerAuth'
@@ -15,6 +15,31 @@ export function playerBlockRef(p: { player_id: string; account_ref?: string }): 
   return p.account_ref || `s:${p.player_id}`
 }
 
+// 上次成功的封鎖名單也存一份在裝置上:重開 App 時名單 API 剛好失敗,
+// 不能退成空名單讓已封鎖的人又冒出來 → 先用裝置上的那份,背景持續重試。
+// key 用 badminton_ 前綴:刪帳號的 clearAccountData 會一起清掉
+function storedBlocksKey(): string | null {
+  const id = getAccount()?.player_id
+  return id ? `badminton_blocks_${id}` : null
+}
+function readStoredBlocks(): Block[] | undefined {
+  try {
+    const k = storedBlocksKey()
+    const raw = k ? localStorage.getItem(k) : null
+    return raw ? (JSON.parse(raw) as Block[]) : undefined
+  } catch {
+    return undefined
+  }
+}
+function writeStoredBlocks(list: Block[]) {
+  try {
+    const k = storedBlocksKey()
+    if (k) localStorage.setItem(k, JSON.stringify(list))
+  } catch {
+    /* 隱私模式 / 空間滿:只是少了離線備份 */
+  }
+}
+
 export function useBlockList() {
   const loggedIn = isLoggedIn()
   const q = useQuery({
@@ -22,9 +47,14 @@ export function useBlockList() {
     queryFn: () => moderationApi.blocks().then((r) => r.data.data ?? []),
     enabled: loggedIn,
     staleTime: 5 * 60_000, // 只有自己會改(改的時候直接寫快取),不用常常重抓
-    retry: 1,
+    retry: 3,
+    refetchInterval: (query) => (query.state.status === 'error' ? 30_000 : false), // 抓不到就一直重試,別停在沒名單
   })
-  return { blocks: loggedIn ? (q.data ?? []) : [], isLoading: loggedIn && q.isLoading }
+  useEffect(() => {
+    if (q.data) writeStoredBlocks(q.data)
+  }, [q.data])
+  const blocks = loggedIn ? (q.data ?? readStoredBlocks() ?? []) : []
+  return { blocks, isLoading: loggedIn && q.isLoading }
 }
 
 // 判斷某個球友 / 團主是否已封鎖。比對規則照契約:account_ref 在名單內,或 "s:"+player_id 在名單內
@@ -137,14 +167,16 @@ export function useBlockActions() {
       toast(i18n.t(v.type === 'org' ? 'useBlocks.blockedOrgToast' : 'useBlocks.blocked'), 'success')
     },
     onError: (e: unknown, v, ctx) => {
-      if (ctx?.prev) qc.setQueryData(BLOCKS_KEY, ctx.prev)
-      else {
-        // 沒有舊名單可回滾:只拿掉剛剛樂觀加的那筆,再補抓
-        qc.setQueryData<Block[]>(BLOCKS_KEY, (list = []) =>
-          list.filter((x) => !(x.type === v.type && x.ref === ctx?.optimisticRef))
-        )
-        qc.invalidateQueries({ queryKey: BLOCKS_KEY })
+      // 只回滾這一筆(不整份換回 prev:同時送出的另一筆封鎖可能已經成功,不能被一起抹掉),再補抓對帳
+      const ref = ctx?.optimisticRef
+      if (ref) {
+        const before = ctx?.prev?.find((x) => x.type === v.type && x.ref === ref) // 本來就封鎖過 → 放回原本那筆
+        qc.setQueryData<Block[]>(BLOCKS_KEY, (list = []) => {
+          const rest = list.filter((x) => !(x.type === v.type && x.ref === ref))
+          return before ? [before, ...rest] : rest
+        })
       }
+      qc.invalidateQueries({ queryKey: BLOCKS_KEY })
       toast(errMsg(e))
     },
   })
@@ -160,8 +192,15 @@ export function useBlockActions() {
       return { prev }
     },
     onSuccess: () => toast(i18n.t('useBlocks.unblocked'), 'info'),
-    onError: (e: unknown, _b, ctx) => {
-      if (ctx?.prev) qc.setQueryData(BLOCKS_KEY, ctx.prev)
+    onError: (e: unknown, b, ctx) => {
+      // 只放回這一筆(理由同封鎖的回滾),再補抓對帳
+      const removed = ctx?.prev?.find((x) => x.type === b.type && x.ref === b.ref)
+      if (removed)
+        qc.setQueryData<Block[]>(BLOCKS_KEY, (list = []) => [
+          removed,
+          ...list.filter((x) => !(x.type === b.type && x.ref === b.ref)),
+        ])
+      qc.invalidateQueries({ queryKey: BLOCKS_KEY })
       toast(errMsg(e))
     },
   })
