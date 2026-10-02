@@ -12,7 +12,7 @@
     "retained": [
       "In sessions where you were approved, your name (and those of family members you brought) stays in that group's roster and game logs (level, games played, minutes, paid flag) as the group leader's session records. After deletion they're no longer linked to your account, and the avatar and signup message are removed",
       "Group leaders' action logs (which may mention the name you used in a session) are deleted automatically after 90 days",
-      "Feedback you sent is kept for the developer but anonymized: your name, email and account ID are removed"
+      "Feedback and reports you sent are kept for the developer but anonymized: your name, email and account ID are removed. Your block list is deleted with your account"
     ],
     "leaderNote": "Group leader (host console) accounts aren't deleted here: request deletion through the in-app \"💬 Feedback\" or by emailing rr900306@gmail.com."
   }
