@@ -1,5 +1,12 @@
 # 更新日誌(玩家端 booking)
 
+## 2026-10-03 — API 請求帶來源平台(X-Client)
+
+- `lib/clientSource.ts`:判斷這次是從哪個平台開的 —— `ios-app/<版本>(<build>)`(iOS app 注入的 `window.BadmintonNative`)、`android-app`(TWA:啟動網址 `?source=twa` 或 referrer `android-app://fyi.badmintontw.app`,記在 sessionStorage,因為 TWA 跟手機 Chrome 共用 localStorage)、`pwa`(standalone)、`web`
+- `main.tsx` 靜態匯入:TWA 的參數 / referrer 只在第一次載入看得到
+- axios 攔截器每個請求帶 `X-Client`;頭像直傳 S3 走 fetch,刻意不帶(S3 CORS 不認)
+- ⚠️ 部署順序:後端要先上(CORS 允許 `X-Client`),不然瀏覽器 preflight 會擋掉所有 API
+
 ## 2026-10-01 — iOS App(原生外殼)支援:Apple 登入、APNs 推播、系統登入視窗
 
 iOS App 在 `../ios-app`:原生外殼載入正式站(跟 Android TWA 同一個思路),網頁照常部署。這次是網頁這邊的配合:

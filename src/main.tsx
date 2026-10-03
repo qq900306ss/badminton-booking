@@ -7,6 +7,8 @@ import { CURRENT_BUILD } from './lib/appUpdate'
 // 靜態匯入:一啟動就接住 beforeinstallprompt(它比任何 lazy 頁面都早發,
 // 停在登入頁時就會來;只靠頁面間接匯入會漏接)
 import './lib/installPrompt'
+// 同理:TWA 的 ?source=twa / referrer 只在第一次載入看得到,一啟動就判斷來源平台
+import './lib/clientSource'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

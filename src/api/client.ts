@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { CLIENT_SOURCE } from '../lib/clientSource'
 import { logout, clearAccountData, markBannedNotice } from '../lib/playerAuth'
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080'
@@ -9,6 +10,9 @@ export const api = axios.create({ baseURL: BASE })
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('player_token')
   if (token) config.headers['Authorization'] = `Bearer ${token}`
+  // 來源平台(iOS app / Android app / PWA / 網頁),後端記在帳號、回饋與檢舉上。
+  // 只加在打自家 API 的這個 axios 實例:頭像直傳 S3 用的是 fetch,不能帶(S3 的 CORS 不認這個標頭)
+  config.headers['X-Client'] = CLIENT_SOURCE
   return config
 })
 
