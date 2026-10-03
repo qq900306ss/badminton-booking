@@ -1,5 +1,12 @@
 # 更新日誌(玩家端 booking)
 
+## 2026-10-03 — 省流量:WS v2 精簡快照
+
+- `lib/realtime.ts` 連 `…/ws?v=2`:後端對 v2 連線推的球場畫面,場上 / 排隊的人只帶 `player_id`(22 人的團 7.2KB → 2.4KB,再加上 WS 壓縮)
+- `lib/slimView.ts` `hydrateView`:用球員名單把格子補回跟 REST 一樣的 PlayerSlot,畫面元件不用改;名單缺人 → 回 null,CourtPage 改成重抓完整資料
+- 收到完整格式(舊後端 / v1)也照樣補,所以前後端誰先上都不會壞;團主後台維持 v1
+- 用正式站真實快照驗證過:精簡 → 補回結果與原本完全相同
+
 ## 2026-10-03 — API 請求帶來源平台(X-Client)
 
 - `lib/clientSource.ts`:判斷這次是從哪個平台開的 —— `ios-app/<版本>(<build>)`(iOS app 注入的 `window.BadmintonNative`)、`android-app`(TWA:啟動網址 `?source=twa` 或 referrer `android-app://fyi.badmintontw.app`,記在 sessionStorage,因為 TWA 跟手機 Chrome 共用 localStorage)、`pwa`(standalone)、`web`

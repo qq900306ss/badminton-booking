@@ -30,7 +30,9 @@ export function connectSessionWS(
   function open() {
     if (closed) return
     try {
-      ws = new WebSocket(`${base}/api/sessions/${sessionId}/ws`)
+      // v=2:精簡快照(球場上的人只帶 player_id,前台用名單補回,見 lib/slimView.ts);
+      // 後端還沒支援時會忽略這個參數照送完整格式,前台一樣吃得下
+      ws = new WebSocket(`${base}/api/sessions/${sessionId}/ws?v=2`)
     } catch {
       schedule()
       return

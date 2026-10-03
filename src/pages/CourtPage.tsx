@@ -16,6 +16,8 @@ import { connectSessionWS } from '../lib/realtime'
 import { pushNotif } from '../lib/notifications'
 import { isPhotoUrl, DEFAULT_ORG_AVATAR } from '../lib/avatar'
 import { sessionApi } from '../api/client'
+import type { SessionPlayer } from '../api/client'
+import { hydrateView } from '../lib/slimView'
 import { isLoggedIn } from '../lib/playerAuth'
 import { useBlocked, useMyAccountRef, useSessionOrgId, type BlockTarget } from '../hooks/useBlocks'
 import { ModerationSheet } from '../components/ModerationSheet'
@@ -113,8 +115,16 @@ export function CourtPage() {
             const at = m.at ?? Date.now()
             if (at >= lastApplied.current) {
               lastApplied.current = at
-              qc.setQueryData(['session', sid], m.view)
               if (m.players) qc.setQueryData(['session-players', sid], m.players)
+              // v2 精簡快照:用名單把場上 / 排隊的人補完整;補不齊(名單還沒同步到新來的人)→ 重抓完整資料
+              const players = m.players ?? qc.getQueryData<SessionPlayer[]>(['session-players', sid])
+              const view = hydrateView(m.view, players)
+              if (view) {
+                qc.setQueryData(['session', sid], view)
+              } else {
+                qc.invalidateQueries({ queryKey: ['session', sid] })
+                qc.invalidateQueries({ queryKey: ['session-players', sid] })
+              }
             }
           } else {
             const scope = m.scope ?? 'all'
