@@ -125,6 +125,11 @@ export function CourtPage() {
                 qc.invalidateQueries({ queryKey: ['session', sid] })
                 qc.invalidateQueries({ queryKey: ['session-players', sid] })
               }
+            } else if (m.players) {
+              // 晚到的舊推播帶著名單(改名 / 改程度…):比它新的球場推播可能已經用舊名單補過畫面,
+              // 這則又因為比較舊被丟掉 → 名字會停在舊的。很少發生,直接重抓兩份對帳最穩
+              qc.invalidateQueries({ queryKey: ['session', sid] })
+              qc.invalidateQueries({ queryKey: ['session-players', sid] })
             }
           } else {
             const scope = m.scope ?? 'all'
