@@ -7,13 +7,17 @@ import { useInstallPrompt, promptInstall, isStandalone } from '../lib/installPro
 // 公開的「安裝頁」:宣傳時貼這一頁的網址,不用登入就能看。
 // 每個平台能做的事不一樣,這頁的工作就是把人導到「那個平台上真的能裝」的路:
 //   Android Chrome → 一鍵原生安裝框
-//   iPhone / iPad  → 沒有安裝 API,只能圖解 Safari「分享 → 加入主畫面」
+//   iPhone / iPad  → App Store(連 LINE / FB 內建瀏覽器也是,App Store 連結在裡面點得開);
+//                    App 最低 iOS 16,更舊的才收合給 Safari「分享 → 加入主畫面」圖解
 //   LINE 內建瀏覽器 → 帶 openExternalBrowser=1 重開,LINE 會改用系統瀏覽器
 //   FB / IG / Threads → 說明 + 複製網址(Android 另給 Chrome intent 直開)
 //   桌機            → QR code 給手機掃
 const HOST_URL =
   (import.meta.env.VITE_HOST_APP_URL as string | undefined) ||
   'https://host.badminton-tw.fyi'
+
+// 不寫國家,App Store 會換成使用者那一區(目前上架台灣、日本)
+const APP_STORE_URL = 'https://apps.apple.com/app/id6818015879'
 
 type Platform = 'installed' | 'oldapp' | 'line' | 'inapp' | 'ios' | 'android' | 'desktop'
 
@@ -35,12 +39,13 @@ function isOpenedFromOldApp(): boolean {
 // 只看 UA;「已安裝」由 useInstallPrompt 決定(standalone 或本分頁剛裝完)
 function detectPlatform(): Exclude<Platform, 'installed' | 'oldapp'> {
   const ua = navigator.userAgent || ''
-  if (isLineInApp()) return 'line'
-  if (isInAppBrowser()) return 'inapp'
   // iPadOS 13+ 的 Safari 會偽裝成 Mac,靠 touch points 認
   const isIos =
     /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  // iOS 走 App Store,不用先跳出 LINE / FB,所以排在內建瀏覽器判斷前面
   if (isIos) return 'ios'
+  if (isLineInApp()) return 'line'
+  if (isInAppBrowser()) return 'inapp'
   if (/android/i.test(ua)) return 'android'
   return 'desktop'
 }
@@ -130,7 +135,9 @@ export function InstallPage() {
           <p className="text-gray-500">{t('InstallPage.tagline')}</p>
           <div className="flex flex-wrap justify-center gap-2 text-xs font-bold">
             <span className="bg-brand-mint text-emerald-800 px-3 py-1 rounded-full">{t('InstallPage.chips.free')}</span>
-            <span className="bg-brand-yellow text-amber-800 px-3 py-1 rounded-full">{t('InstallPage.chips.noStore')}</span>
+            {detected !== 'ios' && (
+              <span className="bg-brand-yellow text-amber-800 px-3 py-1 rounded-full">{t('InstallPage.chips.noStore')}</span>
+            )}
             <span className="bg-brand-lavender text-violet-800 px-3 py-1 rounded-full">{t('InstallPage.chips.login')}</span>
           </div>
         </div>
@@ -153,7 +160,14 @@ export function InstallPage() {
                   {t('InstallPage.oldapp.chromeButton')}
                 </a>
               )}
-              {detected === 'ios' && <p className="text-xs text-gray-500">{t('InstallPage.oldapp.iosHint')}</p>}
+              {detected === 'ios' && (
+                <>
+                  <p className="text-xs text-gray-500">{t('InstallPage.oldapp.iosHint')}</p>
+                  <a href={APP_STORE_URL} className="btn-primary block text-center">
+                    {t('InstallPage.ios.appStoreButton')}
+                  </a>
+                </>
+              )}
             </>
           )}
 
@@ -193,35 +207,44 @@ export function InstallPage() {
             <>
               <p className="font-extrabold text-gray-800 text-lg">{t('InstallPage.ios.title')}</p>
               <p className="text-sm text-gray-500">{t('InstallPage.ios.body')}</p>
-              {!isIosSafari() && (
-                <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 space-y-2">
-                  <p className="text-xs font-bold text-amber-700">{t('InstallPage.ios.notSafari')}</p>
-                  <CopyRow url={shareUrl} copied={copied} onCopy={copy} />
-                </div>
-              )}
-              {/* 三格漫畫(astra 畫的吉祥物教學),文字步驟在下面補細節 */}
-              <div className="grid grid-cols-3 gap-2">
-                {[1, 2, 3].map((n) => (
-                  <div key={n} className="relative">
-                    <img
-                      src={`/install/ios-${n}.jpg`}
-                      alt=""
-                      width={640}
-                      height={640}
-                      loading="lazy"
-                      className="w-full rounded-2xl bg-brand-bg"
-                    />
-                    <span className="absolute -top-1.5 -left-1.5 w-6 h-6 rounded-full bg-brand-pink text-white text-xs font-extrabold flex items-center justify-center shadow">
-                      {n}
-                    </span>
+              <a href={APP_STORE_URL} className="btn-primary block text-center text-lg">
+                {t('InstallPage.ios.appStoreButton')}
+              </a>
+              {/* App 最低 iOS 16;更舊的手機 App Store 裝不了,留原本的「加入主畫面」當備援 */}
+              <details className="bg-gray-50 rounded-2xl p-3">
+                <summary className="text-sm font-bold text-gray-600 cursor-pointer">{t('InstallPage.ios.webTitle')}</summary>
+                <div className="space-y-4 mt-3">
+                  {!isIosSafari() && (
+                    <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 space-y-2">
+                      <p className="text-xs font-bold text-amber-700">{t('InstallPage.ios.notSafari')}</p>
+                      <CopyRow url={shareUrl} copied={copied} onCopy={copy} />
+                    </div>
+                  )}
+                  {/* 三格漫畫(astra 畫的吉祥物教學),文字步驟在下面補細節 */}
+                  <div className="grid grid-cols-3 gap-2">
+                    {[1, 2, 3].map((n) => (
+                      <div key={n} className="relative">
+                        <img
+                          src={`/install/ios-${n}.jpg`}
+                          alt=""
+                          width={640}
+                          height={640}
+                          loading="lazy"
+                          className="w-full rounded-2xl bg-brand-bg"
+                        />
+                        <span className="absolute -top-1.5 -left-1.5 w-6 h-6 rounded-full bg-brand-pink text-white text-xs font-extrabold flex items-center justify-center shadow">
+                          {n}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <ol className="space-y-3">
-                <Step n={1} icon={<span className="text-xl">🧭</span>} text={t('InstallPage.ios.step1')} />
-                <Step n={2} icon={<ShareIcon />} text={t('InstallPage.ios.step2')} />
-                <Step n={3} icon={<PlusBoxIcon />} text={t('InstallPage.ios.step3')} />
-              </ol>
+                  <ol className="space-y-3">
+                    <Step n={1} icon={<span className="text-xl">🧭</span>} text={t('InstallPage.ios.step1')} />
+                    <Step n={2} icon={<ShareIcon />} text={t('InstallPage.ios.step2')} />
+                    <Step n={3} icon={<PlusBoxIcon />} text={t('InstallPage.ios.step3')} />
+                  </ol>
+                </div>
+              </details>
             </>
           )}
 

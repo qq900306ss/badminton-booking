@@ -12,7 +12,7 @@
       "body": "This window was opened by the old-address app, and it can't install the new one. Open this address in your phone's browser to install:",
       "androidMenu": "👉 Tap ⋮ in the top-right of this window → \"Open in Chrome\". In real Chrome you'll get the install button.",
       "chromeButton": "Or try opening in Chrome directly",
-      "iosHint": "iPhone: copy the address → open Safari and paste → Share → Add to Home Screen. You can delete the old icon afterwards."
+      "iosHint": "iPhone: download the new app from the App Store. You can delete the old icon afterwards."
     },
     "installedTitle": "You're all set 🎉",
     "installedBody": "You opened this from the home-screen icon. Go find a group.",
@@ -30,7 +30,9 @@
     },
     "ios": {
       "title": "Install on iPhone / iPad",
-      "body": "iPhone has no install button — add it from Safari by hand. Takes 30 seconds:",
+      "body": "Free on the App Store. You'll get a push notification when it's your turn to play.",
+      "appStoreButton": "📲 Get it on the App Store",
+      "webTitle": "On iOS 15 or older and can't install from the App Store? Add it from Safari instead",
       "step1": "Open this page in Safari",
       "step2": "Tap the Share button at the bottom",
       "step3": "Scroll down, tap \"Add to Home Screen\" → \"Add\"",
