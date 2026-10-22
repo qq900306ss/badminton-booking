@@ -19,6 +19,13 @@ const HOST_URL =
 // 不寫國家,App Store 會換成使用者那一區(目前上架台灣、日本)
 const APP_STORE_URL = 'https://apps.apple.com/app/id6818015879'
 
+// Google Play 版目前在封閉測試:測試人員名單就是這個 Google 群組,加入群組 → 接受測試邀請 → 從 Play 安裝。
+// 正式上架後把 Android 分支改回直接連 PLAY_STORE_URL 即可。
+const PLAY_PACKAGE = 'fyi.badmintontw.app'
+const BETA_GROUP_URL = 'https://groups.google.com/g/badminton-tw-testers'
+const PLAY_OPTIN_URL = `https://play.google.com/apps/testing/${PLAY_PACKAGE}`
+const PLAY_STORE_URL = `https://play.google.com/store/apps/details?id=${PLAY_PACKAGE}`
+
 type Platform = 'installed' | 'oldapp' | 'line' | 'inapp' | 'ios' | 'android' | 'desktop'
 
 // 被「舊網址的 PWA」開著:網址帶 ?moved=1(MovedNotice 帶的),或 referrer 是已知舊 host **且**還是 standalone。
@@ -135,7 +142,7 @@ export function InstallPage() {
           <p className="text-gray-500">{t('InstallPage.tagline')}</p>
           <div className="flex flex-wrap justify-center gap-2 text-xs font-bold">
             <span className="bg-brand-mint text-emerald-800 px-3 py-1 rounded-full">{t('InstallPage.chips.free')}</span>
-            {detected !== 'ios' && (
+            {detected !== 'ios' && detected !== 'android' && (
               <span className="bg-brand-yellow text-amber-800 px-3 py-1 rounded-full">{t('InstallPage.chips.noStore')}</span>
             )}
             <span className="bg-brand-lavender text-violet-800 px-3 py-1 rounded-full">{t('InstallPage.chips.login')}</span>
@@ -250,27 +257,40 @@ export function InstallPage() {
 
           {platform === 'android' && (
             <>
-              <p className="font-extrabold text-gray-800 text-lg">{t('InstallPage.android.title')}</p>
-              <p className="text-sm text-gray-500">{t('InstallPage.android.body')}</p>
-              <img src="/install/android-1.jpg" alt="" width={640} height={640} className="w-44 mx-auto rounded-2xl" />
-              {hasPrompt ? (
-                <button onClick={onInstall} disabled={installing} className="btn-primary w-full text-lg disabled:opacity-60">
-                  {installing ? t('InstallPage.android.installing') : t('InstallPage.android.button')}
-                </button>
-              ) : (
-                // 沒有原生安裝框(還沒發、被關掉、或這是 App 裡/Custom Tab 的視窗 —— 那種視窗 Chrome 不給裝):
-                // 手動路直接給,不等;兩條:瀏覽器選單裝、或先「在 Chrome 中開啟」再裝
-                <div className="bg-gray-50 rounded-2xl p-3 space-y-2">
-                  <p className="text-sm font-bold text-gray-700">
-                    {promptWaited || dismissed ? t('InstallPage.android.fallbackTitle') : t('InstallPage.android.waiting')}
-                  </p>
-                  <p className="text-sm text-gray-600">{t('InstallPage.android.method1')}</p>
-                  <p className="text-sm text-gray-600">{t('InstallPage.android.method2')}</p>
-                  <a href={androidChromeIntentUrl(movedInstallUrl)} className="btn-secondary block text-center text-sm">
-                    {t('InstallPage.android.openChrome')}
-                  </a>
+              <p className="font-extrabold text-gray-800 text-lg">{t('InstallPage.android.betaTitle')}</p>
+              <p className="text-sm text-gray-500">{t('InstallPage.android.betaBody')}</p>
+              <ol className="space-y-3">
+                <BetaStep n={1} text={t('InstallPage.android.betaStep1')} href={BETA_GROUP_URL} button={t('InstallPage.android.betaJoinGroup')} />
+                <BetaStep n={2} text={t('InstallPage.android.betaStep2')} href={PLAY_OPTIN_URL} button={t('InstallPage.android.betaOptIn')} />
+                <BetaStep n={3} text={t('InstallPage.android.betaStep3')} href={PLAY_STORE_URL} button={t('InstallPage.android.betaInstall')} primary />
+              </ol>
+              <p className="text-xs text-gray-400">{t('InstallPage.android.betaNote')}</p>
+              {/* 不想加入測試:原本的「裝到桌面」(PWA)留著當備援 */}
+              <details className="bg-gray-50 rounded-2xl p-3">
+                <summary className="text-sm font-bold text-gray-600 cursor-pointer">{t('InstallPage.android.webTitle')}</summary>
+                <div className="space-y-3 mt-3">
+                  <p className="text-sm text-gray-500">{t('InstallPage.android.body')}</p>
+                  <img src="/install/android-1.jpg" alt="" width={640} height={640} className="w-44 mx-auto rounded-2xl" />
+                  {hasPrompt ? (
+                    <button onClick={onInstall} disabled={installing} className="btn-primary w-full text-lg disabled:opacity-60">
+                      {installing ? t('InstallPage.android.installing') : t('InstallPage.android.button')}
+                    </button>
+                  ) : (
+                    // 沒有原生安裝框(還沒發、被關掉、或這是 App 裡/Custom Tab 的視窗 —— 那種視窗 Chrome 不給裝):
+                    // 手動路直接給,不等;兩條:瀏覽器選單裝、或先「在 Chrome 中開啟」再裝
+                    <div className="bg-gray-50 rounded-2xl p-3 space-y-2">
+                      <p className="text-sm font-bold text-gray-700">
+                        {promptWaited || dismissed ? t('InstallPage.android.fallbackTitle') : t('InstallPage.android.waiting')}
+                      </p>
+                      <p className="text-sm text-gray-600">{t('InstallPage.android.method1')}</p>
+                      <p className="text-sm text-gray-600">{t('InstallPage.android.method2')}</p>
+                      <a href={androidChromeIntentUrl(movedInstallUrl)} className="btn-secondary block text-center text-sm">
+                        {t('InstallPage.android.openChrome')}
+                      </a>
+                    </div>
+                  )}
                 </div>
-              )}
+              </details>
             </>
           )}
 
@@ -353,6 +373,22 @@ function CopyRow({ url, copied, onCopy }: { url: string; copied: boolean; onCopy
         {copied ? `✓ ${t('InstallPage.copied')}` : t('InstallPage.copyLink')}
       </button>
     </div>
+  )
+}
+
+function BetaStep({ n, text, href, button, primary = false }: { n: number; text: string; href: string; button: string; primary?: boolean }) {
+  return (
+    <li className="space-y-2">
+      <div className="flex items-center gap-3">
+        <span className="shrink-0 w-7 h-7 rounded-full bg-brand-pink text-white text-sm font-extrabold flex items-center justify-center">
+          {n}
+        </span>
+        <span className="text-sm text-gray-700">{text}</span>
+      </div>
+      <a href={href} target="_blank" rel="noopener noreferrer" className={`${primary ? 'btn-primary' : 'btn-secondary'} block text-center text-sm`}>
+        {button}
+      </a>
+    </li>
   )
 }
 

@@ -26,7 +26,17 @@
       "fallbackTitle": "インストール画面が出ない?次のどちらかで:",
       "method1": "① 右上の ⋮ メニュー →「アプリをインストール」または「ホーム画面に追加」",
       "method2": "② メニューに「Chrome で開く」しかない場合はアプリ内の画面です。それをタップして本物の Chrome に移ってから ①",
-      "openChrome": "🌐 このページを Chrome で開く"
+      "openChrome": "🌐 このページを Chrome で開く",
+      "betaTitle": "Google Play からインストール(先行テスト版)",
+      "betaBody": "Android 版は Google Play でクローズドテスト中です。3 ステップで Play ストアからインストールできます:",
+      "betaStep1": "スマホの Google アカウントでテストグループに参加",
+      "betaJoinGroup": "👥 テストグループに参加",
+      "betaStep2": "テスト招待を開き「テスターになる」をタップ",
+      "betaOptIn": "✅ テスト招待を受ける",
+      "betaStep3": "Play ストアでアプリをインストール",
+      "betaInstall": "📲 Google Play でインストール",
+      "betaNote": "グループ参加後、Play に反映されるまで数分かかることがあります。正式公開のため、14 日以上アプリを残しておいてください 🙏",
+      "webTitle": "テストに参加しない場合はウェブ版をホームに追加"
     },
     "ios": {
       "title": "iPhone / iPad にインストール",
