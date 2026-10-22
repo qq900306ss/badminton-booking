@@ -16,9 +16,12 @@ function fallbackColor(id: string) {
   return PALETTE[h % PALETTE.length]
 }
 
-function elapsedMins(startedAt?: string): number | null {
+// 算到現在,但過了團的結束時間就停在結束時間(跟後端計入的分鐘數一致)
+function elapsedMins(startedAt?: string, stopAt?: string): number | null {
   if (!startedAt) return null
-  const ms = Date.now() - new Date(startedAt).getTime()
+  const stop = stopAt ? new Date(stopAt).getTime() : NaN
+  const end = Number.isNaN(stop) ? Date.now() : Math.min(Date.now(), stop)
+  const ms = end - new Date(startedAt).getTime()
   if (ms < 0) return null
   return Math.floor(ms / 60000)
 }
@@ -123,6 +126,7 @@ function EmptySlot({ canJoin, onJoin, locked = false, onLockedTap }: { canJoin: 
 
 interface Props {
   court: CourtView
+  stopAt?: string // 團的結束時間:過了就不再往上算
   myPlayerId: string | null
   locked?: boolean
   inAnotherCourt?: boolean
@@ -138,7 +142,7 @@ interface Props {
   playerAction?: (slot: PlayerSlot) => (() => void) | undefined
 }
 
-export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying, onVoteEnd, votePending = false, isBlocked, playerAction }: Props) {
+export function CourtCard({ court, stopAt, myPlayerId, locked = false, inAnotherCourt = false, onJoinPlaying, onJoinQueue, onLeaveQueue, onLeavePlaying, onVoteEnd, votePending = false, isBlocked, playerAction }: Props) {
   const { t } = useTranslation()
   const toast = useToast()
   // playing is a fixed 4-slot array; empty slots have player_id === ''
@@ -156,7 +160,7 @@ export function CourtCard({ court, myPlayerId, locked = false, inAnotherCourt = 
   // 鎖定時空位/排隊改成「灰但可點 → 跳提示」(只對本來有機會加入的人)
   const showLockedAffordance = courtLocked && !imPlaying && !imQueued && !inAnotherCourt
   const notifyLocked = () => toast(t('CourtCard.lockedByHost'), 'error')
-  const mins = elapsedMins(court.started_at)
+  const mins = elapsedMins(court.started_at, stopAt)
 
   return (
     <div className={`card relative overflow-hidden ${courtLocked ? 'ring-2 ring-rose-200' : ''}`}>

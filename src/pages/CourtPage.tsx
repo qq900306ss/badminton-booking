@@ -374,6 +374,7 @@ export function CourtPage() {
           <CourtCard
             key={court.court_id}
             court={court}
+            stopAt={session.end_at}
             myPlayerId={actingId}
             locked={locked}
             inAnotherCourt={myCourtId !== null && myCourtId !== court.court_id}
