@@ -26,7 +26,17 @@
       "fallbackTitle": "No install dialog? Two ways:",
       "method1": "① Tap the ⋮ menu (top right) → \"Install app\" or \"Add to Home screen\"",
       "method2": "② If the menu only offers \"Open in Chrome\", you're inside an app window — tap that to jump to real Chrome, then do ①",
-      "openChrome": "🌐 Open this page in Chrome"
+      "openChrome": "🌐 Open this page in Chrome",
+      "betaTitle": "Install from Google Play (early access)",
+      "betaBody": "The Android app is in closed testing on Google Play. Three steps to install it from the Play Store:",
+      "betaStep1": "Join the tester group with the Google account on your phone",
+      "betaJoinGroup": "👥 Join tester group",
+      "betaStep2": "Open the testing invite and tap “Become a tester”",
+      "betaOptIn": "✅ Accept testing invite",
+      "betaStep3": "Install the app from the Play Store",
+      "betaInstall": "📲 Install on Google Play",
+      "betaNote": "It can take a few minutes after joining the group before Play recognises you. Please keep the app installed for at least 14 days to help us launch publicly 🙏",
+      "webTitle": "Rather not join the test? Install the web version instead"
     },
     "ios": {
       "title": "Install on iPhone / iPad",

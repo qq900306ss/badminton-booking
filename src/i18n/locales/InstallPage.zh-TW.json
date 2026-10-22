@@ -26,7 +26,17 @@
       "fallbackTitle": "沒跳出安裝視窗?兩個方法擇一:",
       "method1": "① 點右上角 ⋮ 選單 → 「安裝應用程式」或「加到主畫面」",
       "method2": "② 如果選單裡沒有安裝、只有「在 Chrome 中開啟」→ 代表你在 App 裡的視窗,先點它跳到真正的 Chrome,再做 ①",
-      "openChrome": "🌐 在 Chrome 開啟這一頁"
+      "openChrome": "🌐 在 Chrome 開啟這一頁",
+      "betaTitle": "在 Google Play 安裝(搶先測試版)",
+      "betaBody": "Android 版正在 Google Play 封閉測試,跟著三步就能從 Play 商店安裝:",
+      "betaStep1": "用你手機上的 Google 帳號加入測試群組",
+      "betaJoinGroup": "👥 加入測試群組",
+      "betaStep2": "開啟測試邀請,按「成為測試人員」",
+      "betaOptIn": "✅ 接受測試邀請",
+      "betaStep3": "到 Play 商店安裝「羽球揪團」",
+      "betaInstall": "📲 前往 Google Play 安裝",
+      "betaNote": "加入群組後要幾分鐘 Play 才會認得你;如果 Play 顯示找不到 App,稍等一下再試。測試期間請保留 App 至少 14 天,幫我們順利正式上架 🙏",
+      "webTitle": "不想加入測試?改裝網頁版到桌面"
     },
     "ios": {
       "title": "在 iPhone / iPad 安裝",
