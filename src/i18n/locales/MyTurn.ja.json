@@ -1,0 +1,22 @@
+{
+  "MyTurn": {
+    "playingAt": "{{court}} でプレー中",
+    "playedMins": "{{n}} 分経過",
+    "waitingFull": "4 人そろったら開始",
+    "voteEnd": "終了に投票 {{v}}/{{n}}",
+    "voted": "投票済み {{v}}/{{n}}",
+    "nextAt": "次はあなた・{{court}}",
+    "startsWhenFull": "コートに 4 人そろったら開始",
+    "anyMoment": "もうすぐ出番です",
+    "aboutMins": "あと約 {{n}} 分",
+    "see": "見る",
+    "queueOpensAt": "{{time}} に順番待ち開始",
+    "queueOpensHint": "時間になったら自分で入れます",
+    "allFull": "どのコートも満員です",
+    "allFullHint": "少し待つか主催者に聞いてみて",
+    "bestIs": "{{court}} が一番早い",
+    "freeNow": "空きあり、すぐ入れます",
+    "playHere": "入る",
+    "queueHere": "ここに並ぶ"
+  }
+}

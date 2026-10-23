@@ -65,6 +65,11 @@
     "inviteBuddies": "Invite buddies",
     "terms": "Terms of use",
     "reportOrBlock": "Report or block this group",
-    "saveFailed": "Couldn't save. Please try again"
+    "saveFailed": "Couldn't save. Please try again",
+    "hi": "Hi {{name}} 👋",
+    "groupLive": "Playing now",
+    "groupToday": "Later today",
+    "groupTomorrow": "Tomorrow",
+    "groupLater": "Coming up"
   }
 }

@@ -176,6 +176,16 @@ export function LobbyPage() {
     }
     return true
   })
+  // 依日期分組:進行中 / 今天 / 明天 / 之後(球友最常問的是「今天有哪團」)
+  const dayKey = (ms: number) => new Date(ms).toLocaleDateString('en-CA')
+  const todayKey = dayKey(now)
+  const tomorrowKey = dayKey(now + 86_400_000)
+  const groups = [
+    { key: 'live', emoji: '🏸', label: t('LobbyPage.groupLive'), items: filtered.filter((s) => !s.start_at || new Date(s.start_at).getTime() <= now) },
+    { key: 'today', emoji: '☀️', label: t('LobbyPage.groupToday'), items: filtered.filter((s) => s.start_at && new Date(s.start_at).getTime() > now && dayKey(new Date(s.start_at).getTime()) === todayKey) },
+    { key: 'tomorrow', emoji: '🌙', label: t('LobbyPage.groupTomorrow'), items: filtered.filter((s) => s.start_at && dayKey(new Date(s.start_at).getTime()) === tomorrowKey && new Date(s.start_at).getTime() > now) },
+    { key: 'later', emoji: '📅', label: t('LobbyPage.groupLater'), items: filtered.filter((s) => s.start_at && new Date(s.start_at).getTime() > now && ![todayKey, tomorrowKey].includes(dayKey(new Date(s.start_at).getTime()))) },
+  ].filter((g) => g.items.length > 0)
   const locActive = !!(cityFilter || districtFilter)
   const locLabel = locActive
     ? `${cityFilter || t('LobbyPage.allCities')}${districtFilter ? ` · ${districtFilter}` : ''}`
@@ -387,14 +397,12 @@ export function LobbyPage() {
       <AnimatePresence>{showIntro && <Intro onDone={dismissIntro} />}</AnimatePresence>
       {!showIntro && showOnboard && <OnboardingCards onClose={() => setShowOnboard(false)} />}
 
-      <header className="px-4 pt-8 pb-4 text-center">
-        <div className="text-5xl mb-2">🏸</div>
+      <header className="max-w-md mx-auto px-4 pt-5 pb-1">
+        <p className="text-sm font-semibold text-gray-400">{t('LobbyPage.hi', { name: myName || t('LobbyPage.defaultPlayer') })}</p>
         <h1 className="text-2xl font-extrabold text-gray-800">{t('LobbyPage.whichSession')}</h1>
-        <p className="text-gray-400 text-sm mt-1">{t('LobbyPage.subtitle')}</p>
       </header>
 
       <div className="max-w-md mx-auto p-4 space-y-3">
-        <InstallButton />
 
         {/* 📋 我的場次:已加入 / 報名審核情況,一眼看到、一鍵回場 */}
         {list.some((s) => s.my_status) && (
@@ -504,7 +512,14 @@ export function LobbyPage() {
           </div>
         )}
 
-        {filtered.map((s) => (
+        {groups.map((g) => (
+          <section key={g.key} className="space-y-3">
+            <h2 className="flex items-center gap-2 px-1 pt-2 text-sm font-extrabold text-gray-500">
+              <span>{g.emoji}</span>
+              {g.label}
+              <span className="text-xs font-bold text-gray-300">{g.items.length}</span>
+            </h2>
+            {g.items.map((s) => (
           <motion.div
             key={s.session_id}
             initial={{ opacity: 0, y: 12 }}
@@ -615,7 +630,14 @@ export function LobbyPage() {
               </button>
             </div>
           </motion.div>
+            ))}
+          </section>
         ))}
+
+        {/* 安裝到桌面:放在列表後面,不搶最上面的位置 */}
+        <div className="pt-2 pb-24">
+          <InstallButton />
+        </div>
       </div>
     </div>
   )

@@ -65,6 +65,11 @@
     "inviteBuddies": "揪球友",
     "terms": "使用條款",
     "reportOrBlock": "檢舉或封鎖這個團",
-    "saveFailed": "儲存失敗,請再試一次"
+    "saveFailed": "儲存失敗,請再試一次",
+    "hi": "嗨,{{name}} 👋",
+    "groupLive": "正在打",
+    "groupToday": "今天稍後",
+    "groupTomorrow": "明天",
+    "groupLater": "之後"
   }
 }
