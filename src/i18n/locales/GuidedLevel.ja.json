@@ -1,0 +1,10 @@
+{
+  "GuidedLevel": {
+    "step1": "だいたいどのくらい?",
+    "step2": "{{tier}}:一番近いのは?",
+    "backToTiers": "選び直す",
+    "preferNot": "レベルは公開しない",
+    "private": "非公開",
+    "change": "変更"
+  }
+}
