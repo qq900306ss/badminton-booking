@@ -157,15 +157,26 @@ const TONES = {
   gray: 'from-gray-100 to-gray-200 text-gray-600',
 }
 
+// 外框是一般區塊;「點了捲到那一場」是左邊文字區自己的按鈕,右邊的動作鈕(投票/上場)是另一顆 —— 不能按鈕包按鈕
 function Shell({ tone, children, onClick }: { tone: keyof typeof TONES; children: React.ReactNode; onClick?: () => void }) {
-  const Tag = onClick ? 'button' : 'div'
   return (
-    <Tag
-      onClick={onClick}
-      className={`w-full text-left rounded-3xl bg-gradient-to-br ${TONES[tone]} px-4 py-3 shadow-md flex items-center gap-3 ${onClick ? 'active:scale-[0.99] transition-transform' : ''}`}
-    >
-      {children}
-    </Tag>
+    <div className={`w-full rounded-3xl bg-gradient-to-br ${TONES[tone]} px-4 py-3 shadow-md flex items-center gap-3`}>
+      {onClick ? <JumpArea onClick={onClick}>{children}</JumpArea> : children}
+    </div>
+  )
+}
+
+// 把 Shell 的子元素分成「說明文字」與「動作鈕」:說明文字包進可點的區塊,動作鈕留在外面
+function JumpArea({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  const items = Array.isArray(children) ? children : [children]
+  const [line, ...actions] = items
+  return (
+    <>
+      <button onClick={onClick} className="min-w-0 flex-1 flex items-center gap-3 text-left active:opacity-80">
+        {line}
+      </button>
+      {actions}
+    </>
   )
 }
 
