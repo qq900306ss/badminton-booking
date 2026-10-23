@@ -47,6 +47,7 @@
       "The \"Host\" button now shows the host-console URL to copy and save, plus how to install it as an app (iPhone: Safari → Add to Home Screen)"
     ],
     "2026/10/23": [
+      "No more picking your level every time: it's remembered after the first time. The first pick is guided — choose roughly where you are, then the description that fits. You can also choose not to show it",
       "New “My status” card at the top of the court page: playing, queued or not yet — and if you’re not queued it tells you which court is fastest, with a one-tap Play / Queue",
       "The court you’re on now shows first",
       "The lobby is grouped into Playing now / Later today / Tomorrow / Coming up",

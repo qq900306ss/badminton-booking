@@ -1,0 +1,10 @@
+{
+  "GuidedLevel": {
+    "step1": "Which sounds most like you?",
+    "step2": "{{tier}} — which one fits best?",
+    "backToTiers": "Back",
+    "preferNot": "I'd rather not say",
+    "private": "Not shown",
+    "change": "Change"
+  }
+}

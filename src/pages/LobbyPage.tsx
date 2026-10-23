@@ -12,7 +12,7 @@ import { HelpButton } from '../components/HelpButton'
 import { forceUpdate } from '../lib/appUpdate'
 import { TW_CITIES } from '../lib/twCities'
 import { InstallButton } from '../components/InstallButton'
-import { LevelPicker } from '../components/LevelPicker'
+import { GuidedLevelPicker } from '../components/GuidedLevelPicker'
 import { ListSkeleton } from '../components/Skeleton'
 import { isPhotoUrl, AVATAR_EMOJIS, DEFAULT_ORG_AVATAR } from '../lib/avatar'
 import { OnboardingCards, ONBOARD_KEY } from '../components/OnboardingCards'
@@ -295,7 +295,7 @@ export function LobbyPage() {
             </div>
             <div>
               <span className="text-sm font-bold text-gray-600">{t('LobbyPage.defaultLevel')}</span>
-              <LevelPicker value={levelInput} onChange={setLevelInput} />
+              <GuidedLevelPicker value={levelInput} onChange={setLevelInput} />
             </div>
             <div>
               <span className="text-sm font-bold text-gray-600">{t('LobbyPage.avatar')}</span>

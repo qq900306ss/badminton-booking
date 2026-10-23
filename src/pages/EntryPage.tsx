@@ -3,9 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { sessionApi } from '../api/client'
-import { LevelPicker } from '../components/LevelPicker'
+import { GuidedLevelPicker } from '../components/GuidedLevelPicker'
+import { levelSummary } from '../lib/levelChoice'
 import { requestNotify } from '../lib/alert'
-import { isLoggedIn, getAccount } from '../lib/playerAuth'
+import { isLoggedIn, getAccount, updateAccount } from '../lib/playerAuth'
 import { LoginScreen } from '../components/LoginScreen'
 import { useBlocked, useSessionOrgId, type BlockTarget } from '../hooks/useBlocks'
 import { ModerationSheet } from '../components/ModerationSheet'
@@ -29,6 +30,8 @@ export function EntryPage() {
     () => getAccount()?.join_name || getAccount()?.display_name || ''
   )
   const [level, setLevel] = useState(() => getAccount()?.default_level || 0)
+  // 帳號記過程度(含「不透露」)→ 加入時只顯示一行,不用再選;沒記過才展開引導選擇
+  const [editLevel, setEditLevel] = useState(() => !getAccount()?.default_level)
 
   // 報名(前台報名開啟的場次)
   const [signupMsg, setSignupMsg] = useState('')
@@ -135,6 +138,9 @@ export function EntryPage() {
     try {
       const res = await sessionApi.join(sessionId, password, n, level)
       const { player_id, display_name } = res.data.data
+      // 後端已把這次選的程度記回帳號 → 本機快取也同步,下次加入直接帶入
+      const acc = getAccount()
+      if (acc && level !== 0 && acc.default_level !== level) updateAccount({ ...acc, default_level: level })
       localStorage.setItem(idKey(sessionId), JSON.stringify({ player_id, display_name }))
       localStorage.setItem('player_id', player_id)
       localStorage.setItem('display_name', display_name)
@@ -402,7 +408,18 @@ export function EntryPage() {
             </div>
             <div>
               <span className="text-sm font-bold text-gray-600">{t('EntryPage.level')}</span>
-              <LevelPicker value={level} onChange={setLevel} />
+              {editLevel ? (
+                <div className="mt-1">
+                  <GuidedLevelPicker value={level} onChange={setLevel} />
+                </div>
+              ) : (
+                <div className="mt-1 flex items-center justify-between rounded-2xl bg-gray-50 px-4 py-3">
+                  <span className="font-extrabold text-gray-700">{levelSummary(level, t)}</span>
+                  <button onClick={() => setEditLevel(true)} className="text-sm font-bold text-brand-pink">
+                    {t('GuidedLevel.change')}
+                  </button>
+                </div>
+              )}
             </div>
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
             <button onClick={confirmJoin} disabled={loading || !name.trim()} className="btn-primary w-full">

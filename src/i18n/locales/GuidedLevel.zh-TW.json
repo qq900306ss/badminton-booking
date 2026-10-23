@@ -1,0 +1,10 @@
+{
+  "GuidedLevel": {
+    "step1": "你大概是哪一種?",
+    "step2": "{{tier}}:哪一句最像你?",
+    "backToTiers": "重選",
+    "preferNot": "我不想透露程度",
+    "private": "不透露",
+    "change": "改"
+  }
+}
