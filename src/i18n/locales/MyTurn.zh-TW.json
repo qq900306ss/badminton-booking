@@ -1,0 +1,22 @@
+{
+  "MyTurn": {
+    "playingAt": "你正在 {{court}} 打",
+    "playedMins": "已經打了 {{n}} 分鐘",
+    "waitingFull": "等人湊滿 4 位就開打",
+    "voteEnd": "投票結束 {{v}}/{{n}}",
+    "voted": "已投 {{v}}/{{n}}",
+    "nextAt": "下一組就是你・{{court}}",
+    "startsWhenFull": "場上湊滿 4 人就開打",
+    "anyMoment": "隨時會換你上場",
+    "aboutMins": "大約再 {{n}} 分鐘",
+    "see": "看場地",
+    "queueOpensAt": "{{time}} 開放排隊",
+    "queueOpensHint": "時間到就能自己上場、排隊",
+    "allFull": "每一場都排滿了",
+    "allFullHint": "等一下再來看看,或問問團主",
+    "bestIs": "{{court}} 最快輪到你",
+    "freeNow": "有空位,馬上就能上場",
+    "playHere": "上場",
+    "queueHere": "排這裡"
+  }
+}

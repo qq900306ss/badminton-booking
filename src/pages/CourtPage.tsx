@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSessionView, useCourtActions, useSessionPlayers } from '../hooks/useSession'
+import { MyTurnCard } from '../components/MyTurnCard'
 import { CourtCard } from '../components/CourtCard'
 import { FamilyBar } from '../components/FamilyBar'
 import { CourtSkeleton } from '../components/Skeleton'
@@ -309,6 +310,22 @@ export function CourtPage() {
         </div>
       </div>
 
+      {/* 我的狀態:在打 / 在排 / 還沒排 → 最快輪到哪一場(黏在頂端,隨時看得到) */}
+      <div className="sticky top-[3.5rem] z-[9] px-4 pt-3">
+        <MyTurnCard
+          courts={session.courts}
+          me={actingId}
+          stopAt={session.end_at}
+          queueLocked={locked}
+          queueOpensAt={openTimeStr}
+          busy={joinPlaying.isPending || joinQueue.isPending || voteEnd.isPending}
+          onJoinPlaying={(courtId, position) => joinPlaying.mutate({ courtId, position, asPlayer: asPlayerArg })}
+          onJoinQueue={(courtId) => joinQueue.mutate({ courtId, asPlayer: asPlayerArg })}
+          onVoteEnd={(courtId) => voteEnd.mutate({ courtId, asPlayer: asPlayerArg })}
+          onJump={(courtId) => document.getElementById(`court-${courtId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+        />
+      </div>
+
       {/* session title — 團主頭像 + 團名 */}
       {session.title && (
         <div className="flex items-center justify-center gap-2 pt-3">
@@ -351,14 +368,6 @@ export function CourtPage() {
         adding={addFamily.isPending}
       />
 
-      {/* queue-open gate banner */}
-      {locked && (
-        <div className="mx-4 mt-3 bg-brand-yellow/60 rounded-2xl px-4 py-3 text-center">
-          <p className="font-bold text-amber-700">⏰ {t('CourtPage.queueOpensAt', { time: openTimeStr })}</p>
-          <p className="text-xs text-amber-600 mt-0.5">{t('CourtPage.queueLockedHint')}</p>
-        </div>
-      )}
-
       {/* 公平讓分 / 顯示場數 面板 */}
       <FairPlayInfo
         view={session}
@@ -368,11 +377,13 @@ export function CourtPage() {
         playerAction={playerAction}
       />
 
-      {/* courts grid */}
+      {/* courts grid — 自己(或切換中的家人)所在的那一場排最前面 */}
       <div className="p-4 grid gap-4 sm:grid-cols-2">
-        {session.courts.map((court) => (
+        {[...session.courts]
+          .sort((a, b) => Number(b.court_id === myCourtId) - Number(a.court_id === myCourtId))
+          .map((court) => (
+          <div key={court.court_id} id={`court-${court.court_id}`} className="scroll-mt-40">
           <CourtCard
-            key={court.court_id}
             court={court}
             stopAt={session.end_at}
             myPlayerId={actingId}
@@ -387,6 +398,7 @@ export function CourtPage() {
             isBlocked={isPlayerBlocked}
             playerAction={playerAction}
           />
+          </div>
         ))}
       </div>
 

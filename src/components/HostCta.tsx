@@ -94,6 +94,8 @@ export function HostCta() {
   // 隱私權 / 刪帳號頁是給人讀條文的,漂浮開團鈕會蓋住內文也不合時宜
   const onPrivacy = useMatch('/privacy') !== null
   const onDeletion = useMatch('/account-deletion') !== null
+  // 球場頁:球友在場內不需要開團,浮動鈕還會蓋住場地卡和投票鈕
+  const onCourt = useMatch('/court/:sessionId') !== null
 
   // Show the bubble briefly on mount, then re-tease it every ~30s. Gentle enough
   // not to nag, present enough to keep the invite discoverable.
@@ -109,7 +111,7 @@ export function HostCta() {
     }
   }, [])
 
-  if (onInstallPage || onPrivacy || onDeletion) return null
+  if (onInstallPage || onPrivacy || onDeletion || onCourt) return null
 
   return (
     <>

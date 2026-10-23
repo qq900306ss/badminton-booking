@@ -65,6 +65,11 @@
     "inviteBuddies": "仲間を誘う",
     "terms": "利用規約",
     "reportOrBlock": "このグループを通報・ブロック",
-    "saveFailed": "保存に失敗しました。もう一度お試しください"
+    "saveFailed": "保存に失敗しました。もう一度お試しください",
+    "hi": "こんにちは、{{name}} さん 👋",
+    "groupLive": "開催中",
+    "groupToday": "今日このあと",
+    "groupTomorrow": "明日",
+    "groupLater": "これから"
   }
 }

@@ -1,0 +1,22 @@
+{
+  "MyTurn": {
+    "playingAt": "You're on {{court}}",
+    "playedMins": "Playing for {{n}} min",
+    "waitingFull": "Starts when 4 players are in",
+    "voteEnd": "Vote to end {{v}}/{{n}}",
+    "voted": "Voted {{v}}/{{n}}",
+    "nextAt": "You're next · {{court}}",
+    "startsWhenFull": "Starts once the court has 4",
+    "anyMoment": "You're up any moment",
+    "aboutMins": "About {{n}} min",
+    "see": "View",
+    "queueOpensAt": "Queue opens at {{time}}",
+    "queueOpensHint": "Then you can join and queue yourself",
+    "allFull": "Every court is full",
+    "allFullHint": "Check back soon or ask the host",
+    "bestIs": "{{court}} is your fastest",
+    "freeNow": "Open spot — play now",
+    "playHere": "Play",
+    "queueHere": "Queue here"
+  }
+}
