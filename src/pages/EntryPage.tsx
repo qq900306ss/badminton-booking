@@ -66,7 +66,7 @@ export function EntryPage() {
   useEffect(() => {
     if (!sessionId || orgBlocked) return
     const saved = localStorage.getItem(idKey(sessionId))
-    const accountID = getAccount()?.player_id
+    const account = getAccount()
     const adopt = (player_id: string, display_name: string) => {
       localStorage.setItem(idKey(sessionId), JSON.stringify({ player_id, display_name }))
       localStorage.setItem('player_id', player_id)
@@ -84,9 +84,16 @@ export function EntryPage() {
           }
           localStorage.removeItem(idKey(sessionId)) // 被移出 → 清掉,重新選
         }
-        // 報名核准後(或在別台裝置加入過):成員裡有我的帳號 → 直接進場
-        const mine = accountID
-          ? r.data.data.find((p) => p.player_id === accountID && !p.pending)
+        // 報名核准後(或在別台裝置加入過):成員裡有我 → 直接進場。
+        // 名單的 player_id 是這團專用的成員 id(不是帳號 id),用 account_ref 認自己(家人也帶我的 ref,要排除);
+        // 舊資料的 player_id 仍是帳號 id,一併相容。
+        const mine = account
+          ? r.data.data.find(
+              (p) =>
+                !p.pending &&
+                ((!!account.account_ref && p.account_ref === account.account_ref && !p.owner_id) ||
+                  p.player_id === account.player_id)
+            )
           : undefined
         if (mine) adopt(mine.player_id, mine.display_name)
       })
