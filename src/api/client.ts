@@ -75,10 +75,11 @@ export const playerApi = {
       default_level: defaultLevel,
       avatar_url: avatarUrl,
     }),
-  avatarUploadUrl: (contentType: string) =>
+  // size 會簽進上傳網址(後端限 3MB),實際檔案大小不同 S3 會拒絕
+  avatarUploadUrl: (contentType: string, size: number) =>
     api.post<{ data: { upload_url: string; public_url: string } }>(
       '/api/players/me/avatar-upload-url',
-      { content_type: contentType }
+      { content_type: contentType, size }
     ),
   sendFeedback: (message: string) => api.post('/api/feedback', { message }),
   // 刪除自己的帳號(Google Play 要求 App 內可刪帳號);成功回 204
