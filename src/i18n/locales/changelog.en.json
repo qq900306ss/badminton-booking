@@ -45,6 +45,16 @@
     "2026/08/10": [
       "New \"📢 Announcement\" in the session: messages from the host (e.g. dinner afterwards) show above the courts — collapsible, and re-opens when there's a new one",
       "The \"Host\" button now shows the host-console URL to copy and save, plus how to install it as an app (iPhone: Safari → Add to Home Screen)"
+    ],
+    "2026/10/23": [
+      "New “My status” card at the top of the court page: playing, queued or not yet — and if you’re not queued it tells you which court is fastest, with a one-tap Play / Queue",
+      "The court you’re on now shows first",
+      "The lobby is grouped into Playing now / Later today / Tomorrow / Coming up",
+      "Fixed avatar photo uploads; expired LINE / Google profile photos now refresh when you sign in",
+      "Faster lobby loading and improved security"
+    ],
+    "2026/10/22": [
+      "Minutes played now count from the session start time: warming up before the start and time after the end no longer count"
     ]
   }
 }
