@@ -59,6 +59,7 @@
         "title": "Retention and deletion",
         "items": [
           "Account data is kept until you delete your account",
+          "Each session’s roster (including signup messages and paid flags), courts and per-game records are deleted automatically 90 days after the session ends; after that only each player’s totals (sessions joined, games, minutes — no messages) are kept, and those are deleted with the account",
           "You can delete it yourself at any time in the app under \"Settings → Delete account\", or on the account deletion page below (login required)",
           "If you signed in with Apple, deleting your account also asks Apple to revoke this app's sign-in authorization"
         ]
