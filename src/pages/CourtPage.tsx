@@ -377,11 +377,11 @@ export function CourtPage() {
         playerAction={playerAction}
       />
 
-      {/* courts grid — 自己(或切換中的家人)所在的那一場排最前面 */}
+      {/* courts grid — 固定照場地順序,不把「我的那一場」搬到最前面:排隊/退出一按卡片就換位置,
+          手指下的按鈕會瞬間換成別場的「排隊等待」(換場時點到推薦場又被排回去)。
+          要找自己那一場用上面「我的狀態」卡的「看場地 ›」 */}
       <div className="p-4 grid gap-4 sm:grid-cols-2">
-        {[...session.courts]
-          .sort((a, b) => Number(b.court_id === myCourtId) - Number(a.court_id === myCourtId))
-          .map((court) => (
+        {session.courts.map((court) => (
           <div key={court.court_id} id={`court-${court.court_id}`} className="scroll-mt-40">
           <CourtCard
             court={court}
