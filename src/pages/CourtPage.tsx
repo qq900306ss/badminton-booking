@@ -406,7 +406,8 @@ export function CourtPage() {
       <div className="max-w-md mx-auto px-4 pb-2">
         <InstallButton label={t('CourtPage.installLabel')} />
       </div>
-      <p className="text-center text-xs text-gray-300 pb-6">{t('CourtPage.liveUpdateFooter')}</p>
+      {/* 底部留空:右下角的開團宣傳鈕是浮動的,最後一張場地卡要能捲到它上面,按鈕才不會被蓋住 */}
+      <p className="text-center text-xs text-gray-300 pb-32">{t('CourtPage.liveUpdateFooter')}</p>
     </div>
   )
 }
