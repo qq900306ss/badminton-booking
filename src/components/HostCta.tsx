@@ -158,8 +158,9 @@ export function HostCta() {
             bg-gradient-to-br from-pink-500 to-rose-500 text-white shadow-lg ring-4 ring-white
             active:scale-90 transition-transform"
         >
-          <span className="text-2xl leading-none drop-shadow-sm">🏸</span>
-          <span className="mt-0.5 text-[11px] font-extrabold [text-shadow:0_1px_2px_rgb(0_0_0_/_0.35)]">{t('HostCta.button')}</span>
+          <span className="text-lg leading-none drop-shadow-sm">🏸</span>
+          {/* 兩行短字(「你也是/團主?」),直接對團主喊話比「開團」更能吸到人 */}
+          <span className="mt-0.5 whitespace-pre-line text-center text-[11px] leading-[1.15] font-extrabold [text-shadow:0_1px_2px_rgb(0_0_0_/_0.35)]">{t('HostCta.button')}</span>
         </button>
       </motion.div>
 

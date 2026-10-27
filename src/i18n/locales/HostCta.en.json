@@ -1,10 +1,10 @@
 {
   "HostCta": {
-    "bubble": "Want to host your own games?",
-    "button": "Host",
+    "bubble": "Are you a host? Free courts, rotation & game counts",
+    "button": "Are you\na host?",
     "aria": "Go to the host console and start your own badminton group (free)",
     "dismiss": "Dismiss",
-    "sheetTitle": "Host your own games!",
+    "sheetTitle": "Are you a host?",
     "sheetDesc": "The host console is a separate site — completely free. Copy the URL first (send it to yourself) so you can find your way back next time!",
     "copyUrl": "Copy URL",
     "copied": "Copied",
